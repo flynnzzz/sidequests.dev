@@ -11,7 +11,11 @@
 #include <dirent.h>
 
 #define LUA_DIR_PATH "./lua"
-#define join_path(base, top) (strcat(path, "/"); strcat(path, top))
+#define join_path(base, top) \
+	{ \
+		strcat(path, "/"); \
+		strcat(path, top); \
+	}
 #define BUFFER_SIZE 256
 #define MAX_NAME_LEN 128
 #define MAX_FUNCTIONS_NUM 128
