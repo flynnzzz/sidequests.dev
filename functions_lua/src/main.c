@@ -3,11 +3,8 @@
  *
  * Load .lua files, store functions and run the main loop
  */
+#include "cmath.h"
 #include <dirent.h>
-#include <lua5.4/lauxlib.h>
-#include <lua5.4/lua.h>
-#include <lua5.4/lualib.h>
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -93,14 +90,6 @@ static void load_lua(lua_State *L, const char *lua_dir) {
     store_lua_fn(L, fn_name);
   }
   closedir(luadir);
-}
-
-/* TODO: move to dedicated module */
-static int c_pow(lua_State *L) {
-  const double base = luaL_checknumber(L, 1), exp = luaL_checknumber(L, 2);
-  lua_pushnumber(L, pow(base, exp));
-
-  return 1;
 }
 
 static void print_functions() {
