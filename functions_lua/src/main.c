@@ -5,6 +5,11 @@
  */
 #include "cmath.h"
 #include <dirent.h>
+#include <lua5.4/lauxlib.h>
+#include <lua5.4/lua.h>
+#include <lua5.4/lualib.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,6 +25,7 @@
 
 typedef struct lua_function {
   char name[MAX_NAME_LEN];
+  luaL_Reg reg;
   int ref, nparams;
 } lua_fn;
 
@@ -98,6 +104,29 @@ static void print_functions() {
            lua_funcs[i].nparams);
 }
 
+static void execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
+                           double args[]) {
+
+  lua_getglobal(L, fn_name);
+  if (!lua_isfunction(L, -1)) {
+    fprintf(stderr, "'f' is not a Lua function\n");
+    exit(1);
+  }
+
+  for (int i = 0; i < nargs; i++) {
+    lua_pushnumber(L, args[i]);
+  }
+
+  if (lua_pcall(L, nargs, 1, 0) != LUA_OK) {
+    fprintf(stderr, "Lua error: %s\n", lua_tostring(L, -1));
+    exit(1);
+  }
+
+  printf("%.3f\n", lua_tonumber(L, -1));
+
+  lua_pop(L, 1);
+}
+
 int main(void) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
@@ -105,7 +134,6 @@ int main(void) {
 
   /*
    * Register C functions
-   * TODO: refactor
    */
   lua_register(L, "c_pow", c_pow);
 
@@ -115,6 +143,15 @@ int main(void) {
   fprintf(stderr, "loading .lua files:\n");
   load_lua(L, LUA_DIR_PATH);
 
+  // TODO: replace with variable args
+  double argsf[] = {2, 2}, argsg[] = {2};
+
+  printf("testing 'f':\n");
+  execute_lua_fn(L, "f", 2, argsf);
+  printf("testing 'g':\n");
+  execute_lua_fn(L, "g", 1, argsg);
+
+  printf("WIP\n");
   int index;
   do {
     printf("Select function to execute:\n");
