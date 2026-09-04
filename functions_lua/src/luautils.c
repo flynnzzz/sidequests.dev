@@ -1,9 +1,13 @@
 
 /*
  * luautils.c
+ *
+ * TODO: handle unhandled errors
  */
 #include "luautils.h"
 #include <dirent.h>
+#include <lua5.4/lua.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define BUFFER_SIZE 256
@@ -52,7 +56,6 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   DIR *luadir = opendir(LUA_DIR_PATH);
   if (luadir == NULL) {
     perror(LUA_DIR_PATH);
-
     lua_close(L);
     exit(1);
   }
@@ -67,7 +70,11 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
     strcpy(path, lua_dir);
 
     join_path(path, d_entry->d_name);
-    luaL_dofile(L, path);
+    if (luaL_dofile(L, path) != LUA_OK) {
+      perror(lua_tostring(L, -1));
+      lua_pop(L, 1);
+      continue;
+    }
 
     const size_t name_len = strlen(d_entry->d_name);
     char fn_name[MAX_NAME_LEN];
@@ -97,8 +104,7 @@ float execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
   }
 
   if (lua_pcall(L, nargs, 1, 0) != LUA_OK) {
-    fprintf(stderr, "Lua error: %s\n", lua_tostring(L, -1));
-
+    perror(lua_tostring(L, -1));
     lua_close(L);
     exit(1);
   }

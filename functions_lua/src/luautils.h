@@ -4,6 +4,7 @@
  * Utils module to simplify loading Lua files.
  * By convention every Lua file should contain at least one single function
  * which shares names with the source file, this ensures that it will be loaded.
+ *  TODO: this restriction will be lifted shortly
  */
 #ifndef LUAUTILS_H
 #define LUAUTILS_H
