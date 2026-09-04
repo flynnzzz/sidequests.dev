@@ -29,9 +29,6 @@ typedef struct lua_function {
   int ref, nparams;
 } lua_fn;
 
-static lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
-static int funcs_size = 0;
-
 // Source - https://stackoverflow.com/a/744822
 // Posted by plinth, modified by community. See post 'Timeline' for change
 // history Retrieved 2026-08-27, License - CC BY-SA 2.5
@@ -54,7 +51,8 @@ static int lua_fn_nparams(lua_State *L, const char *fn_name) {
   return ar.nparams;
 }
 
-static void store_lua_fn(lua_State *L, const char *fn_name) {
+static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
+                         int *size) {
   lua_getglobal(L, fn_name);
   int ref = luaL_ref(L, LUA_REGISTRYINDEX);
   if (ref == -1) {
@@ -62,17 +60,24 @@ static void store_lua_fn(lua_State *L, const char *fn_name) {
     return;
   }
 
-  strcpy(lua_funcs[funcs_size].name, fn_name);
-  lua_funcs[funcs_size].ref = ref;
-  lua_funcs[funcs_size].nparams = lua_fn_nparams(L, fn_name);
+  strcpy(funcs[(*size)].name, fn_name);
+  funcs[(*size)].ref = ref;
+  funcs[(*size)].nparams = lua_fn_nparams(L, fn_name);
 
-  funcs_size++;
+  (*size)++;
 }
 
-static void load_lua(lua_State *L, const char *lua_dir) {
+/*
+ * Load and save functions from the specified directory
+ * to `lua_fn` array
+ */
+static void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[],
+                         int *size) {
   DIR *luadir = opendir(LUA_DIR_PATH);
   if (luadir == NULL) {
     perror(LUA_DIR_PATH);
+
+    lua_close(L);
     exit(1);
   }
 
@@ -94,23 +99,19 @@ static void load_lua(lua_State *L, const char *lua_dir) {
     strcpy(fn_name, d_entry->d_name);
     fn_name[filename_len - 4] = '\0';
 
-    store_lua_fn(L, fn_name);
+    store_lua_fn(L, fn_name, funcs, size);
   }
   closedir(luadir);
 }
 
-static void print_functions() {
-  for (int i = 0; i < funcs_size; i++)
-    printf("%d. %s id=%d nparams=%d\n", i, lua_funcs[i].name, lua_funcs[i].ref,
-           lua_funcs[i].nparams);
-}
-
-static void execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
-                           double args[]) {
+static float execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
+                            double args[]) {
 
   lua_getglobal(L, fn_name);
   if (!lua_isfunction(L, -1)) {
     fprintf(stderr, "'f' is not a Lua function\n");
+
+    lua_close(L);
     exit(1);
   }
 
@@ -120,61 +121,47 @@ static void execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
 
   if (lua_pcall(L, nargs, 1, 0) != LUA_OK) {
     fprintf(stderr, "Lua error: %s\n", lua_tostring(L, -1));
+
+    lua_close(L);
     exit(1);
   }
 
-  printf("%.3f\n", lua_tonumber(L, -1));
+  float result = lua_tonumber(L, -1);
+  lua_pop(L, 1);
 
+  return result;
+}
+
+static void update_cpath(lua_State *L) {
+  fprintf(stderr, "updating cpath...\n");
+
+  lua_getglobal(L, "package");
+  lua_getfield(L, -1, "cpath");
+  const char *current_cpath = lua_tostring(L, -1);
+
+  char new_cpath[512];
+  snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
+  fprintf(stderr, "\nnew cpath set: %s\n\n", new_cpath);
+  lua_pop(L, 1);
+
+  lua_pushstring(L, new_cpath);
+  lua_setfield(L, -2, "cpath");
   lua_pop(L, 1);
 }
 
 int main(void) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
+  update_cpath(L);
 
-  /*
-   * Set cpath
-   */
-  printf("updating cpath...\n");
-  lua_getglobal(L, "package");
-  lua_getfield(L, -1, "cpath");
-  const char *current_cpath = lua_tostring(L, -1);
-  char new_cpath[512];
-  snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
-  fprintf(stderr, "\nnew cpath set: %s\n\n", new_cpath);
-  lua_pop(L, 1);
-  lua_pushstring(L, new_cpath);
-  lua_setfield(L, -2, "cpath");
-  lua_pop(L, 1);
-
-  // TODO: setup atexit()
-
-  /*
-   * Load lua scripts
-   */
-  fprintf(stderr, "loading .lua files:\n");
-  load_lua(L, LUA_DIR_PATH);
+  lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+  int funcs_size = 0;
+  load_lua_fns(L, LUA_DIR_PATH, lua_funcs, &funcs_size);
 
   // TODO: replace with variable args
   double argsf[] = {2, 2}, argsg[] = {2};
-
-  printf("testing 'f':\n");
   execute_lua_fn(L, "f", 2, argsf);
-  printf("testing 'g':\n");
   execute_lua_fn(L, "g", 1, argsg);
-
-  printf("WIP\n");
-  int index;
-  do {
-    printf("Select function to execute:\n");
-    print_functions();
-    if (scanf("%d", &index) != 1)
-      exit(0);
-
-    // TODO: modify
-    putchar(index);
-
-  } while (1);
 
   lua_close(L);
   return EXIT_SUCCESS;
