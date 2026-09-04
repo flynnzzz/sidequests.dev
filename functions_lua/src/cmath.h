@@ -8,6 +8,4 @@
 
 int c_pow(lua_State *L);
 
-int luaopen_cmath(lua_State *L);
-
 #endif // !CMATH_H

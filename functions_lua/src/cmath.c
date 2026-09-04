@@ -6,3 +6,14 @@ int c_pow(lua_State *L) {
 
   return 1;
 }
+
+/*
+ * Register C functions
+ */
+
+static const luaL_Reg module[] = {{"pow", c_pow}, {NULL, NULL}};
+
+int luaopen_cmath(lua_State *L) {
+  luaL_newlib(L, module);
+  return 1;
+}

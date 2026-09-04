@@ -3,7 +3,6 @@
  *
  * Load .lua files, store functions and run the main loop
  */
-#include "cmath.h"
 #include <dirent.h>
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lua.h>
@@ -130,12 +129,22 @@ static void execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
 int main(void) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
-  // TODO: setup atexit()
 
   /*
-   * Register C functions
+   * Set cpath
    */
-  lua_register(L, "c_pow", c_pow);
+  printf("updating cpath...\n");
+  lua_getglobal(L, "package");
+  lua_getfield(L, -1, "cpath");
+  const char *current_cpath = lua_tostring(L, -1);
+  char new_cpath[512];
+  snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
+  lua_pop(L, 1);
+  lua_pushstring(L, new_cpath);
+  lua_setfield(L, -2, "cpath");
+  lua_pop(L, 1);
+
+  // TODO: setup atexit()
 
   /*
    * Load lua scripts
