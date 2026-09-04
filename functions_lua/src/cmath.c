@@ -1,3 +1,8 @@
+/*
+ * cmath.c
+ *
+ * Exposed C functions for Lua
+ */
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lua.h>
 #include <lua5.4/lualib.h>
@@ -13,7 +18,6 @@ static int c_pow(lua_State *L) {
 /*
  * Register C functions
  */
-
 static const luaL_Reg module[] = {{"pow", c_pow}, {NULL, NULL}};
 
 int luaopen_libcmath(lua_State *L) {
