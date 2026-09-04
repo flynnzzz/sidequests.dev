@@ -12,8 +12,7 @@ int main(void) {
   update_cpath(L);
 
   lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
-  int funcs_size = 0;
-  load_lua_fns(L, LUA_DIR_PATH, lua_funcs, &funcs_size);
+  load_lua_fns(L, LUA_DIR_PATH, lua_funcs);
 
   // TODO: replace with variable args
   double argsf[] = {2, 2}, argsg[] = {2};

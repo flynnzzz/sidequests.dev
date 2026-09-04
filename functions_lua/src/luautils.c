@@ -25,6 +25,20 @@ static int endswith(const char *str, const char *suffix) {
   return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
+static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
+                         int index) {
+  lua_getglobal(L, fn_name);
+  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+  if (ref == -1) {
+    fprintf(stderr, "function '%s' not found\n", fn_name);
+    return;
+  }
+
+  strcpy(funcs[(index)].name, fn_name);
+  funcs[(index)].ref = ref;
+  funcs[(index)].nparams = lua_fn_nparams(L, fn_name);
+}
+
 int lua_fn_nparams(lua_State *L, const char *fn_name) {
   lua_Debug ar;
 
@@ -34,24 +48,7 @@ int lua_fn_nparams(lua_State *L, const char *fn_name) {
   return ar.nparams;
 }
 
-static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
-                         int *size) {
-  lua_getglobal(L, fn_name);
-  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-  if (ref == -1) {
-    fprintf(stderr, "function '%s' not found\n", fn_name);
-    return;
-  }
-
-  strcpy(funcs[(*size)].name, fn_name);
-  funcs[(*size)].ref = ref;
-  funcs[(*size)].nparams = lua_fn_nparams(L, fn_name);
-
-  (*size)++;
-}
-
-void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[],
-                  int *size) {
+void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   DIR *luadir = opendir(LUA_DIR_PATH);
   if (luadir == NULL) {
     perror(LUA_DIR_PATH);
@@ -61,7 +58,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[],
   }
 
   struct dirent *d_entry;
-  while ((d_entry = readdir(luadir)) != NULL) {
+  for (int i = 0; (d_entry = readdir(luadir)) != NULL; i++) {
     if (!endswith(d_entry->d_name, ".lua") ||
         strcmp(d_entry->d_name, LUA_EXCLUDE_PATH) == 0)
       continue;
@@ -72,13 +69,14 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[],
     join_path(path, d_entry->d_name);
     luaL_dofile(L, path);
 
-    const size_t filename_len = strlen(d_entry->d_name);
-
+    const size_t name_len = strlen(d_entry->d_name);
     char fn_name[MAX_NAME_LEN];
     strcpy(fn_name, d_entry->d_name);
-    fn_name[filename_len - 4] = '\0';
 
-    store_lua_fn(L, fn_name, funcs, size);
+    /* truncate the .lua extension */
+    fn_name[name_len - 4] = '\0';
+
+    store_lua_fn(L, fn_name, funcs, i);
   }
   closedir(luadir);
 }

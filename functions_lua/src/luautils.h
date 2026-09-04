@@ -29,7 +29,7 @@ int lua_fn_nparams(lua_State *L, const char *fn_name);
  * Load and save functions from the specified directory
  * to `lua_fn` array
  */
-void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[], int *size);
+void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]);
 
 float execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
                      double args[]);
