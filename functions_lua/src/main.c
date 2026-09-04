@@ -13,6 +13,7 @@
 #include <string.h>
 
 #define LUA_DIR_PATH "./lua"
+#define LUA_EXCLUDE_PATH "cmath.lua"
 #define join_path(base, top)                                                   \
   {                                                                            \
     strcat(path, "/");                                                         \
@@ -77,7 +78,8 @@ static void load_lua(lua_State *L, const char *lua_dir) {
 
   struct dirent *d_entry;
   while ((d_entry = readdir(luadir)) != NULL) {
-    if (!endswith(d_entry->d_name, ".lua"))
+    if (!endswith(d_entry->d_name, ".lua") ||
+        strcmp(d_entry->d_name, LUA_EXCLUDE_PATH) == 0)
       continue;
 
     char path[BUFFER_SIZE];
@@ -139,7 +141,7 @@ int main(void) {
   const char *current_cpath = lua_tostring(L, -1);
   char new_cpath[512];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
-  fprintf(stderr, "new cpath: set %s\n", new_cpath);
+  fprintf(stderr, "\nnew cpath set: %s\n\n", new_cpath);
   lua_pop(L, 1);
   lua_pushstring(L, new_cpath);
   lua_setfield(L, -2, "cpath");
