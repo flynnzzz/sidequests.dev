@@ -1,10 +1,17 @@
-all: lib main
+CC = gcc
+CFLAGS = -Wall
+LDLIBS = -llua5.4 -ldl -lm
 
-lib: src/cmath.c 
-	gcc -fPIC -Wall src/cmath.c -shared -llua5.4 -ldl -lm -o bin/libcmath.so
+all: bin/libcmath.so bin/app
 
-main: src/main.c bin/libcmath.so
-	gcc -Wall src/main.c -Lbin -lcmath -llua5.4 -ldl -lm -o bin/app
+bin/libcmath.so: src/cmath.c 
+	$(CC) -fPIC -shared $(CFLAGS) $< $(LDLIBS) -o $@
+
+bin/app: src/main.c bin/libcmath.so
+	$(CC) $(CFLAGS) $< -Lbin -lcmath \
+		-Wl,-rpath,'$$ORIGIN' \
+		$(LDLIBS) -o $@
+# pass the relative path to the linker
 
 clean:
 	rm -f bin/libcmath.so bin/app

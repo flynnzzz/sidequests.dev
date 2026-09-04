@@ -139,6 +139,7 @@ int main(void) {
   const char *current_cpath = lua_tostring(L, -1);
   char new_cpath[512];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
+  fprintf(stderr, "new cpath: set %s\n", new_cpath);
   lua_pop(L, 1);
   lua_pushstring(L, new_cpath);
   lua_setfield(L, -2, "cpath");
