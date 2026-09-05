@@ -12,6 +12,7 @@
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lua.h>
 #include <lua5.4/lualib.h>
+#include <stdarg.h>
 
 #define LUA_DIR_PATH "./lua"
 #define LUA_EXCLUDE_PATH "cmath.lua"
@@ -28,12 +29,15 @@ int lua_fn_nparams(lua_State *L, const char *fn_name);
 
 /*
  * Load and save functions from the specified directory
- * to `lua_fn` array
+ * to `lua_fn` array.
  */
 void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]);
 
-float execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
-                     double args[]);
+/*
+ * NOTE: passing variadic parameters of type `int` generates undefined
+ * behaviour. It is recommended to pass double or float types.
+ */
+double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...);
 
 void update_cpath(lua_State *L);
 

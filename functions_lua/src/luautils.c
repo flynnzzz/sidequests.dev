@@ -6,10 +6,10 @@
  */
 #include "luautils.h"
 #include <dirent.h>
-#include <lua5.4/lua.h>
-#include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
 #define BUFFER_SIZE 256
 #define join_path(base, top)                                                   \
   {                                                                            \
@@ -88,28 +88,29 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   closedir(luadir);
 }
 
-float execute_lua_fn(lua_State *L, const char *fn_name, int nargs,
-                     double args[]) {
+double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
 
   lua_getglobal(L, fn_name);
   if (!lua_isfunction(L, -1)) {
     fprintf(stderr, "'f' is not a Lua function\n");
-
     lua_close(L);
     exit(1);
   }
 
-  for (int i = 0; i < nargs; i++) {
-    lua_pushnumber(L, args[i]);
+  va_list ap;
+  va_start(ap, nparams);
+  for (int i = 0; i < nparams; i++) {
+    lua_pushnumber(L, va_arg(ap, double));
   }
+  va_end(ap);
 
-  if (lua_pcall(L, nargs, 1, 0) != LUA_OK) {
+  if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
     perror(lua_tostring(L, -1));
     lua_close(L);
     exit(1);
   }
 
-  float result = lua_tonumber(L, -1);
+  const double result = lua_tonumber(L, -1);
   lua_pop(L, 1);
 
   return result;
