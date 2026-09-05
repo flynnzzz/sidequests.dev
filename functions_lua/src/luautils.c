@@ -2,6 +2,7 @@
 /*
  * luautils.c
  *
+ * Implementations of luautils.h.
  * TODO: handle unhandled errors
  */
 #include "luautils.h"
@@ -10,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_SIZE 256
+#define MAX_PATH_LEN 512
 #define join_path(base, top)                                                   \
   {                                                                            \
     strcat(path, "/");                                                         \
@@ -63,10 +64,10 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   struct dirent *d_entry;
   for (int i = 0; (d_entry = readdir(luadir)) != NULL; i++) {
     if (!endswith(d_entry->d_name, ".lua") ||
-        strcmp(d_entry->d_name, LUA_EXCLUDE_PATH) == 0)
+        strcmp(d_entry->d_name, LUA_EXCLUDEFILE) == 0)
       continue;
 
-    char path[BUFFER_SIZE];
+    char path[MAX_PATH_LEN];
     strcpy(path, lua_dir);
 
     join_path(path, d_entry->d_name);
@@ -92,7 +93,7 @@ double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
 
   lua_getglobal(L, fn_name);
   if (!lua_isfunction(L, -1)) {
-    fprintf(stderr, "'f' is not a Lua function\n");
+    fprintf(stderr, "%s is not a Lua function\n", fn_name);
     lua_close(L);
     exit(1);
   }
@@ -117,6 +118,7 @@ double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
 }
 
 void update_cpath(lua_State *L) {
+
   fprintf(stderr, "updating cpath...\n");
 
   lua_getglobal(L, "package");

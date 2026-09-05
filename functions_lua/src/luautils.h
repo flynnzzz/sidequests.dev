@@ -4,7 +4,6 @@
  * Utils module to simplify loading Lua files.
  * By convention every Lua file should contain at least one single function
  * which shares names with the source file, this ensures that it will be loaded.
- *  TODO: this restriction will be lifted shortly
  */
 #ifndef LUAUTILS_H
 #define LUAUTILS_H
@@ -15,13 +14,11 @@
 #include <stdarg.h>
 
 #define LUA_DIR_PATH "./lua"
-#define LUA_EXCLUDE_PATH "cmath.lua"
-
+#define LUA_EXCLUDEFILE "cmath.lua"
 #define MAX_NAME_LEN 128
 
 typedef struct lua_function {
   char name[MAX_NAME_LEN];
-  luaL_Reg reg;
   int ref, nparams;
 } lua_fn;
 
@@ -35,10 +32,13 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]);
 
 /*
  * NOTE: passing variadic parameters of type `int` generates undefined
- * behaviour. It is recommended to pass double or float types.
+ * behaviour. It is recommended to pass in double or float types.
  */
 double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...);
 
+/*
+ * Updates package.cpath to include the binaries folder of the current program.
+ */
 void update_cpath(lua_State *L);
 
 #endif // !LUAUTILS_H
