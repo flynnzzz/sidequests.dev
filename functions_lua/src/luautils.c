@@ -8,6 +8,7 @@
 #include "luautils.h"
 #include <dirent.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -62,7 +63,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   }
 
   struct dirent *d_entry;
-  for (int i = 0; (d_entry = readdir(luadir)) != NULL; i++) {
+  for (int i = 0; (d_entry = readdir(luadir)) != NULL;) {
     if (!endswith(d_entry->d_name, ".lua") ||
         strcmp(d_entry->d_name, LUA_EXCLUDEFILE) == 0)
       continue;
@@ -84,7 +85,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
     /* truncate the .lua extension */
     fn_name[name_len - 4] = '\0';
 
-    store_lua_fn(L, fn_name, funcs, i);
+    store_lua_fn(L, fn_name, funcs, i++);
   }
   closedir(luadir);
 }
@@ -118,16 +119,13 @@ double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
 }
 
 void update_cpath(lua_State *L) {
-
-  fprintf(stderr, "updating cpath...\n");
-
   lua_getglobal(L, "package");
   lua_getfield(L, -1, "cpath");
   const char *current_cpath = lua_tostring(L, -1);
 
   char new_cpath[512];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
-  fprintf(stderr, "new cpath set: %s\n", new_cpath);
+  fprintf(stderr, "new cpath set: \n'%s'\n", new_cpath);
   lua_pop(L, 1);
 
   lua_pushstring(L, new_cpath);
