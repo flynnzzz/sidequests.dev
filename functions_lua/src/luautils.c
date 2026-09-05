@@ -7,12 +7,15 @@
  */
 #include "luautils.h"
 #include <dirent.h>
+#include <lua5.4/lauxlib.h>
+#include <lua5.4/lua.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_PATH_LEN 512
+#define EXTENSION_NAME 4 // .lua
 #define join_path(base, top)                                                   \
   {                                                                            \
     strcat(path, "/");                                                         \
@@ -33,21 +36,23 @@ static int endswith(const char *str, const char *suffix) {
 
 static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
                          int index) {
+  // <-> function | ...
   lua_getglobal(L, fn_name);
-  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-  if (ref == -1) {
+  const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+  if (ref == LUA_REFNIL) {
     fprintf(stderr, "function '%s' not found\n", fn_name);
     return;
   }
 
   strcpy(funcs[(index)].name, fn_name);
-  funcs[(index)].ref = ref;
-  funcs[(index)].nparams = lua_fn_nparams(L, fn_name);
+  funcs[index].ref = ref;
+  funcs[index].nparams = lua_fn_nparams(L, fn_name);
 }
 
 int lua_fn_nparams(lua_State *L, const char *fn_name) {
   lua_Debug ar;
 
+  // <-> function | ...
   lua_getglobal(L, fn_name);
   lua_getinfo(L, ">u", &ar);
 
@@ -73,17 +78,16 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
 
     join_path(path, d_entry->d_name);
     if (luaL_dofile(L, path) != LUA_OK) {
-      perror(lua_tostring(L, -1));
+      fprintf(stderr, lua_tostring(L, -1));
       lua_pop(L, 1);
       continue;
     }
 
-    const size_t name_len = strlen(d_entry->d_name);
     char fn_name[MAX_NAME_LEN];
     strcpy(fn_name, d_entry->d_name);
 
     /* truncate the .lua extension */
-    fn_name[name_len - 4] = '\0';
+    fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
 
     store_lua_fn(L, fn_name, funcs, i++);
   }
@@ -92,11 +96,11 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
 
 double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
 
+  // -> function | ...
   lua_getglobal(L, fn_name);
   if (!lua_isfunction(L, -1)) {
     fprintf(stderr, "%s is not a Lua function\n", fn_name);
-    lua_close(L);
-    exit(1);
+    lua_pop(L, -1);
   }
 
   va_list ap;
@@ -104,31 +108,40 @@ double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...) {
   for (int i = 0; i < nparams; i++) {
     lua_pushnumber(L, va_arg(ap, double));
   }
+  // -> p1 | ... | -> pn | function | ...
+
   va_end(ap);
 
+  // <- [p1, ..., pn, function], -> result | ...
   if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
-    perror(lua_tostring(L, -1));
-    lua_close(L);
-    exit(1);
+    fprintf(stderr, lua_tostring(L, -1));
+    lua_pop(L, -1);
   }
 
   const double result = lua_tonumber(L, -1);
+
+  // <- result | ...
   lua_pop(L, 1);
 
   return result;
 }
 
 void update_cpath(lua_State *L) {
+
+  // -> cpath | -> package | ...
   lua_getglobal(L, "package");
   lua_getfield(L, -1, "cpath");
-  const char *current_cpath = lua_tostring(L, -1);
 
+  const char *current_cpath = lua_tostring(L, -1);
   char new_cpath[512];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
-  fprintf(stderr, "new cpath set: \n'%s'\n", new_cpath);
-  lua_pop(L, 1);
+  fprintf(stderr, "[INFO] new cpath set: \n'%s'\n", new_cpath);
 
+  // <- cpath, -> new_cpath | package | ...
+  lua_pop(L, 1);
   lua_pushstring(L, new_cpath);
+
+  // <- new_cpath | <- kpackage | ...
   lua_setfield(L, -2, "cpath");
   lua_pop(L, 1);
 }
