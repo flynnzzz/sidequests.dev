@@ -86,13 +86,8 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
     join_path(path, d_entry->d_name);
 
     // -> function | ...
-    if (luaL_dofile(L, path) != LUA_OK) {
-      fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
-      lua_pop(L, 1);
-      continue;
-    }
-
-    if (!lua_isfunction(L, -1)) {
+    if (luaL_loadfile(L, path) != LUA_OK || lua_pcall(L, 0, 1, 0) != LUA_OK ||
+        !lua_isfunction(L, -1)) {
       fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
       lua_pop(L, 1);
       continue;
@@ -104,6 +99,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
     /* truncate the .lua extension */
     fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
 
+    // <- function | ...
     store_lua_fn(L, fn_name, funcs, i++);
   }
   closedir(luadir);
