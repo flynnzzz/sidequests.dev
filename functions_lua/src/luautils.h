@@ -2,8 +2,6 @@
  * luautils.h
  *
  * Utils module to simplify loading Lua files.
- * By convention every Lua file should contain at least one single function
- * which shares names with the source file, this ensures that it will be loaded.
  */
 #ifndef LUAUTILS_H
 #define LUAUTILS_H
@@ -22,7 +20,7 @@ typedef struct lua_function {
   int ref, nparams;
 } lua_fn;
 
-int lua_fn_nparams(lua_State *L, const char *fn_name);
+int lua_fn_nparams(lua_State *L, int ref);
 
 /*
  * Load and save functions from the specified directory
@@ -34,7 +32,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]);
  * NOTE: passing variadic parameters of type `int` generates undefined
  * behaviour. It is recommended to pass in double or float types.
  */
-double execute_lua_fn(lua_State *L, const char *fn_name, int nparams, ...);
+double execute_lua_fn(lua_State *L, int ref, int nparams, ...);
 
 /*
  * Updates package.cpath to include the binaries folder of the current program.

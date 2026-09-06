@@ -1,4 +1,39 @@
 
+file: cmath.c
+full path: /home/flynn/dev/sidequests.dev/functions_lua/src/cmath.c
+
+/*
+ * cmath.c
+ *
+ * Exposed C functions for Lua
+ */
+#include <lua5.4/lauxlib.h>
+#include <lua5.4/lua.h>
+#include <lua5.4/lualib.h>
+#include <math.h>
+
+static int c_pow(lua_State *L) {
+  const double base = luaL_checknumber(L, 1), exp = luaL_checknumber(L, 2);
+  lua_pushnumber(L, pow(base, exp));
+
+  return 1;
+}
+
+/*
+ * Register C functions
+ */
+static const luaL_Reg module[] = {{"pow", c_pow}, {NULL, NULL}};
+
+int luaopen_libcmath(lua_State *L) {
+  luaL_newlib(L, module);
+  return 1;
+}
+
+
+file: luautils.c
+full path: /home/flynn/dev/sidequests.dev/functions_lua/src/luautils.c
+
+
 /*
  * luautils.c
  *
@@ -45,23 +80,14 @@ static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
 
   strcpy(funcs[(index)].name, fn_name);
   funcs[index].ref = ref;
-  funcs[index].nparams = lua_fn_nparams(L, ref);
+  funcs[index].nparams = lua_fn_nparams(L, fn_name);
 }
 
-int lua_fn_nparams(lua_State *L, int ref) {
+int lua_fn_nparams(lua_State *L, const char *fn_name) {
   lua_Debug ar;
 
-  // -> function | ...
-  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-  if (!lua_isfunction(L, -1)) {
-    fprintf(stderr,
-            "[ERROR] %d does not refer to a Lua function, unable to retreive "
-            "info\n",
-            ref);
-    lua_pop(L, 1);
-    return -1;
-  }
-  // <- function | ...
+  // <-> function | ...
+  lua_getglobal(L, fn_name);
   lua_getinfo(L, ">u", &ar);
 
   return ar.nparams;
@@ -126,6 +152,7 @@ double execute_lua_fn(lua_State *L, int ref, int nparams, ...) {
   va_start(ap, nparams);
   for (int i = 0; i < nparams; i++) {
     double arg = va_arg(ap, double);
+    printf("pushing: %f", arg);
     lua_pushnumber(L, arg);
   }
   // -> p1 | -> ... | -> pn | function | ...
@@ -165,3 +192,36 @@ void update_cpath(lua_State *L) {
   lua_setfield(L, -2, "cpath");
   lua_pop(L, 1);
 }
+
+
+file: main.c
+full path: /home/flynn/dev/sidequests.dev/functions_lua/src/main.c
+
+/*
+ * main.c
+ *
+ * Startup the Lua Virtual Machine.
+ */
+#include "luautils.h"
+#include <stdio.h>
+#define MAX_FUNCTIONS_NUM 128
+
+int main(void) {
+  lua_State *L = luaL_newstate();
+  luaL_openlibs(L);
+  update_cpath(L);
+
+  lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+  load_lua_fns(L, LUA_DIR_PATH, lua_funcs);
+
+  const double res1 = execute_lua_fn(L, lua_funcs[0].ref, lua_funcs[0].nparams,
+                                     2.0, 2.0),
+               res2 = execute_lua_fn(L, lua_funcs[1].ref, lua_funcs[1].nparams,
+                                     2.0);
+  printf("executing functions:\n - %s -> %.2f\n - %s -> %.2f\n",
+         lua_funcs[0].name, res1, lua_funcs[1].name, res2);
+
+  lua_close(L);
+  return 0;
+}
+

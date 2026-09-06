@@ -3,6 +3,8 @@
 --
 local cmath = require("lua.cmath")
 
-function g(a)
+local function g(a)
 	return cmath.pow(a, a)
 end
+
+return g
