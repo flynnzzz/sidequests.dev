@@ -14,11 +14,15 @@
 #define LUA_DIR_PATH "./lua"
 #define LUA_EXCLUDEFILE "cmath.lua"
 #define MAX_NAME_LEN 128
+#define MAX_FUNCTIONS_NUM 128
 
 typedef struct lua_function {
   char name[MAX_NAME_LEN];
   int ref, nparams;
 } lua_fn;
+
+extern lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+extern int nfuncs;
 
 int lua_fn_nparams(lua_State *L, int ref);
 
@@ -26,7 +30,7 @@ int lua_fn_nparams(lua_State *L, int ref);
  * Load and save functions from the specified directory
  * to `lua_fn` array.
  */
-void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]);
+void load_lua_fns(lua_State *L, const char *lua_dir);
 
 /*
  * NOTE: passing variadic parameters of type `int` generates undefined

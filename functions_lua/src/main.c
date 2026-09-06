@@ -5,15 +5,13 @@
  */
 #include "luautils.h"
 #include <stdio.h>
-#define MAX_FUNCTIONS_NUM 128
 
 int main(void) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
   update_cpath(L);
 
-  lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
-  load_lua_fns(L, LUA_DIR_PATH, lua_funcs);
+  load_lua_fns(L, LUA_DIR_PATH);
 
   const double res1 = execute_lua_fn(L, lua_funcs[0].ref, lua_funcs[0].nparams,
                                      2.0, 2.0),

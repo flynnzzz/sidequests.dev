@@ -14,12 +14,15 @@
 #include <string.h>
 
 #define MAX_PATH_LEN 512
-#define EXTENSION_NAME 4 // .lua
+#define EXTENSION_NAME 4 // '.lua'
 #define join_path(base, top)                                                   \
   {                                                                            \
     strcat(path, "/");                                                         \
     strcat(path, top);                                                         \
   }
+
+lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+int nfuncs = 0;
 
 // Source - https://stackoverflow.com/a/744822
 // Posted by plinth, modified by community. See post 'Timeline' for change
@@ -33,8 +36,7 @@ static int endswith(const char *str, const char *suffix) {
   return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
-static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
-                         int index) {
+static void store_lua_fn(lua_State *L, const char *fn_name) {
   // <- function | ...
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
@@ -43,9 +45,11 @@ static void store_lua_fn(lua_State *L, const char *fn_name, lua_fn funcs[],
     return;
   }
 
-  strcpy(funcs[(index)].name, fn_name);
-  funcs[index].ref = ref;
-  funcs[index].nparams = lua_fn_nparams(L, ref);
+  // !global: lua_funcs, nfuncs
+  strcpy(lua_funcs[nfuncs].name, fn_name);
+  lua_funcs[nfuncs].ref = ref;
+  lua_funcs[nfuncs].nparams = lua_fn_nparams(L, ref);
+  nfuncs++;
 }
 
 int lua_fn_nparams(lua_State *L, int ref) {
@@ -67,7 +71,7 @@ int lua_fn_nparams(lua_State *L, int ref) {
   return ar.nparams;
 }
 
-void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
+void load_lua_fns(lua_State *L, const char *lua_dir) {
   DIR *luadir = opendir(LUA_DIR_PATH);
   if (luadir == NULL) {
     fprintf(stderr, "[ERROR] could not open %s\n", LUA_DIR_PATH);
@@ -76,7 +80,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
   }
 
   struct dirent *d_entry;
-  for (int i = 0; (d_entry = readdir(luadir)) != NULL;) {
+  while ((d_entry = readdir(luadir)) != NULL) {
     if (!endswith(d_entry->d_name, ".lua") ||
         strcmp(d_entry->d_name, LUA_EXCLUDEFILE) == 0)
       continue;
@@ -100,7 +104,7 @@ void load_lua_fns(lua_State *L, const char *lua_dir, lua_fn funcs[]) {
     fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
 
     // <- function | ...
-    store_lua_fn(L, fn_name, funcs, i++);
+    store_lua_fn(L, fn_name);
   }
   closedir(luadir);
 }
@@ -161,3 +165,5 @@ void update_cpath(lua_State *L) {
   lua_setfield(L, -2, "cpath");
   lua_pop(L, 1);
 }
+
+void printlua_fns() {}
