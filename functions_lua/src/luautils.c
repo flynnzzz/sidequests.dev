@@ -200,7 +200,7 @@ void luaU_updatecpath(lua_State *L) {
   const char *current_cpath = lua_tostring(L, -1);
   char new_cpath[512];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
-  fprintf(stderr, "[INFO] new cpath set: \n'%s'\n", new_cpath);
+  // fprintf(stderr, "[INFO] new cpath set: \n'%s'\n", new_cpath);
 
   // <- cpath, -> new_cpath | package | ...
   lua_pop(L, 1);
@@ -211,4 +211,9 @@ void luaU_updatecpath(lua_State *L) {
   lua_pop(L, 1);
 }
 
-void printlua_fns() {}
+void printlua_fns() {
+  printf("Loaded functions:\n");
+  for (int i = 0; i < nfuncs; i++)
+    printf(" %d. %s - %d params\n", i, luaU_globalfuntions[i].name,
+           luaU_globalfuntions[i].nparams);
+}

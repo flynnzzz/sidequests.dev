@@ -45,4 +45,6 @@ double luaU_doluaufn(lua_State *L, int idx, ...);
  */
 void luaU_updatecpath(lua_State *L);
 
+void printlua_fns();
+
 #endif // !LUAUTILS_H
