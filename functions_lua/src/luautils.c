@@ -20,14 +20,22 @@
     strcat(path, "/");                                                         \
     strcat(path, top);                                                         \
   }
-#define luaU_pushvariadic(type, nparams, last)                                 \
+
+/*
+ * Auxiliary function.
+ *
+ * Pushes `n` values of `type` onto the stack.
+ * The last parameter preceiding the `n` variatic args needs to be
+ * specified in `last`.
+ */
+#define luaU_pushvariadic(type, n, last)                                       \
   {                                                                            \
     va_list ap;                                                                \
     va_start(ap, last);                                                        \
                                                                                \
-    for (int i = 0; i < nparams; i++) {                                        \
+    for (int i = 0; i < n; i++) {                                              \
       type arg = va_arg(ap, type);                                             \
-      lua_pushnumber(L, arg);                                                  \
+      lua_pushvalue(L, arg);                                                   \
     }                                                                          \
                                                                                \
     va_end(ap);                                                                \
