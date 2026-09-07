@@ -16,12 +16,12 @@
 #define MAX_NAME_LEN 128
 #define MAX_FUNCTIONS_NUM 128
 
-typedef struct lua_function {
+typedef struct luaU_function {
   char name[MAX_NAME_LEN];
   int ref, nparams;
-} lua_fn;
+} luaU_fn;
 
-extern lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+extern luaU_fn luaU_globalfuntions[MAX_FUNCTIONS_NUM];
 extern int nfuncs;
 
 int luaU_fnparams(lua_State *L, int ref);
@@ -37,6 +37,8 @@ void luaU_loadfns(lua_State *L, const char *lua_dir);
  * behaviour. It is recommended to pass in double or float types.
  */
 double luaU_dofunction(lua_State *L, int ref, int nparams, ...);
+
+double luaU_doluaufn(lua_State *L, int idx, ...);
 
 /*
  * Updates package.cpath to include the binaries folder of the current program.

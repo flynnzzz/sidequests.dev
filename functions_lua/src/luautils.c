@@ -21,7 +21,7 @@
     strcat(path, top);                                                         \
   }
 
-lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
+luaU_fn luaU_globalfuntions[MAX_FUNCTIONS_NUM];
 int nfuncs = 0;
 
 // Source - https://stackoverflow.com/a/744822
@@ -46,9 +46,9 @@ static void luaU_storefn(lua_State *L, const char *fn_name) {
   }
 
   // !global: lua_funcs, nfuncs
-  strcpy(lua_funcs[nfuncs].name, fn_name);
-  lua_funcs[nfuncs].ref = ref;
-  lua_funcs[nfuncs].nparams = luaU_fnparams(L, ref);
+  strcpy(luaU_globalfuntions[nfuncs].name, fn_name);
+  luaU_globalfuntions[nfuncs].ref = ref;
+  luaU_globalfuntions[nfuncs].nparams = luaU_fnparams(L, ref);
   nfuncs++;
 }
 
@@ -124,6 +124,7 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
 
   va_list ap;
   va_start(ap, nparams);
+
   for (int i = 0; i < nparams; i++) {
     double arg = va_arg(ap, double);
     lua_pushnumber(L, arg);
@@ -141,6 +142,46 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
   const double result = lua_tonumber(L, -1);
 
   // <- result | ...
+  lua_pop(L, 1);
+
+  return result;
+}
+
+double luaU_doluaufn(lua_State *L, int idx, ...) {
+
+  const int ref = luaU_globalfuntions[idx].ref,
+            nparams = luaU_globalfuntions[idx].nparams;
+
+  /*
+   * `luaU_dofunction`
+   */
+  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+
+  if (!lua_isfunction(L, -1)) {
+    fprintf(stderr,
+            "[ERROR] %d does not refer a Lua function, aborting execution\n",
+            ref);
+    lua_pop(L, 1);
+    return 0;
+  }
+
+  va_list ap;
+  va_start(ap, idx);
+
+  for (int i = 0; i < nparams; i++) {
+    double arg = va_arg(ap, double);
+    lua_pushnumber(L, arg);
+  }
+
+  va_end(ap);
+
+  if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
+    fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
+    lua_pop(L, 1);
+  }
+
+  const double result = lua_tonumber(L, -1);
+
   lua_pop(L, 1);
 
   return result;
