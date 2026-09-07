@@ -36,7 +36,7 @@ static int endswith(const char *str, const char *suffix) {
   return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
-static void store_lua_fn(lua_State *L, const char *fn_name) {
+static void luaU_storefn(lua_State *L, const char *fn_name) {
   // <- function | ...
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
@@ -48,11 +48,11 @@ static void store_lua_fn(lua_State *L, const char *fn_name) {
   // !global: lua_funcs, nfuncs
   strcpy(lua_funcs[nfuncs].name, fn_name);
   lua_funcs[nfuncs].ref = ref;
-  lua_funcs[nfuncs].nparams = lua_fn_nparams(L, ref);
+  lua_funcs[nfuncs].nparams = luaU_fnparams(L, ref);
   nfuncs++;
 }
 
-int lua_fn_nparams(lua_State *L, int ref) {
+int luaU_fnparams(lua_State *L, int ref) {
   lua_Debug ar;
 
   // -> function | ...
@@ -71,10 +71,10 @@ int lua_fn_nparams(lua_State *L, int ref) {
   return ar.nparams;
 }
 
-void load_lua_fns(lua_State *L, const char *lua_dir) {
-  DIR *luadir = opendir(LUA_DIR_PATH);
+void luaU_loadfns(lua_State *L, const char *lua_dir) {
+  DIR *luadir = opendir(LUA_DIRPATH);
   if (luadir == NULL) {
-    fprintf(stderr, "[ERROR] could not open %s\n", LUA_DIR_PATH);
+    fprintf(stderr, "[ERROR] could not open %s\n", LUA_DIRPATH);
     lua_close(L);
     exit(1);
   }
@@ -104,12 +104,12 @@ void load_lua_fns(lua_State *L, const char *lua_dir) {
     fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
 
     // <- function | ...
-    store_lua_fn(L, fn_name);
+    luaU_storefn(L, fn_name);
   }
   closedir(luadir);
 }
 
-double execute_lua_fn(lua_State *L, int ref, int nparams, ...) {
+double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
 
   // -> function | ...
   lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
@@ -146,7 +146,7 @@ double execute_lua_fn(lua_State *L, int ref, int nparams, ...) {
   return result;
 }
 
-void update_cpath(lua_State *L) {
+void luaU_updatecpath(lua_State *L) {
 
   // -> cpath | -> package | ...
   lua_getglobal(L, "package");

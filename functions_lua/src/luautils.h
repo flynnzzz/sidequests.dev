@@ -11,7 +11,7 @@
 #include <lua5.4/lualib.h>
 #include <stdarg.h>
 
-#define LUA_DIR_PATH "./lua"
+#define LUA_DIRPATH "./lua"
 #define LUA_EXCLUDEFILE "cmath.lua"
 #define MAX_NAME_LEN 128
 #define MAX_FUNCTIONS_NUM 128
@@ -24,23 +24,23 @@ typedef struct lua_function {
 extern lua_fn lua_funcs[MAX_FUNCTIONS_NUM];
 extern int nfuncs;
 
-int lua_fn_nparams(lua_State *L, int ref);
+int luaU_fnparams(lua_State *L, int ref);
 
 /*
  * Load and save functions from the specified directory
  * to `lua_fn` array.
  */
-void load_lua_fns(lua_State *L, const char *lua_dir);
+void luaU_loadfns(lua_State *L, const char *lua_dir);
 
 /*
  * NOTE: passing variadic parameters of type `int` generates undefined
  * behaviour. It is recommended to pass in double or float types.
  */
-double execute_lua_fn(lua_State *L, int ref, int nparams, ...);
+double luaU_dofunction(lua_State *L, int ref, int nparams, ...);
 
 /*
  * Updates package.cpath to include the binaries folder of the current program.
  */
-void update_cpath(lua_State *L);
+void luaU_updatecpath(lua_State *L);
 
 #endif // !LUAUTILS_H
