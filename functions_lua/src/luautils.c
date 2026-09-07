@@ -20,6 +20,18 @@
     strcat(path, "/");                                                         \
     strcat(path, top);                                                         \
   }
+#define luaU_pushvariadic(type, nparams, last)                                 \
+  {                                                                            \
+    va_list ap;                                                                \
+    va_start(ap, last);                                                        \
+                                                                               \
+    for (int i = 0; i < nparams; i++) {                                        \
+      type arg = va_arg(ap, type);                                             \
+      lua_pushnumber(L, arg);                                                  \
+    }                                                                          \
+                                                                               \
+    va_end(ap);                                                                \
+  }
 
 luaU_fn luaU_globalfuntions[MAX_FUNCTIONS_NUM];
 int nfuncs = 0;
@@ -122,16 +134,8 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
     return 0;
   }
 
-  va_list ap;
-  va_start(ap, nparams);
-
-  for (int i = 0; i < nparams; i++) {
-    double arg = va_arg(ap, double);
-    lua_pushnumber(L, arg);
-  }
   // -> p1 | -> ... | -> pn | function | ...
-
-  va_end(ap);
+  luaU_pushvariadic(double, nparams, nparams);
 
   // <- [p1, ..., pn, function], -> result | ...
   if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
@@ -165,15 +169,7 @@ double luaU_doluaufn(lua_State *L, int idx, ...) {
     return 0;
   }
 
-  va_list ap;
-  va_start(ap, idx);
-
-  for (int i = 0; i < nparams; i++) {
-    double arg = va_arg(ap, double);
-    lua_pushnumber(L, arg);
-  }
-
-  va_end(ap);
+  luaU_pushvariadic(double, nparams, idx);
 
   if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
     fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
