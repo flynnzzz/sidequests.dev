@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_PATH_LEN 512
+#define MAX_PATHLEN 512
 #define EXTENSION_NAME 4 // '.lua'
 #define join_path(base, top)                                                   \
   {                                                                            \
@@ -22,9 +22,9 @@
   }
 
 /*
- * Auxiliary function.
+ * Auxiliary macro.
  *
- * Pushes `n` values of `type` onto the stack.
+ * Pushes `n` numbers of `type` onto the stack.
  * The last parameter preceiding the `n` variatic args needs to be
  * specified in `last`.
  */
@@ -35,13 +35,13 @@
                                                                                \
     for (int i = 0; i < n; i++) {                                              \
       type arg = va_arg(ap, type);                                             \
-      lua_pushvalue(L, arg);                                                   \
+      lua_pushnumber(L, arg);                                                  \
     }                                                                          \
                                                                                \
     va_end(ap);                                                                \
   }
 
-luaU_fn luaU_globalfuntions[MAX_FUNCTIONS_NUM];
+luaU_fn luaU_globalfuntions[MAX_NFUNCTIONS];
 int nfuncs = 0;
 
 // Source - https://stackoverflow.com/a/744822
@@ -105,7 +105,7 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
         strcmp(d_entry->d_name, LUA_EXCLUDEFILE) == 0)
       continue;
 
-    char path[MAX_PATH_LEN];
+    char path[MAX_PATHLEN];
     strcpy(path, lua_dir);
     join_path(path, d_entry->d_name);
 
@@ -117,7 +117,7 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
       continue;
     }
 
-    char fn_name[MAX_NAME_LEN];
+    char fn_name[MAX_NAMELEN];
     strcpy(fn_name, d_entry->d_name);
 
     /* truncate the .lua extension */
@@ -129,9 +129,8 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
   closedir(luadir);
 }
 
-double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
+int luaU_rawgetfn(lua_State *L, int ref) {
 
-  // -> function | ...
   lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
 
   if (!lua_isfunction(L, -1)) {
@@ -139,14 +138,15 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
             "[ERROR] %d does not refer a Lua function, aborting execution\n",
             ref);
     lua_pop(L, 1);
-    return 0;
+    return 1;
   }
+  return 0;
+}
 
-  // -> p1 | -> ... | -> pn | function | ...
-  luaU_pushvariadic(double, nparams, nparams);
+double luaU_pcall(lua_State *L, int n, int r, int f) {
 
   // <- [p1, ..., pn, function], -> result | ...
-  if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
+  if (lua_pcall(L, n, r, f) != LUA_OK) {
     fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
     lua_pop(L, 1);
   }
@@ -159,6 +159,18 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
   return result;
 }
 
+double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
+
+  // -> function | ...
+  luaU_rawgetfn(L, ref);
+
+  // -> p1 | -> ... | -> pn | function | ...
+  luaU_pushvariadic(double, nparams, nparams);
+
+  // <- [p1, ..., pn, function, result] | ...
+  return luaU_pcall(L, nparams, 1, 0);
+}
+
 double luaU_doluaufn(lua_State *L, int idx, ...) {
 
   const int ref = luaU_globalfuntions[idx].ref,
@@ -167,28 +179,9 @@ double luaU_doluaufn(lua_State *L, int idx, ...) {
   /*
    * `luaU_dofunction`
    */
-  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-
-  if (!lua_isfunction(L, -1)) {
-    fprintf(stderr,
-            "[ERROR] %d does not refer a Lua function, aborting execution\n",
-            ref);
-    lua_pop(L, 1);
-    return 0;
-  }
-
+  luaU_rawgetfn(L, ref);
   luaU_pushvariadic(double, nparams, idx);
-
-  if (lua_pcall(L, nparams, 1, 0) != LUA_OK) {
-    fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
-    lua_pop(L, 1);
-  }
-
-  const double result = lua_tonumber(L, -1);
-
-  lua_pop(L, 1);
-
-  return result;
+  return luaU_pcall(L, nparams, 1, 0);
 }
 
 void luaU_updatecpath(lua_State *L) {
@@ -198,7 +191,7 @@ void luaU_updatecpath(lua_State *L) {
   lua_getfield(L, -1, "cpath");
 
   const char *current_cpath = lua_tostring(L, -1);
-  char new_cpath[512];
+  char new_cpath[MAX_PATHLEN];
   snprintf(new_cpath, sizeof(new_cpath), "./bin/?.so;%s", current_cpath);
   // fprintf(stderr, "[INFO] new cpath set: \n'%s'\n", new_cpath);
 
@@ -214,6 +207,6 @@ void luaU_updatecpath(lua_State *L) {
 void printlua_fns() {
   printf("Loaded functions:\n");
   for (int i = 0; i < nfuncs; i++)
-    printf(" %d. %s - %d params\n", i, luaU_globalfuntions[i].name,
+    printf(" %d. %s - %d params\n", i + 1, luaU_globalfuntions[i].name,
            luaU_globalfuntions[i].nparams);
 }

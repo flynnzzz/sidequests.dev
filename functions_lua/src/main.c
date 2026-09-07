@@ -4,6 +4,7 @@
  * Startup the Lua Virtual Machine!
  */
 #include "luautils.h"
+#include <lua5.4/lua.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,22 @@
   "   -h print this message\n"                                                 \
   "   -l list available functions\n"                                           \
   "   -x execute a function\n"
+#define BUFFER_SIZE 128
+#define FLAG_LEN 2
+
+static int to_arrayidx(int idx) { return idx - 1; }
 
 static int is_flag(const char *arg) { return arg[0] == '-'; }
+
+static lua_State *init_lua() {
+
+  lua_State *L = luaL_newstate();
+  luaL_openlibs(L);
+  luaU_updatecpath(L);
+  luaU_loadfns(L, LUA_DIRPATH);
+
+  return L;
+}
 
 int main(int argc, const char **argv) {
 
@@ -24,28 +39,71 @@ int main(int argc, const char **argv) {
     exit(1);
   }
 
-  lua_State *L = luaL_newstate();
-  luaL_openlibs(L);
-  luaU_updatecpath(L);
-
-  luaU_loadfns(L, LUA_DIRPATH);
-
-  for (int i = 1; i < argc; i++) {
-
+  char flag[FLAG_LEN];
+  int flag_found = 0;
+  for (int i = 0; i < argc && !flag_found; i++) {
     if (is_flag(argv[i])) {
-
-      if (strcmp(argv[i], "-h") == 0) {
-        printf(USAGE);
-        return 0;
-      } else if (strcmp(argv[i], "-l") == 0) {
-        printlua_fns();
-        return 0;
-      } else if (strcmp(argv[i], "-x")) {
-        printf("WIP\n");
-      }
+      strcpy(flag, argv[i]);
+      flag_found = 1;
     }
   }
 
-  lua_close(L);
+  lua_State *L;
+  char flagchar = flag[1];
+  switch (flagchar) {
+
+  case 'x': {
+
+    L = init_lua();
+
+    char target[BUFFER_SIZE];
+    int target_found = 0, target_index;
+    for (int i = 1; i < argc && !target_found; i++) {
+      if (!is_flag(argv[i])) {
+        strcpy(target, argv[i]);
+        target_found = 1;
+        target_index = i;
+      }
+    }
+
+    int fn_idx = atoi(target);
+    if (fn_idx == 0 || (fn_idx = to_arrayidx(fn_idx)) >= nfuncs) {
+      fprintf(stderr, "[ERROR] invalid target\n");
+      lua_close(L);
+      return 1;
+    }
+
+    const luaU_fn lua_fn = luaU_globalfuntions[fn_idx];
+    const int ref = lua_fn.ref, nparams = lua_fn.nparams;
+
+    // TODO: annotate stack interaction
+    luaU_rawgetfn(L, ref);
+
+    const int provided_params = argc - 3;
+    if (provided_params < nparams) {
+      fprintf(stderr, "[ERROR] not enough arguments\n");
+      lua_close(L);
+      return 1;
+    }
+
+    for (int i = target_index; i < target_index + nparams; i++) {
+      lua_pushnumber(L, atof(argv[i + 1]));
+    }
+    printf("Result: %f\n", luaU_pcall(L, nparams, 1, 0));
+    lua_close(L);
+
+  } break;
+
+  case 'l': {
+    L = init_lua();
+    printlua_fns();
+    lua_close(L);
+  } break;
+
+  default: {
+    printf(USAGE);
+  } break;
+  }
+
   return 0;
 }
