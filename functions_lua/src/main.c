@@ -51,9 +51,7 @@ int main(int argc, const char **argv) {
   lua_State *L;
   char flagchar = flag[1];
   switch (flagchar) {
-
   case 'x': {
-
     L = init_lua();
 
     char target[BUFFER_SIZE];
@@ -66,40 +64,42 @@ int main(int argc, const char **argv) {
       }
     }
 
-    int fn_idx = atoi(target);
-    if (fn_idx == 0 || (fn_idx = to_arrayidx(fn_idx)) >= nfuncs) {
+    int function_index = atoi(target);
+    if (function_index == 0 ||
+        (function_index = to_arrayidx(function_index)) >= nfuncs) {
       fprintf(stderr, "[ERROR] invalid target\n");
       lua_close(L);
-      return 1;
+      exit(1);
     }
 
-    const luaU_fn lua_fn = luaU_globalfuntions[fn_idx];
-    const int ref = lua_fn.ref, nparams = lua_fn.nparams;
+    const int ref = luaU_globalfuntions[function_index].ref,
+              nparams = luaU_globalfuntions[function_index].nparams;
 
-    // TODO: annotate stack interaction
+    // -> function | ...
     luaU_rawgetfn(L, ref);
 
     const int provided_params = argc - 3;
     if (provided_params < nparams) {
       fprintf(stderr, "[ERROR] not enough arguments\n");
       lua_close(L);
-      return 1;
+      exit(1);
     }
 
+    // -> p1 | -> ... | -> pn | function | ...
     for (int i = target_index; i < target_index + nparams; i++) {
       lua_pushnumber(L, atof(argv[i + 1]));
     }
+
+    // <- result | ...
     printf("Result: %f\n", luaU_pcall(L, nparams, 1, 0));
     lua_close(L);
 
   } break;
-
   case 'l': {
     L = init_lua();
     printlua_fns();
     lua_close(L);
   } break;
-
   default: {
     printf(USAGE);
   } break;
