@@ -79,8 +79,8 @@ int luaU_fnparams(lua_State *L, int ref) {
   lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
   if (!lua_isfunction(L, -1)) {
     fprintf(stderr,
-            "[ERROR] %d does not refer to a Lua function, unable to retreive "
-            "info\n",
+            " [ERROR] id '%d' does not refer to a Lua function, unable to "
+            "retreive info.\n",
             ref);
     lua_pop(L, 1);
     return -1;
@@ -94,7 +94,7 @@ int luaU_fnparams(lua_State *L, int ref) {
 void luaU_loadfns(lua_State *L, const char *lua_dir) {
   DIR *luadir = opendir(LUA_DIRPATH);
   if (luadir == NULL) {
-    fprintf(stderr, "[ERROR] could not open %s\n", LUA_DIRPATH);
+    fprintf(stderr, " [ERROR] could not open %s.\n", LUA_DIRPATH);
     lua_close(L);
     exit(1);
   }
@@ -112,7 +112,7 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
     // -> function | ...
     if (luaL_loadfile(L, path) != LUA_OK || lua_pcall(L, 0, 1, 0) != LUA_OK ||
         !lua_isfunction(L, -1)) {
-      fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
+      fprintf(stderr, " [ERROR] %s\n", lua_tostring(L, -1));
       lua_pop(L, 1);
       continue;
     }
@@ -135,7 +135,7 @@ int luaU_rawgetfn(lua_State *L, int ref) {
 
   if (!lua_isfunction(L, -1)) {
     fprintf(stderr,
-            "[ERROR] %d does not refer a Lua function, aborting execution\n",
+            " [ERROR] %d does not refer a Lua function, aborting execution.\n",
             ref);
     lua_pop(L, 1);
     return 1;
@@ -147,7 +147,7 @@ double luaU_pcall(lua_State *L, int n, int r, int f) {
 
   // <- [p1, ..., pn, function], -> result | ...
   if (lua_pcall(L, n, r, f) != LUA_OK) {
-    fprintf(stderr, "[ERROR] %s\n", lua_tostring(L, -1));
+    fprintf(stderr, " [ERROR] %s\n", lua_tostring(L, -1));
     lua_pop(L, 1);
   }
 

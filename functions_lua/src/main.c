@@ -13,12 +13,12 @@
   " usage: luafun [OPTIONS] [function]\n\n"                                    \
   " OPTIONS:\n"                                                                \
   "   -h print this message\n"                                                 \
-  "   -l list available functions\n"                                           \
+  "   -l list all available functions\n"                                       \
   "   -x execute a function\n"
+#define USE_USAGE " Try luafun -h for more information."
+#define LIST_USAGE " Try luafun -l to list available functions."
 #define BUFFER_SIZE 128
 #define FLAG_LEN 2
-
-static int to_arrayidx(int idx) { return idx - 1; }
 
 static int is_flag(const char *arg) { return arg[0] == '-'; }
 
@@ -48,6 +48,11 @@ int main(int argc, const char **argv) {
     }
   }
 
+  if (!flag_found) {
+    puts(USE_USAGE);
+    exit(1);
+  }
+
   lua_State *L;
   char flagchar = flag[1];
   switch (flagchar) {
@@ -64,34 +69,55 @@ int main(int argc, const char **argv) {
       }
     }
 
+    if (!target_found) {
+      puts(" no target specified.\n");
+      puts(USE_USAGE);
+      exit(1);
+    }
+
     int function_index = atoi(target);
-    if (function_index == 0 ||
-        (function_index = to_arrayidx(function_index)) >= nfuncs) {
-      fprintf(stderr, "[ERROR] invalid target\n");
+    if (function_index == 0 || --function_index >= nfuncs) {
+      puts(" invalid target index.\n");
+      puts(LIST_USAGE);
       lua_close(L);
       exit(1);
     }
 
     const int ref = luaU_globalfuntions[function_index].ref,
               nparams = luaU_globalfuntions[function_index].nparams;
+    const char *function_name = luaU_globalfuntions[function_index].name;
 
     // -> function | ...
     luaU_rawgetfn(L, ref);
 
     const int provided_params = argc - 3;
     if (provided_params < nparams) {
-      fprintf(stderr, "[ERROR] not enough arguments\n");
+      fprintf(stderr,
+              " [ERROR] not enough arguments for '%s': %d required but "
+              "%d were given.\n",
+              function_name, nparams, provided_params);
       lua_close(L);
       exit(1);
     }
 
     // -> p1 | -> ... | -> pn | function | ...
-    for (int i = target_index; i < target_index + nparams; i++) {
+    const int endarg = target_index + nparams;
+    for (int i = target_index; i < endarg; i++) {
       lua_pushnumber(L, atof(argv[i + 1]));
     }
 
     // <- result | ...
-    printf("Result: %f\n", luaU_pcall(L, nparams, 1, 0));
+    const double result = luaU_pcall(L, nparams, 1, 0);
+
+    printf(" %s(", function_name);
+    for (int i = target_index; i < endarg; i++) {
+      if (i < target_index + nparams - 1)
+        printf("%.2f, ", atof(argv[i + 1]));
+      else
+        printf("%.2f", atof(argv[i + 1]));
+    }
+    printf(") -> %.2f\n", result);
+
     lua_close(L);
 
   } break;
@@ -100,8 +126,12 @@ int main(int argc, const char **argv) {
     printlua_fns();
     lua_close(L);
   } break;
+  case 'h': {
+    puts(USAGE);
+  } break;
   default: {
-    printf(USAGE);
+    printf(" unrecognized flag '-%c'\n\n", flagchar);
+    puts(USE_USAGE);
   } break;
   }
 
