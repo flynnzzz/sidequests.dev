@@ -22,7 +22,7 @@ typedef struct luaU_function {
   int ref, nparams;
 } luaU_fn;
 
-extern luaU_fn luaU_globalfuntions[MAX_NFUNCTIONS];
+extern luaU_fn luaU_globalfunctions[MAX_NFUNCTIONS];
 extern int nfuncs;
 
 int luaU_fnparams(lua_State *L, int ref);

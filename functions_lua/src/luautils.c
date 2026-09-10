@@ -17,8 +17,8 @@
 #define EXTENSION_NAME 4 // '.lua'
 #define join_path(base, top)                                                   \
   {                                                                            \
-    strcat(path, "/");                                                         \
-    strcat(path, top);                                                         \
+    strncat(path, "/", 2);                                                     \
+    strncat(path, top, MAX_PATHLEN - strlen(base));                            \
   }
 
 /*
@@ -41,8 +41,8 @@
     va_end(ap);                                                                \
   }
 
-const char *letters = "abcdefghijklmnopqrstuvwxyz";
-luaU_fn luaU_globalfuntions[MAX_NFUNCTIONS];
+const char letters[MAX_FPARAM] = "abcdefghijklmnopqrstuvwxyz";
+luaU_fn luaU_globalfunctions[MAX_NFUNCTIONS];
 int nfuncs = 0;
 
 // Source - https://stackoverflow.com/a/744822
@@ -67,9 +67,9 @@ static void luaU_storefn(lua_State *L, const char *fn_name) {
   }
 
   // !global: lua_funcs, nfuncs
-  strcpy(luaU_globalfuntions[nfuncs].name, fn_name);
-  luaU_globalfuntions[nfuncs].ref = ref;
-  luaU_globalfuntions[nfuncs].nparams = luaU_fnparams(L, ref);
+  strncpy(luaU_globalfunctions[nfuncs].name, fn_name, MAX_NAMELEN);
+  luaU_globalfunctions[nfuncs].ref = ref;
+  luaU_globalfunctions[nfuncs].nparams = luaU_fnparams(L, ref);
   nfuncs++;
 }
 
@@ -103,11 +103,11 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
   struct dirent *d_entry;
   while ((d_entry = readdir(luadir)) != NULL) {
     if (!endswith(d_entry->d_name, ".lua") ||
-        strcmp(d_entry->d_name, LUA_EXCLUDEFILE) == 0)
+        strncmp(d_entry->d_name, LUA_EXCLUDEFILE, MAX_NAMELEN) == 0)
       continue;
 
     char path[MAX_PATHLEN];
-    strcpy(path, lua_dir);
+    strncpy(path, lua_dir, MAX_PATHLEN);
     join_path(path, d_entry->d_name);
 
     // -> function | ...
@@ -119,7 +119,7 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
     }
 
     char fn_name[MAX_NAMELEN];
-    strcpy(fn_name, d_entry->d_name);
+    strncpy(fn_name, d_entry->d_name, MAX_NAMELEN);
 
     /* truncate the .lua extension */
     fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
@@ -174,8 +174,8 @@ double luaU_dofunction(lua_State *L, int ref, int nparams, ...) {
 
 double luaU_doluaufn(lua_State *L, int idx, ...) {
 
-  const int ref = luaU_globalfuntions[idx].ref,
-            nparams = luaU_globalfuntions[idx].nparams;
+  const int ref = luaU_globalfunctions[idx].ref,
+            nparams = luaU_globalfunctions[idx].nparams;
 
   /*
    * `luaU_dofunction`
@@ -207,12 +207,13 @@ void luaU_updatecpath(lua_State *L) {
 
 void printlua_fns() {
   for (int i = 0; i < nfuncs; i++) {
-    printf(" %d. %s(", i + 1, luaU_globalfuntions[i].name);
-    for (int j = 0; j < luaU_globalfuntions[i].nparams && j < strlen(letters);
+    printf(" %d. %s(", i + 1, luaU_globalfunctions[i].name);
+    for (int j = 0; j < luaU_globalfunctions[i].nparams && j < strlen(letters);
          j++) {
       const char *format =
-          j < luaU_globalfuntions[i].nparams - 1 && strlen(letters) - 1 ? "%c, "
-                                                                        : "%c";
+          j < luaU_globalfunctions[i].nparams - 1 && j < strlen(letters) - 1
+              ? "%c, "
+              : "%c";
       printf(format, letters[j]);
     }
     puts(")");

@@ -43,7 +43,7 @@ int main(int argc, const char **argv) {
   int flag_found = 0;
   for (int i = 0; i < argc && !flag_found; i++) {
     if (is_flag(argv[i])) {
-      strcpy(flag, argv[i]);
+      strncpy(flag, argv[i], FLAG_LEN);
       flag_found = 1;
     }
   }
@@ -63,7 +63,7 @@ int main(int argc, const char **argv) {
     int target_found = 0, target_index;
     for (int i = 1; i < argc && !target_found; i++) {
       if (!is_flag(argv[i])) {
-        strcpy(target, argv[i]);
+        strncpy(target, argv[i], BUFFER_SIZE);
         target_found = 1;
         target_index = i;
       }
@@ -83,9 +83,9 @@ int main(int argc, const char **argv) {
       exit(1);
     }
 
-    const int ref = luaU_globalfuntions[function_index].ref,
-              nparams = luaU_globalfuntions[function_index].nparams;
-    const char *function_name = luaU_globalfuntions[function_index].name;
+    const int ref = luaU_globalfunctions[function_index].ref,
+              nparams = luaU_globalfunctions[function_index].nparams;
+    const char *function_name = luaU_globalfunctions[function_index].name;
 
     // -> function | ...
     luaU_rawgetfn(L, ref);
