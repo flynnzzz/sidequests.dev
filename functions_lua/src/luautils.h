@@ -15,6 +15,7 @@
 #define LUA_EXCLUDEFILE "cmath.lua"
 #define MAX_NAMELEN 128
 #define MAX_NFUNCTIONS 128
+#define MAX_FPARAM 26 + 1
 
 typedef struct luaU_function {
   char name[MAX_NAMELEN];

@@ -33,7 +33,7 @@
     va_list ap;                                                                \
     va_start(ap, last);                                                        \
                                                                                \
-    for (int i = 0; i < n; i++) {                                              \
+    for (int i = 0; i < n && i < MAX_FPARAM; i++) {                            \
       type arg = va_arg(ap, type);                                             \
       lua_pushnumber(L, arg);                                                  \
     }                                                                          \
@@ -41,6 +41,7 @@
     va_end(ap);                                                                \
   }
 
+const char *letters = "abcdefghijklmnopqrstuvwxyz";
 luaU_fn luaU_globalfuntions[MAX_NFUNCTIONS];
 int nfuncs = 0;
 
@@ -205,8 +206,15 @@ void luaU_updatecpath(lua_State *L) {
 }
 
 void printlua_fns() {
-  printf("Loaded functions:\n");
-  for (int i = 0; i < nfuncs; i++)
-    printf(" %d. %s - %d params\n", i + 1, luaU_globalfuntions[i].name,
-           luaU_globalfuntions[i].nparams);
+  for (int i = 0; i < nfuncs; i++) {
+    printf(" %d. %s(", i + 1, luaU_globalfuntions[i].name);
+    for (int j = 0; j < luaU_globalfuntions[i].nparams && j < strlen(letters);
+         j++) {
+      const char *format =
+          j < luaU_globalfuntions[i].nparams - 1 && strlen(letters) - 1 ? "%c, "
+                                                                        : "%c";
+      printf(format, letters[j]);
+    }
+    puts(")");
+  }
 }

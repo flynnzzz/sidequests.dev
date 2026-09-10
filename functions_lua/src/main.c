@@ -111,10 +111,8 @@ int main(int argc, const char **argv) {
 
     printf(" %s(", function_name);
     for (int i = target_index; i < endarg; i++) {
-      if (i < target_index + nparams - 1)
-        printf("%.2f, ", atof(argv[i + 1]));
-      else
-        printf("%.2f", atof(argv[i + 1]));
+      const char *format = i < endarg - 1 ? "%.2f, " : "%.2f";
+      printf(format, atof(argv[i + 1]));
     }
     printf(") -> %.2f\n", result);
 
