@@ -9,17 +9,13 @@
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lua.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_PATHLEN 512
-#define EXTENSION_NAME 4 // '.lua'
-#define join_path(base, top)                                                   \
-  {                                                                            \
-    strncat(path, "/", 2);                                                     \
-    strncat(path, top, MAX_PATHLEN - strlen(base));                            \
-  }
+#define EXT_LEN 4 + 1 // '.lua'
 
 /*
  * Auxiliary macro.
@@ -57,6 +53,15 @@ static int endswith(const char *str, const char *suffix) {
   return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
+static int join_path(char *base, const char *top, size_t path_len) {
+  const size_t current = strlen(base);
+  if (current + strlen(top) + 2 > path_len)
+    return -1; // error
+  strcat(base, "/");
+  strcat(base, top);
+  return 0;
+}
+
 static void luaU_storefn(lua_State *L, const char *fn_name) {
   // <- function | ...
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -68,6 +73,7 @@ static void luaU_storefn(lua_State *L, const char *fn_name) {
 
   // !global: lua_funcs, nfuncs
   strncpy(luaU_globalfunctions[nfuncs].name, fn_name, MAX_NAMELEN);
+  luaU_globalfunctions[nfuncs].name[MAX_NAMELEN - 1] = '\0';
   luaU_globalfunctions[nfuncs].ref = ref;
   luaU_globalfunctions[nfuncs].nparams = luaU_fnparams(L, ref);
   nfuncs++;
@@ -108,7 +114,8 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
 
     char path[MAX_PATHLEN];
     strncpy(path, lua_dir, MAX_PATHLEN);
-    join_path(path, d_entry->d_name);
+    path[MAX_PATHLEN - 1] = '\0';
+    join_path(path, d_entry->d_name, MAX_PATHLEN);
 
     // -> function | ...
     if (luaL_loadfile(L, path) != LUA_OK || lua_pcall(L, 0, 1, 0) != LUA_OK ||
@@ -120,9 +127,13 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
 
     char fn_name[MAX_NAMELEN];
     strncpy(fn_name, d_entry->d_name, MAX_NAMELEN);
+    fn_name[MAX_NAMELEN - 1] = '\0';
+
+    if (strlen(fn_name) < EXT_LEN)
+      continue;
 
     /* truncate the .lua extension */
-    fn_name[strlen(d_entry->d_name) - EXTENSION_NAME] = '\0';
+    fn_name[strlen(fn_name) - EXT_LEN] = '\0';
 
     // <- function | ...
     luaU_storefn(L, fn_name);

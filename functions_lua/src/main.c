@@ -18,7 +18,7 @@
 #define USE_USAGE " Try luafun -h for more information."
 #define LIST_USAGE " Try luafun -l to list available functions."
 #define BUFFER_SIZE 128
-#define FLAG_LEN 2
+#define FLAG_LEN 2 + 1
 
 static int is_flag(const char *arg) { return arg[0] == '-'; }
 
@@ -44,6 +44,7 @@ int main(int argc, const char **argv) {
   for (int i = 0; i < argc && !flag_found; i++) {
     if (is_flag(argv[i])) {
       strncpy(flag, argv[i], FLAG_LEN);
+      flag[FLAG_LEN - 1] = '\0';
       flag_found = 1;
     }
   }
@@ -64,6 +65,7 @@ int main(int argc, const char **argv) {
     for (int i = 1; i < argc && !target_found; i++) {
       if (!is_flag(argv[i])) {
         strncpy(target, argv[i], BUFFER_SIZE);
+        target[BUFFER_SIZE - 1] = '\0';
         target_found = 1;
         target_index = i;
       }
