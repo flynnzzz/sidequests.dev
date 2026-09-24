@@ -33,17 +33,26 @@ int luaU_fnparams(lua_State *L, int ref);
  */
 void luaU_loadfns(lua_State *L, const char *lua_dir);
 
-// TODO: add descriptions
+/*
+ * Push a function assigned to `ref` onto the stack
+ */
 int luaU_rawgetfn(lua_State *L, int ref);
 
+/*
+ * lua_pcall wrapper
+ */
 double luaU_pcall(lua_State *L, int n, int r, int f);
 
 /*
+ * Executes a lua function with `nparams` parameters assigned to `ref`
  * NOTE: passing variadic parameters of type `int` generates undefined
  * behaviour. It is recommended to pass in double or float types.
  */
 double luaU_dofunction(lua_State *L, int ref, int nparams, ...);
 
+/*
+ * Executes a lua function at index `idx` from the `luaU_globalfunctions` array
+ */
 double luaU_doluaufn(lua_State *L, int idx, ...);
 
 /*
