@@ -133,7 +133,7 @@ void luaU_loadfns(lua_State *L, const char *lua_dir) {
       continue;
 
     /* truncate the .lua extension */
-    fn_name[strlen(fn_name) - EXT_LEN] = '\0';
+    fn_name[strlen(fn_name) - EXT_LEN - 1] = '\0';
 
     // <- function | ...
     luaU_storefn(L, fn_name);
