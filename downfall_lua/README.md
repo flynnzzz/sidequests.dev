@@ -1,5 +1,5 @@
 # downfall.lua
- Simple simulation of the `gambler's run` dilemma
+ Simple simulation of the `[gambler's ruin](https://en.wikipedia.org/wiki/Gambler's_ruin)` dilemma
 
 
 ## 1. requirements
