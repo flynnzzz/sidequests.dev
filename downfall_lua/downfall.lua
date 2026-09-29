@@ -1,6 +1,6 @@
 MAXINT = 2 ^ 50
 USAGE =
-	"usage: lua downfall.lua <A> [B]\n A = first player's starting points\n B = second player's starting points\nif only A is given then B will be set to the same value"
+	"usage:\n lua downfall.lua <A> [B]\n\n  A = first player's starting points\n  B = second player's starting points\n\n if only A is given then B will be set to the same value"
 
 local Side = {
 	HEADS = 0,
