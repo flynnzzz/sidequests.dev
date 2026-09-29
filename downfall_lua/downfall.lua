@@ -58,7 +58,7 @@ local function play(A, B)
 			winner = "B"
 		end
 
-		print("Player " .. winner .. " wins")
+		print("Player " .. winner .. " wins after " .. i .. " rounds")
 	elseif i > 0 then
 		print("A winner could not be determined")
 	else
