@@ -11,12 +11,15 @@ end
 
 local function play(A, B)
 	local total = A + B
+	local cointoss
+	local percentage
 	local over = A == 0 or B == 0
 	local result = "None"
 
 	local i = 0
 	while i < MAXINT and not over do
-		local cointoss = math.random(0, 1)
+		cointoss = math.random(0, 1)
+		percentage = winchance(A, total)
 
 		if cointoss == Side.HEADS then
 			B = B + 1
@@ -31,7 +34,15 @@ local function play(A, B)
 
 		over = A == 0 or B == 0
 
-		print(string.format("round %d: %s - A's winchance: %.1f%%", i, result, winchance(A, total)))
+		print(
+			string.format(
+				"round %d: %s\n winchance: (A) %.1f%%  vs  (B) %.1f%%\n",
+				i,
+				result,
+				percentage,
+				100 - percentage
+			)
+		)
 	end
 
 	if over and i ~= 0 then
@@ -43,7 +54,7 @@ local function play(A, B)
 		end
 
 		print("Player " .. winner .. " wins")
-	elseif i == MAXINT then
+	elseif i > 0 then
 		print("A winner could not be determined")
 	else
 		print("There was no winner")
