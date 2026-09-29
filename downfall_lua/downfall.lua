@@ -1,4 +1,6 @@
 MAXINT = 2 ^ 50
+USAGE =
+	"usage: lua downfall.lua <A> [B]\n A = first player's starting points\n B = second player's starting points\nif only A is given then B will be set to the same value"
 
 local Side = {
 	HEADS = 0,
@@ -14,7 +16,8 @@ local function play(A, B)
 	local cointoss
 	local percentage
 	local over = A == 0 or B == 0
-	local result = "None"
+	local result = "NA"
+	local winner = "no one"
 
 	local i = 0
 	while i < MAXINT and not over do
@@ -22,13 +25,15 @@ local function play(A, B)
 		percentage = winchance(A, total)
 
 		if cointoss == Side.HEADS then
-			B = B + 1
-			A = A - 1
-			result = "Heads"
-		else
 			A = A + 1
 			B = B - 1
+			result = "Heads"
+			winner = "A"
+		else
+			B = B + 1
+			A = A - 1
 			result = "Tails"
+			winner = "B"
 		end
 		i = i + 1
 
@@ -36,9 +41,10 @@ local function play(A, B)
 
 		print(
 			string.format(
-				"round %d: %s\n winchance: (A) %.1f%%  vs  (B) %.1f%%\n",
+				"round %d: %s, %s takes\n winchance: (A) %.1f%%  vs  (B) %.1f%%\n",
 				i,
 				result,
+				winner,
 				percentage,
 				100 - percentage
 			)
@@ -46,7 +52,6 @@ local function play(A, B)
 	end
 
 	if over and i ~= 0 then
-		local winner
 		if A > B then
 			winner = "A"
 		elseif A < B then
@@ -57,16 +62,19 @@ local function play(A, B)
 	elseif i > 0 then
 		print("A winner could not be determined")
 	else
-		print("There was no winner")
+		print("Rounds couldn't be started, there is no winner")
 	end
 end
 
 function Main()
-	local n = tonumber(0)
+	local n
 
-	if arg[1] ~= nil then
-		n = tonumber(arg[1])
+	if arg[1] == nil then
+		print(USAGE)
+		return
 	end
+
+	n = tonumber(arg[1])
 
 	local m
 	if arg[2] ~= nil then
