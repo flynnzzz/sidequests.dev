@@ -1,14 +1,5 @@
-local Seed = require("seed").Seed
-
-local function rangeto(n)
-	local values = {}
-	for i = 1, n do
-		values[i] = i
-	end
-	return values
-end
-local values = rangeto(10)
-local maxvalue = math.max(table.unpack(values))
+local S = require("seed")
+local SeedSet = S.SeedSet
 
 local Card = {}
 Card.__index = Card
@@ -16,16 +7,17 @@ Card.__index = Card
 function Card:of(seed, value)
 	local card = setmetatable({}, self)
 
-	if not Seed.is_seed(seed) then
+	if not S.is_seed(seed) then
 		error(tostring(seed) .. " is not an allowed seed")
 	end
 
+	local maxvalue = SeedSet.maxvalue
 	if value > maxvalue then
 		error(tostring(value) .. " exceeds the maximum allowed value of " .. tostring(maxvalue))
 	end
 
-	if value < 0 then
-		error("negative values not allowed: " .. tostring(value))
+	if value <= 0 then
+		error("card value not allowed: " .. tostring(value))
 	end
 
 	card.seed = seed
@@ -33,4 +25,8 @@ function Card:of(seed, value)
 	return card
 end
 
-return { Card = Card, MAXVALUE = maxvalue, values = values }
+function Card:__tostring()
+	return self.value .. " of " .. self.seed
+end
+
+return { Card = Card }
