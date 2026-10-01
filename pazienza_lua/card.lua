@@ -1,18 +1,4 @@
-Seed = {
-	DENARE = "Denare",
-	COPPE = "Coppe",
-	SPADE = "Spade",
-	BASTONI = "Bastoni",
-}
-
-function Seed.is_seed(seed)
-	for _, value in pairs(Seed) do
-		if value == seed then
-			return true
-		end
-	end
-	return false
-end
+local Seed = require("pazienza_lua.seed")
 
 local function rangeto(n)
 	local values = {}
@@ -21,8 +7,7 @@ local function rangeto(n)
 	end
 	return values
 end
-
-Values = rangeto(10)
+local values = rangeto(10)
 
 local Card = {}
 Card.__index = Card
@@ -34,7 +19,7 @@ function Card:of(seed, value)
 		error(tostring(seed) .. " is not an allowed seed")
 	end
 
-	local maxvalue = math.max(table.unpack(Values))
+	local maxvalue = math.max(table.unpack(values))
 	if value > maxvalue then
 		error(tostring(value) .. " exceeds the maximum allowed value of " .. tostring(maxvalue))
 	end
@@ -47,3 +32,5 @@ function Card:of(seed, value)
 	card.value = value
 	return card
 end
+
+return Card
