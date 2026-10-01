@@ -1,7 +1,10 @@
-local function rangeto(n)
+local C = require("card")
+local Card = C.card
+
+local function cardset(seed, maxvalue)
 	local values = {}
-	for i = 1, n do
-		values[i] = i
+	for i = 1, maxvalue do
+		values[i] = Card:new(seed, i)
 	end
 	return values
 end
@@ -13,7 +16,7 @@ function SeedSet:new(seed, maxvalue)
 	local newseed = setmetatable({}, self)
 	newseed.seed = seed
 	newseed.maxvalue = maxvalue
-	newseed.values = rangeto(maxvalue)
+	newseed.values = cardset(seed, maxvalue)
 	return newseed
 end
 
