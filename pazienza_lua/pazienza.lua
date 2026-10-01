@@ -1,3 +1,3 @@
-local Card = require("card")
+local cards = require("cards")
 
 local deck = {}
