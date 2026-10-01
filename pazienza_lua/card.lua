@@ -7,10 +7,6 @@ Card.__index = Card
 function Card:of(seed, value)
 	local card = setmetatable({}, self)
 
-	if not S.is_seed(seed) then
-		error(tostring(seed) .. " is not an allowed seed")
-	end
-
 	local maxvalue = SeedSet.maxvalue
 	if value > maxvalue then
 		error(tostring(value) .. " exceeds the maximum allowed value of " .. tostring(maxvalue))

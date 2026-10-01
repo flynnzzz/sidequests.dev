@@ -1,9 +1,10 @@
 local S = require("seed")
-local C = require("cards")
+local C = require("card")
 local D = require("deck")
+local E = require("seedtype")
 
 local SeedSet = S.SeedSet
-local Eseed = S.Eseed
+local Eseed = E.Italian
 local Card = C.Card
 local Deck = D.Deck
 
