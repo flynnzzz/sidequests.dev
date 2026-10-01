@@ -12,7 +12,6 @@ print(SeedSet.maxvalue)
 
 local denare = SeedSet:new(Eseed.DENARE, Eseed.maxvalue)
 print(denare)
-print(tostring(table.concat(denare.values, ", ")))
 print(Card:of(Eseed.DENARE, 10))
 
 local deck = Deck:new(Eseed)

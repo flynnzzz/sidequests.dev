@@ -1,10 +1,10 @@
 local C = require("card")
-local Card = C.card
+local Card = C.Card
 
 local function cardset(seed, maxvalue)
 	local values = {}
 	for i = 1, maxvalue do
-		values[i] = Card:new(seed, i)
+		values[i] = Card:of(seed, i)
 	end
 	return values
 end
@@ -21,7 +21,12 @@ function SeedSet:new(seed, maxvalue)
 end
 
 function SeedSet:__tostring()
-	return self.seed .. "\n values: " .. table.concat(self.values, " - ")
+	local ivalues = {}
+	for i, _ in ipairs(self.values) do
+		ivalues[i] = i
+	end
+
+	return self.seed .. "\n values: " .. table.concat(ivalues, " - ")
 end
 
 return { SeedSet = SeedSet }
