@@ -9,9 +9,12 @@ local Card = C.Card
 local Deck = D.Deck
 
 print(SeedSet.maxvalue)
-print(SeedSet:new(Eseed.DENARE))
-print(tostring(table.concat(SeedSet.values, ", ")))
+
+local denare = SeedSet:new(Eseed.DENARE, Eseed.maxvalue)
+print(denare)
+print(tostring(table.concat(denare.values, ", ")))
 print(Card:of(Eseed.DENARE, 10))
 
 local deck = Deck:new(Eseed)
 print("Deck:\n" .. tostring(deck))
+print(deck.maxcards)

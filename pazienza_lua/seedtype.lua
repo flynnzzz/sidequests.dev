@@ -7,7 +7,7 @@ SeedType.__pairs = function(self)
 	return function()
 		repeat
 			key, value = next(self, key)
-		until key == nil or type(value) ~= "function"
+		until key == nil or (type(value) ~= "function" and type(value) ~= "number")
 
 		return key, value
 	end
@@ -27,6 +27,7 @@ local Italian = setmetatable({
 	COPPE = "Coppe",
 	SPADE = "Spade",
 	BASTONI = "Bastoni",
+	maxvalue = 10,
 }, SeedType)
 
 return { Italian = Italian }

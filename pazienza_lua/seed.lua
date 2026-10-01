@@ -5,15 +5,15 @@ local function rangeto(n)
 	end
 	return values
 end
-local values = rangeto(10)
-local maxvalue = math.max(table.unpack(values))
 
-local SeedSet = { values = values, maxvalue = maxvalue }
+local SeedSet = {}
 SeedSet.__index = SeedSet
 
-function SeedSet:new(seed)
+function SeedSet:new(seed, maxvalue)
 	local newseed = setmetatable({}, self)
 	newseed.seed = seed
+	newseed.maxvalue = maxvalue
+	newseed.values = rangeto(maxvalue)
 	return newseed
 end
 
