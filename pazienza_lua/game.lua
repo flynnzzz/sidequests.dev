@@ -4,7 +4,7 @@ local function printstack(stack)
 	local values = {}
 
 	for _, value in ipairs(stack) do
-		values[#values + 1] = tostring(value)
+		values[#values + 1] = value:compactstr()
 	end
 
 	print("[ " .. table.concat(values, ", ") .. " ]")
@@ -65,18 +65,26 @@ function Game:play()
 
 	repeat
 		Game:draw()
-		printstack(Game.stack)
+		-- printstack(Game.stack)
 		Game:check()
-		printstack(Game.stack)
+		-- printstack(Game.stack)
 		i = i + 1
 
 	until self.deck.maxcards == 0
+
+	print("result: ")
+	printstack(self.stack)
 
 	if Game:won() then
 		print("WIN")
 	else
 		print("LOSE")
 	end
+end
+
+function Game:restart()
+	self.deck:regenerate()
+	self.stack = {}
 end
 
 return Game

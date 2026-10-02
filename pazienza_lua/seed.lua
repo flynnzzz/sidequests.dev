@@ -1,5 +1,4 @@
-local C = require("card")
-local Card = C.Card
+local Card = require("card")
 
 local function cardset(seed, maxvalue)
 	local values = {}

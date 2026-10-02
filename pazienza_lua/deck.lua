@@ -31,15 +31,22 @@ function Deck:new(seedtype)
 	for _, value in pairs(seedtype) do
 		deck[value] = SeedSet:new(value, seedtype.maxvalue)
 	end
-	deck.stack = generate(deck)
+	deck.cards = generate(deck)
 
 	return deck
+end
+
+function Deck:regenerate()
+	local new = generate(self)
+	self.maxcards = table.len(self.seedtype) * self.seedtype.maxvalue
+	self.cards = new
+	return new
 end
 
 function Deck:draw()
 	local i = math.random(1, self.maxcards)
 	self.maxcards = self.maxcards - 1
-	local drawn = table.remove(self.stack, i)
+	local drawn = table.remove(self.cards, i)
 	return drawn
 end
 
@@ -52,7 +59,7 @@ function Deck:select(i)
 	end
 
 	self.maxcards = self.maxcards - 1
-	local drawn = table.remove(self.stack, i)
+	local drawn = table.remove(self.cards, i)
 	return drawn
 end
 
@@ -64,4 +71,4 @@ function Deck:__tostring()
 	return s
 end
 
-return { Deck = Deck }
+return Deck

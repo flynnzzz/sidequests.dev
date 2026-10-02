@@ -17,4 +17,9 @@ function Card:__tostring()
 	return self.value .. " of " .. self.seed
 end
 
-return { Card = Card }
+function Card:compactstr()
+	local pref = math.min(3, #self.seed)
+	return self.value .. " " .. string.sub(self.seed, 1, pref)
+end
+
+return Card

@@ -1,11 +1,24 @@
-local D = require("deck")
-local E = require("seedtype")
+local Deck = require("deck")
 local Game = require("game")
 
-local ItalianSeeds = E.Italian
-local Deck = D.Deck
+local seedtype = require("seedtype")
+local itseedtype = seedtype.Italian
 
-local italiane = Deck:new(ItalianSeeds)
-Game:attachdeck(italiane)
+local itdeck = Deck:new(itseedtype)
+Game:attachdeck(itdeck)
 
-Game:play()
+local Simulation = { counter = 0 }
+
+function Simulation.start()
+	print("starting simulation...")
+	local win = false
+	repeat
+		Game:play()
+		win = Game:won()
+		Game:restart()
+		Simulation.counter = Simulation.counter + 1
+	until win
+	print("achieved victory after " .. Simulation.counter .. " rounds")
+end
+
+Simulation.start()
