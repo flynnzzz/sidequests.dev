@@ -1,10 +1,20 @@
 local Game = { deck = nil, stack = {} }
 
-local function stacktostring(stack)
+local function stackcompactstr(stack)
 	local values = {}
 
 	for _, value in ipairs(stack) do
 		values[#values + 1] = value:compactstr()
+	end
+
+	return "{ " .. table.concat(values, ", ") .. " }"
+end
+
+local function stacktostring(stack)
+	local values = {}
+
+	for _, value in ipairs(stack) do
+		values[#values + 1] = tostring(value)
 	end
 
 	return "{ " .. table.concat(values, ", ") .. " }"
@@ -56,6 +66,14 @@ function Game:won()
 	return #self.stack == 2
 end
 
+function Game:stacktostring()
+	return stacktostring(self.stack)
+end
+
+function Game:stackcompactstr()
+	return stackcompactstr(self.stack)
+end
+
 function Game:play()
 	if self.deck == nil then
 		error("no deck associated with game, call Game:attachdeck() to attach")
@@ -68,14 +86,14 @@ function Game:play()
 
 	repeat
 		Game:draw()
-		print(string.format("drawing: %s", stacktostring(Game.stack)))
+		print(string.format("drawing: %s", stackcompactstr(Game.stack)))
 		Game:check()
-		print(string.format(" matching: %s\ncards left: %d\n", stacktostring(Game.stack), self.deck.maxcards))
+		print(string.format(" matching: %s\ncards left: %d\n", stackcompactstr(Game.stack), self.deck.maxcards))
 		i = i + 1
 
 	until self.deck.maxcards == 0
 
-	print("result: " .. stacktostring(self.stack))
+	print("result: " .. stackcompactstr(self.stack))
 
 	if Game:won() then
 		print("WIN")
