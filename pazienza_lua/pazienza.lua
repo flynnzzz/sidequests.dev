@@ -36,6 +36,11 @@ function Simulation:start()
 			winningpiles
 		)
 	)
+
+	local counter = self.counter
+	self.counter = 0
+
+	return counter
 end
 
 function Simulation:startdetailed()
@@ -66,6 +71,55 @@ function Simulation:startdetailed()
 			winningpiles
 		)
 	)
+
+	local counter = self.counter
+	self.counter = 0
+
+	return counter
 end
 
-Simulation:startdetailed()
+function Simulation:startnoprint()
+	local won = false
+	repeat
+		Game:playnoprint()
+		won = Game:won()
+		Game:restart()
+		if not won then
+			self.counter = self.counter + 1
+		end
+	until won
+
+	local counter = self.counter
+	self.counter = 0
+
+	return counter
+end
+
+function Simulation:calcaverage(maxiteration)
+	local average
+	local totalgames = 0
+	local start = os.clock()
+	for _ = 1, maxiteration do
+		local gamesplayed = self:startnoprint()
+		totalgames = totalgames + gamesplayed
+	end
+	local elapsed = os.clock() - start
+
+	average = totalgames / maxiteration
+	print(
+		string.format(
+			"time elapsed: %.4f\naverage winchance: %.8f %%\naverage # of games to win: %.4f",
+			elapsed,
+			1 / average * 100,
+			average
+		)
+	)
+
+	return average
+end
+
+print("single simulation:\n")
+Simulation:start()
+
+print("\naverage:\n")
+Simulation:calcaverage(999)
