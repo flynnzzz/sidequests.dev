@@ -44,7 +44,7 @@ function Deck:draw()
 end
 
 function Deck:select(i)
-	if i > 40 then
+	if i > self.maxcards then
 		error("maxcards exceeded: " .. i)
 	end
 	if i <= 0 then
