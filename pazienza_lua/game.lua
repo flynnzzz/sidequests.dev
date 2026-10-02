@@ -1,13 +1,13 @@
 local Game = { deck = nil, stack = {} }
 
-local function printstack(stack)
+local function stacktostring(stack)
 	local values = {}
 
 	for _, value in ipairs(stack) do
 		values[#values + 1] = value:compactstr()
 	end
 
-	print("[ " .. table.concat(values, ", ") .. " ]")
+	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
 function Game:attachdeck(deck)
@@ -60,26 +60,46 @@ function Game:play()
 	if self.deck == nil then
 		error("no deck associated with game, call Game:attachdeck() to attach")
 	end
+	if #self.stack > 0 then
+		error("restart game with Game:restart() before playing another round")
+	end
 	Game.drawmul(2)
 	local i = 1
 
 	repeat
 		Game:draw()
-		-- printstack(Game.stack)
+		print(string.format("drawing: %s", stacktostring(Game.stack)))
 		Game:check()
-		-- printstack(Game.stack)
+		print(string.format(" matching: %s\ncards left: %d\n", stacktostring(Game.stack), self.deck.maxcards))
 		i = i + 1
 
 	until self.deck.maxcards == 0
 
-	print("result: ")
-	printstack(self.stack)
+	print("result: " .. stacktostring(self.stack))
 
 	if Game:won() then
 		print("WIN")
 	else
 		print("LOSE")
 	end
+end
+
+function Game:playnoprint()
+	if self.deck == nil then
+		error("no deck associated with game, call Game:attachdeck() to attach")
+	end
+	if #self.stack > 0 then
+		error("restart game with Game:restart() before playing another round")
+	end
+	Game.drawmul(2)
+	local i = 1
+
+	repeat
+		Game:draw()
+		Game:check()
+		i = i + 1
+
+	until self.deck.maxcards == 0
 end
 
 function Game:restart()
