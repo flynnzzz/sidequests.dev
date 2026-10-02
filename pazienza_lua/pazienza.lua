@@ -10,16 +10,20 @@ Game:attachdeck(itdeck)
 local Simulation = { counter = 0 }
 
 function Simulation.start()
-	local win = false
+	local won = false
+	local winningpiles
 
 	local start = os.clock()
 	print("starting simulation...")
 	repeat
 		Game:playnoprint()
-		win = Game:won()
+		won = Game:won()
+		if won then
+			winningpiles = Game:stacktostring()
+		end
 		Game:restart()
 		Simulation.counter = Simulation.counter + 1
-	until win
+	until won
 
 	local elapsed = os.clock() - start
 	print(
@@ -27,7 +31,7 @@ function Simulation.start()
 			" achieved victory after %d rounds (%.4f seconds)\nwinning piles: %s",
 			Simulation.counter,
 			elapsed,
-			Game:stacktostring()
+			winningpiles
 		)
 	)
 end
@@ -35,8 +39,8 @@ end
 function Simulation.startdetailed()
 	local won = false
 	local winningpiles
-	local start = os.clock()
 
+	local start = os.clock()
 	print("starting simulation...")
 	repeat
 		Game:playnoprint()
