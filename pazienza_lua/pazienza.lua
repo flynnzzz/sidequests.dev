@@ -31,3 +31,25 @@ local gamestack = {
 }
 
 printstack(gamestack)
+
+function MATCH(pivot, tail)
+	return pivot.seed == tail.seed or pivot.value == tail.value
+end
+
+function CHECK(stack, pivot)
+	if #stack <= 2 then
+		return
+	end
+
+	if not MATCH(stack[pivot], stack[pivot - 2]) then
+		return
+	else
+		table.remove(stack, pivot)
+		CHECK(stack, pivot - 1)
+		CHECK(stack, pivot)
+	end
+end
+
+CHECK(gamestack, 5)
+
+printstack(gamestack)
