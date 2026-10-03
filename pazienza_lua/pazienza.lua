@@ -140,7 +140,7 @@ local actions = {
 	end,
 
 	average = function()
-		Simulation:calcaverage(20)
+		Simulation:calcaverage(256)
 	end,
 }
 
