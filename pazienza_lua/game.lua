@@ -5,7 +5,7 @@ local Verbosity = {
 	HIGH = "h",
 }
 
-local Game = { deck = nil, stack = {}, verbosity = Verbosity.MEDIUM }
+local Game = { deck = nil, stack = {} }
 
 function Game:attachdeck(deck)
 	self.deck = deck
@@ -73,7 +73,7 @@ function Game:stackcompactstr()
 	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
-function Game:play()
+function Game:playwith(verbosity)
 	if self.deck == nil then
 		error("no deck associated with game, call Game:attachdeck() to attach")
 	end
@@ -86,25 +86,29 @@ function Game:play()
 	local s = ""
 	repeat
 		Game:draw()
-		if self.verbosity == Verbosity.HIGH then
+		if verbosity == Verbosity.HIGH then
 			s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
 		end
 
 		local cardcount = #self.stack
 		Game:check()
-		if self.verbosity == Verbosity.HIGH and #self.stack < cardcount then
+		if verbosity == Verbosity.HIGH and #self.stack < cardcount then
 			s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
 		end
-		if self.verbosity == Verbosity.HIGH then
+		if verbosity == Verbosity.HIGH then
 			s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
 		end
 
 		i = i + 1
 	until self.deck.maxcards == 0
 
-	if self.verbosity == Verbosity.HIGH then
+	if verbosity == Verbosity.HIGH then
 		io.write(s)
 	end
+end
+
+function Game:play()
+	self:playwith(Verbosity.HIGH)
 end
 
 function Game:restart()

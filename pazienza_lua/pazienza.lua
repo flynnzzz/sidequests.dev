@@ -12,6 +12,11 @@ Options:
   -l                Set verbosity to LOW
   -m                Set verbosity to MEDIUM
   -h                Set verbosity to HIGH
+
+Default verbosity values:
+  play: HIGH
+  simulate: MEDIUM
+  average: LOWEST
 ]]
 
 local Deck = require("deck")
@@ -29,52 +34,46 @@ Game:attachdeck(itdeck)
 local Simulation = {
 	game = Game,
 	counter = 0,
-	verbosity = Verbosity.MEDIUM,
 }
 
-function Simulation:setverbosity(verbosity)
-	self.verbosity = verbosity
-	self.game.verbosity = verbosity
-end
-
-function Simulation:start()
+function Simulation:startwith(verbosity)
 	local won = false
 	local winningpiles
 	local gameresult
 
 	local start = os.clock()
-	if self.verbosity == Verbosity.MEDIUM then
+	if verbosity == Verbosity.MEDIUM then
 		print("starting simulation...")
 	end
 
 	local tracker = ""
 	repeat
-		Game:play()
+		Game:playwith(verbosity)
 		won = Game:won()
 		if won then
 			winningpiles = Game:stacktostring()
 		end
 
-		if self.verbosity == Verbosity.MEDIUM then
+		if verbosity == Verbosity.MEDIUM then
 			gameresult = Game:stackcompactstr()
 		end
 		Game:restart()
 
 		self.counter = self.counter + 1
 
-		if self.verbosity == Verbosity.MEDIUM then
+		if verbosity == Verbosity.MEDIUM then
 			tracker = tracker .. string.format("%d. %s\n", self.counter, gameresult)
 		end
 
 	until won
 
-	if self.verbosity == Verbosity.MEDIUM then
+	if verbosity == Verbosity.MEDIUM then
 		print(tracker)
 	end
 
 	local elapsed = os.clock() - start
 
-	if self.verbosity ~= Verbosity.LOWEST then
+	if verbosity ~= Verbosity.LOWEST then
 		print(
 			string.format(
 				"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
@@ -91,7 +90,11 @@ function Simulation:start()
 	return counter
 end
 
-function Simulation:calcaverage(maxiteration)
+function Simulation:start()
+	return self:startwith(Verbosity.MEDIUM)
+end
+
+function Simulation:calcaverage(maxiteration, verbosity)
 	print("> running " .. maxiteration .. " simulation loops...")
 
 	local average
@@ -99,7 +102,7 @@ function Simulation:calcaverage(maxiteration)
 
 	local start = os.clock()
 	for _ = 1, maxiteration do
-		local gamesplayed = self:start()
+		local gamesplayed = self:startwith(verbosity)
 		totalgames = totalgames + gamesplayed
 	end
 	local elapsed = os.clock() - start
@@ -118,29 +121,42 @@ function Simulation:calcaverage(maxiteration)
 end
 
 local actions = {
-	play = function()
-		Game:play()
-		if Game.verbosity == Verbosity.MEDIUM or Game.verbosity == Verbosity.HIGH then
-			print("> final round: " .. Game:stacktostring())
-		elseif Game.verbosity == Verbosity.LOW then
-			print("> " .. Game:stackcompactstr())
-		end
-		if Game:won() then
-			print("> You won!")
+	play = function(verbosity)
+		if verbosity == nil then
+			Game:play()
 		else
-			print("> You lost...")
+			Game:playwith(verbosity)
+			if verbosity == Verbosity.MEDIUM or verbosity == Verbosity.HIGH then
+				print("> final round: " .. Game:stacktostring())
+			elseif verbosity == Verbosity.LOW then
+				print("> " .. Game:stackcompactstr())
+			end
+
+			if Game:won() then
+				print("> You won!")
+			else
+				print("> You lost...")
+			end
 		end
 	end,
 
-	simulate = function()
-		local count = Simulation:start()
-		if Simulation.verbosity == Verbosity.LOWEST then
-			print("> victory after: " .. count .. " rounds")
+	simulate = function(verbosity)
+		if verbosity == nil then
+			Simulation:start()
+		else
+			local count = Simulation:startwith(verbosity)
+			if verbosity == Verbosity.LOWEST then
+				print("> victory after: " .. count .. " rounds")
+			end
 		end
 	end,
 
-	average = function()
-		Simulation:calcaverage(256)
+	average = function(verbosity)
+		if verbosity == nil then
+			Simulation:calcaverage(256, Verbosity.LOWEST)
+		else
+			Simulation:calcaverage(256, verbosity)
+		end
 	end,
 }
 
@@ -160,20 +176,15 @@ end
 function Main()
 	local action = arg[1]
 	local flag = arg[2]
+	local verbosity
 
 	if isallowed(flag) then
-		local verbosity = flag:sub(2, 2)
-		Simulation:setverbosity(verbosity)
+		verbosity = flag:sub(2, 2)
 	end
 
 	local runnable = actions[action]
-
-	if runnable == actions.play and not isallowed(flag) then
-		Simulation:setverbosity(Verbosity.HIGH)
-	end
-
 	if runnable ~= nil then
-		runnable()
+		runnable(verbosity)
 	else
 		print(USAGE)
 		return
