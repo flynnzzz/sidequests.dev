@@ -167,6 +167,11 @@ function Main()
 	end
 
 	local runnable = actions[action]
+
+	if runnable == actions.play and not isallowed(flag) then
+		Simulation:setverbosity(Verbosity.HIGH)
+	end
+
 	if runnable ~= nil then
 		runnable()
 	else
