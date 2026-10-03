@@ -3,12 +3,12 @@ Usage:
   lua pazienza.lua <ACTION> [OPTIONS]
 
 Actions:
-  play              Play one game (verbosity is fixed and set to HIGH)
+  play              Play one game
   simulate          Play games until victory
   average           Calculate the average win rate
 
 Options:
-  -z                Show no print output
+  -z                Set verbosity to LOWEST
   -l                Set verbosity to LOW
   -m                Set verbosity to MEDIUM
   -h                Set verbosity to HIGH
@@ -47,7 +47,7 @@ function Simulation:start()
 		print("starting simulation...")
 	end
 
-	local s = ""
+	local tracker = ""
 	repeat
 		Game:play()
 		won = Game:won()
@@ -63,17 +63,18 @@ function Simulation:start()
 		self.counter = self.counter + 1
 
 		if self.verbosity == Verbosity.MEDIUM then
-			s = s .. string.format("%d. %s\n", self.counter, gameresult)
+			tracker = tracker .. string.format("%d. %s\n", self.counter, gameresult)
 		end
 
 	until won
 
 	if self.verbosity == Verbosity.MEDIUM then
-		print(s)
+		print(tracker)
 	end
 
 	local elapsed = os.clock() - start
-	if self.verbosity ~= Verbosity.ZERO then
+
+	if self.verbosity ~= Verbosity.LOWEST then
 		print(
 			string.format(
 				"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
@@ -92,8 +93,6 @@ end
 
 function Simulation:calcaverage(maxiteration)
 	print("> running " .. maxiteration .. " simulation loops...")
-	local origverb = self.verbosity
-	self:setverbosity(Verbosity.ZERO)
 
 	local average
 	local totalgames = 0
@@ -108,22 +107,24 @@ function Simulation:calcaverage(maxiteration)
 	average = totalgames / maxiteration
 	print(
 		string.format(
-			"> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.4f",
+			"\n> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.4f",
 			elapsed,
 			1 / average * 100,
 			average
 		)
 	)
 
-	self:setverbosity(origverb)
-
 	return average
 end
 
 local actions = {
 	play = function()
-		Simulation:setverbosity(Verbosity.HIGH)
 		Game:play()
+		if Game.verbosity == Verbosity.MEDIUM or Game.verbosity == Verbosity.HIGH then
+			print("> final round: " .. Game:stacktostring())
+		elseif Game.verbosity == Verbosity.LOW then
+			print("> " .. Game:stackcompactstr())
+		end
 		if Game:won() then
 			print("> You won!")
 		else
@@ -132,11 +133,14 @@ local actions = {
 	end,
 
 	simulate = function()
-		Simulation:start()
+		local count = Simulation:start()
+		if Simulation.verbosity == Verbosity.LOWEST then
+			print("> victory after: " .. count .. " rounds")
+		end
 	end,
 
 	average = function()
-		Simulation:calcaverage(256)
+		Simulation:calcaverage(20)
 	end,
 }
 
@@ -150,7 +154,7 @@ local function isallowed(flag)
 	local prefix = flag:sub(1, 1)
 	local content = flag:sub(2, 2)
 
-	return string.find(flags, prefix, 1, true) ~= nil and string.find(flags, content, 1, true) ~= nil
+	return prefix == "-" and string.find(flags, prefix, 1, true) ~= nil and string.find(flags, content, 1, true) ~= nil
 end
 
 function Main()

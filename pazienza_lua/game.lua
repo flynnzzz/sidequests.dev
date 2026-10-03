@@ -1,5 +1,5 @@
 local Verbosity = {
-	ZERO = "z",
+	LOWEST = "z",
 	LOW = "l",
 	MEDIUM = "m",
 	HIGH = "h",
