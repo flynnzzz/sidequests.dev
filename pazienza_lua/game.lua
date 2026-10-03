@@ -1,24 +1,11 @@
-local Game = { deck = nil, stack = {} }
+local Verbosity = {
+	ZERO = 0,
+	LOW = 1,
+	MEDIUM = 2,
+	HIGH = 3,
+}
 
-local function stackcompactstr(stack)
-	local values = {}
-
-	for _, value in ipairs(stack) do
-		values[#values + 1] = value:compactstr()
-	end
-
-	return "{ " .. table.concat(values, ", ") .. " }"
-end
-
-local function stacktostring(stack)
-	local values = {}
-
-	for _, value in ipairs(stack) do
-		values[#values + 1] = tostring(value)
-	end
-
-	return "{ " .. table.concat(values, ", ") .. " }"
-end
+local Game = { deck = nil, stack = {}, verbosity = Verbosity.MEDIUM }
 
 function Game:attachdeck(deck)
 	self.deck = deck
@@ -67,11 +54,23 @@ function Game:won()
 end
 
 function Game:stacktostring()
-	return stacktostring(self.stack)
+	local values = {}
+
+	for _, value in ipairs(self.stack) do
+		values[#values + 1] = tostring(value)
+	end
+
+	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
 function Game:stackcompactstr()
-	return stackcompactstr(self.stack)
+	local values = {}
+
+	for _, value in ipairs(self.stack) do
+		values[#values + 1] = value:compactstr()
+	end
+
+	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
 function Game:play()
@@ -86,37 +85,16 @@ function Game:play()
 
 	repeat
 		Game:draw()
-		print(string.format("drawing: %s", stackcompactstr(Game.stack)))
+		if self.verbosity == Verbosity.HIGH then
+			print(string.format("drawing: %s", self:stackcompactstr()))
+		end
+
 		Game:check()
-		print(string.format(" matching: %s\ncards left: %d\n", stackcompactstr(Game.stack), self.deck.maxcards))
+		if self.verbosity == Verbosity.HIGH then
+			print(string.format(" matching: %s\ncards left: %d\n", self:stackcompactstr(), self.deck.maxcards))
+		end
+
 		i = i + 1
-
-	until self.deck.maxcards == 0
-
-	print("result: " .. stackcompactstr(self.stack))
-
-	if Game:won() then
-		print("WIN")
-	else
-		print("LOSE")
-	end
-end
-
-function Game:playnoprint()
-	if self.deck == nil then
-		error("no deck associated with game, call Game:attachdeck() to attach")
-	end
-	if #self.stack > 0 then
-		error("restart game with Game:restart() before playing another round")
-	end
-	Game.drawmul(2)
-	local i = 1
-
-	repeat
-		Game:draw()
-		Game:check()
-		i = i + 1
-
 	until self.deck.maxcards == 0
 end
 
@@ -125,4 +103,4 @@ function Game:restart()
 	self.stack = {}
 end
 
-return Game
+return { Game = Game, Verbosity = Verbosity }

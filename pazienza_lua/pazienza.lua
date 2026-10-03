@@ -1,5 +1,8 @@
 local Deck = require("deck")
-local Game = require("game")
+local G = require("game")
+
+local Game = G.Game
+local Verbosity = G.Verbosity
 
 local seedtype = require("seedtype")
 local itseedtype = seedtype.Italian
@@ -7,87 +10,55 @@ local itseedtype = seedtype.Italian
 local itdeck = Deck:new(itseedtype)
 Game:attachdeck(itdeck)
 
-local Simulation = { counter = 0 }
+local Simulation = {
+	game = Game,
+	counter = 0,
+	verbosity = Verbosity.MEDIUM,
+}
+
+function Simulation:setverbosity(verbosity)
+	self.verbosity = verbosity
+	self.game.verbosity = verbosity
+end
 
 function Simulation:start()
 	local won = false
 	local winningpiles
 
 	local start = os.clock()
-	print("starting simulation...")
+	if self.verbosity == Verbosity.MEDIUM then
+		print("starting simulation...")
+	end
+
 	repeat
-		Game:playnoprint()
+		Game:play()
 		won = Game:won()
 		if won then
 			winningpiles = Game:stacktostring()
 		end
+
+		local gameresult = Game:stackcompactstr()
 		Game:restart()
-		if not won then
-			self.counter = self.counter + 1
+
+		self.counter = self.counter + 1
+
+		if self.verbosity == Verbosity.MEDIUM then
+			print(string.format("%d. %s", self.counter, gameresult))
 		end
+
 	until won
 
 	local elapsed = os.clock() - start
-	print(
-		string.format(
-			" achieved victory after %d rounds (%.4f seconds)\nwinning piles: %s",
-			self.counter,
-			elapsed,
-			winningpiles
+	if self.verbosity ~= Verbosity.ZERO then
+		print(
+			string.format(
+				"achieved victory after %d rounds (%.4f seconds)\nwinning piles: %s",
+				self.counter,
+				elapsed,
+				winningpiles
+			)
 		)
-	)
-
-	local counter = self.counter
-	self.counter = 0
-
-	return counter
-end
-
-function Simulation:startdetailed()
-	local won = false
-	local winningpiles
-
-	local start = os.clock()
-	print("starting simulation...")
-	repeat
-		Game:playnoprint()
-		won = Game:won()
-		if won then
-			winningpiles = Game:stacktostring()
-		end
-		print(string.format("%d. %s", self.counter, Game:stackcompactstr()))
-		Game:restart()
-		if not won then
-			self.counter = self.counter + 1
-		end
-	until won
-
-	local elapsed = os.clock() - start
-	print(
-		string.format(
-			"\nachieved victory after %d rounds (%.4f seconds)\nwinning piles: %s",
-			self.counter,
-			elapsed,
-			winningpiles
-		)
-	)
-
-	local counter = self.counter
-	self.counter = 0
-
-	return counter
-end
-
-function Simulation:startnoprint()
-	local won = false
-	repeat
-		Game:playnoprint()
-		won = Game:won()
-		Game:restart()
-		if not won then
-			self.counter = self.counter + 1
-		end
-	until won
+	end
 
 	local counter = self.counter
 	self.counter = 0
@@ -96,11 +67,15 @@ function Simulation:startnoprint()
 end
 
 function Simulation:calcaverage(maxiteration)
+	local origverb = self.verbosity
+	self:setverbosity(Verbosity.ZERO)
+
 	local average
 	local totalgames = 0
+
 	local start = os.clock()
 	for _ = 1, maxiteration do
-		local gamesplayed = self:startnoprint()
+		local gamesplayed = self:start()
 		totalgames = totalgames + gamesplayed
 	end
 	local elapsed = os.clock() - start
@@ -115,11 +90,10 @@ function Simulation:calcaverage(maxiteration)
 		)
 	)
 
+	self:setverbosity(origverb)
+
 	return average
 end
 
-print("single simulation:\n")
+Simulation:setverbosity(Verbosity.MEDIUM)
 Simulation:start()
-
-print("\naverage:\n")
-Simulation:calcaverage(999)
