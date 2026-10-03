@@ -24,12 +24,14 @@ end
 function Simulation:start()
 	local won = false
 	local winningpiles
+	local gameresult
 
 	local start = os.clock()
 	if self.verbosity == Verbosity.MEDIUM then
 		print("starting simulation...")
 	end
 
+	local s = ""
 	repeat
 		Game:play()
 		won = Game:won()
@@ -37,16 +39,22 @@ function Simulation:start()
 			winningpiles = Game:stacktostring()
 		end
 
-		local gameresult = Game:stackcompactstr()
+		if self.verbosity == Verbosity.MEDIUM then
+			gameresult = Game:stackcompactstr()
+		end
 		Game:restart()
 
 		self.counter = self.counter + 1
 
 		if self.verbosity == Verbosity.MEDIUM then
-			print(string.format("%d. %s", self.counter, gameresult))
+			s = s .. string.format("%d. %s\n", self.counter, gameresult)
 		end
 
 	until won
+
+	if self.verbosity == Verbosity.MEDIUM then
+		print(s)
+	end
 
 	local elapsed = os.clock() - start
 	if self.verbosity ~= Verbosity.ZERO then

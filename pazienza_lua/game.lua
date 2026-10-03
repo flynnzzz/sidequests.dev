@@ -83,19 +83,24 @@ function Game:play()
 	Game.drawmul(2)
 	local i = 1
 
+	local s = ""
 	repeat
 		Game:draw()
 		if self.verbosity == Verbosity.HIGH then
-			print(string.format("drawing: %s", self:stackcompactstr()))
+			s = s .. string.format("drawing: %s\n", self:stackcompactstr())
 		end
 
 		Game:check()
 		if self.verbosity == Verbosity.HIGH then
-			print(string.format(" matching: %s\ncards left: %d\n", self:stackcompactstr(), self.deck.maxcards))
+			s = s .. string.format(" matching: %s\ncards left: %d\n\n", self:stackcompactstr(), self.deck.maxcards)
 		end
 
 		i = i + 1
 	until self.deck.maxcards == 0
+
+	if self.verbosity == Verbosity.HIGH then
+		print(s)
+	end
 end
 
 function Game:restart()
