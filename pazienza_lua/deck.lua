@@ -1,5 +1,4 @@
-local seed = require("seed")
-local SeedSet = seed.SeedSet
+local SeedSet = require("seedset")
 
 function table.len(table)
 	local count = 0

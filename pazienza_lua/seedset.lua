@@ -28,4 +28,4 @@ function SeedSet:__tostring()
 	return self.seed .. "\n values: " .. table.concat(ivalues, " - ")
 end
 
-return { SeedSet = SeedSet }
+return SeedSet

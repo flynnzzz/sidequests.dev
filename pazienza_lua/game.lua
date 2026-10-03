@@ -99,7 +99,7 @@ function Game:play()
 	until self.deck.maxcards == 0
 
 	if self.verbosity == Verbosity.HIGH then
-		print(s)
+		io.write(s)
 	end
 end
 

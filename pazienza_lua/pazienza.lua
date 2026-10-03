@@ -1,3 +1,5 @@
+local USAGE =
+	" usage:\n  lua pazienza.lua <ACTION> [-zlmh]\n ACTION:\n play: play one game\n simulate: play until victory\n average: calculate average winrate"
 local Deck = require("deck")
 local G = require("game")
 
@@ -103,5 +105,63 @@ function Simulation:calcaverage(maxiteration)
 	return average
 end
 
-Simulation:setverbosity(Verbosity.MEDIUM)
-Simulation:start()
+local actions = {
+	play = function()
+		Simulation:setverbosity(Verbosity.HIGH)
+		Game:play()
+		if Game:won() then
+			print("You won!")
+		else
+			print("You lost...")
+		end
+	end,
+	simulate = function()
+		Simulation:start()
+	end,
+	average = function()
+		Simulation:calcaverage(256)
+	end,
+}
+
+local flags = "-zlmh"
+
+local function isallowed(flag)
+	if flag == nil or string.len(flag) ~= 2 then
+		return false
+	end
+
+	local prefix = flag:sub(1, 1)
+	local content = flag:sub(2, 2)
+
+	return string.find(flags, prefix, 1, true) ~= nil and string.find(flags, content, 1, true) ~= nil
+end
+
+function Main()
+	local action = arg[1]
+	local flag = arg[2]
+
+	if isallowed(flag) then
+		local verbosity
+		local content = flag:sub(2, 2)
+		if content == "z" then
+			verbosity = Verbosity.ZERO
+		elseif content == "l" then
+			verbosity = Verbosity.LOW
+		elseif content == "m" then
+			verbosity = Verbosity.MEDIUM
+		elseif content == "h" then
+			verbosity = Verbosity.HIGH
+		end
+		Simulation:setverbosity(verbosity)
+	end
+
+	local runnable = actions[action]
+	if runnable ~= nil then
+		runnable()
+	else
+		print(USAGE)
+		return
+	end
+end
+
+Main()
