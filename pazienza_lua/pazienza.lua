@@ -1,5 +1,19 @@
-local USAGE =
-	" usage:\n  lua pazienza.lua <ACTION> [-zlmh]\n ACTION:\n play: play one game\n simulate: play until victory\n average: calculate average winrate"
+local USAGE = [[
+Usage:
+  lua pazienza.lua <ACTION> [OPTIONS]
+
+Actions:
+  play              Play one game (verbosity is fixed and set to HIGH)
+  simulate          Play games until victory
+  average           Calculate the average win rate
+
+Options:
+  -z                Show no print output
+  -l                Set verbosity to LOW
+  -m                Set verbosity to MEDIUM
+  -h                Set verbosity to HIGH
+]]
+
 local Deck = require("deck")
 local G = require("game")
 
@@ -115,9 +129,11 @@ local actions = {
 			print("You lost...")
 		end
 	end,
+
 	simulate = function()
 		Simulation:start()
 	end,
+
 	average = function()
 		Simulation:calcaverage(256)
 	end,
@@ -141,17 +157,7 @@ function Main()
 	local flag = arg[2]
 
 	if isallowed(flag) then
-		local verbosity
-		local content = flag:sub(2, 2)
-		if content == "z" then
-			verbosity = Verbosity.ZERO
-		elseif content == "l" then
-			verbosity = Verbosity.LOW
-		elseif content == "m" then
-			verbosity = Verbosity.MEDIUM
-		elseif content == "h" then
-			verbosity = Verbosity.HIGH
-		end
+		local verbosity = flag:sub(2, 2)
 		Simulation:setverbosity(verbosity)
 	end
 

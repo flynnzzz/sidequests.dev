@@ -1,8 +1,8 @@
 local Verbosity = {
-	ZERO = 0,
-	LOW = 1,
-	MEDIUM = 2,
-	HIGH = 3,
+	ZERO = "z",
+	LOW = "l",
+	MEDIUM = "m",
+	HIGH = "h",
 }
 
 local Game = { deck = nil, stack = {}, verbosity = Verbosity.MEDIUM }
