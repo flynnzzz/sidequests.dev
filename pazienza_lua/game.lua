@@ -87,12 +87,16 @@ function Game:play()
 	repeat
 		Game:draw()
 		if self.verbosity == Verbosity.HIGH then
-			s = s .. string.format("drawing: %s\n", self:stackcompactstr())
+			s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
 		end
 
+		local cardcount = #self.stack
 		Game:check()
+		if self.verbosity == Verbosity.HIGH and #self.stack < cardcount then
+			s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
+		end
 		if self.verbosity == Verbosity.HIGH then
-			s = s .. string.format(" matching: %s\ncards left: %d\n\n", self:stackcompactstr(), self.deck.maxcards)
+			s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
 		end
 
 		i = i + 1

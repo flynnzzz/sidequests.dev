@@ -76,7 +76,7 @@ function Simulation:start()
 	if self.verbosity ~= Verbosity.ZERO then
 		print(
 			string.format(
-				"achieved victory after %d rounds (%.4f seconds)\nwinning piles: %s",
+				"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
 				self.counter,
 				elapsed,
 				winningpiles
@@ -91,6 +91,7 @@ function Simulation:start()
 end
 
 function Simulation:calcaverage(maxiteration)
+	print("> running " .. maxiteration .. " simulation loops...")
 	local origverb = self.verbosity
 	self:setverbosity(Verbosity.ZERO)
 
@@ -107,7 +108,7 @@ function Simulation:calcaverage(maxiteration)
 	average = totalgames / maxiteration
 	print(
 		string.format(
-			"time elapsed: %.4f\naverage winchance: %.8f %%\naverage # of games to win: %.4f",
+			"> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.4f",
 			elapsed,
 			1 / average * 100,
 			average
@@ -124,9 +125,9 @@ local actions = {
 		Simulation:setverbosity(Verbosity.HIGH)
 		Game:play()
 		if Game:won() then
-			print("You won!")
+			print("> You won!")
 		else
-			print("You lost...")
+			print("> You lost...")
 		end
 	end,
 
