@@ -25,6 +25,7 @@ Default verbosity values:
 ]]
 
 local Deck = require("deck")
+local Logger = require("logger")
 local G = require("game")
 
 local Game = G.Game
@@ -36,67 +37,73 @@ local seedtype = SeedType.Mahjong
 local deck = Deck:new(seedtype)
 Game:attachdeck(deck)
 
+local simulation_logger = Logger:new()
 local Simulation = {
 	game = Game,
 	counter = 0,
+	logger = simulation_logger,
 }
 
-function Simulation:startwith(verbosity)
+function Simulation:start()
 	local won = false
 	local winningpiles
-	local gameresult
 
 	local start = os.clock()
-	if verbosity == Verbosity.MEDIUM then
-		print("starting simulation...")
-	end
+	self.logger:log(Verbosity.MEDIUM, "> starting simulation...\n")
+	-- if verbosity == Verbosity.MEDIUM then
+	-- 	print("starting simulation...")
+	-- end
 
-	local tracker = ""
 	repeat
-		Game:playwith(verbosity)
+		Game:play()
 		won = Game:won()
 		if won then
 			winningpiles = Game:stacktostring()
 		end
+		self.logger:log(Verbosity.MEDIUM, string.format("%d. %s\n", self.counter + 1, Game:stackcompactstr()))
 
-		if verbosity == Verbosity.MEDIUM then
-			gameresult = Game:stackcompactstr()
-		end
 		Game:restart()
 
 		self.counter = self.counter + 1
 
-		if verbosity == Verbosity.MEDIUM then
-			tracker = tracker .. string.format("%d. %s\n", self.counter, gameresult)
-		end
+	-- if verbosity == Verbosity.MEDIUM then
+	-- 	tracker = tracker .. string.format("%d. %s\n", self.counter, gameresult)
+	-- end
 
 	until won
 
-	if verbosity == Verbosity.MEDIUM then
-		print(tracker)
-	end
-
 	local elapsed = os.clock() - start
 
-	if verbosity ~= Verbosity.LOWEST then
-		print(
-			string.format(
-				"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
-				self.counter,
-				elapsed,
-				winningpiles
-			)
+	self.logger:log(
+		{ Verbosity.LOW, Verbosity.MEDIUM, Verbosity.HIGH },
+		string.format(
+			"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s\n",
+			self.counter,
+			elapsed,
+			winningpiles
 		)
-	end
+	)
+	self.logger:log(Verbosity.LOWEST, "> victory after: " .. self.counter .. " rounds\n")
+
+	-- if verbosity == Verbosity.LOWEST then
+	-- 	print("> victory after: " .. count .. " rounds")
+	-- end
+
+	-- if verbosity ~= Verbosity.LOWEST then
+	-- 	print(
+	-- 		string.format(
+	-- 			"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
+	-- 			self.counter,
+	-- 			elapsed,
+	-- 			winningpiles
+	-- 		)
+	-- 	)
+	-- end
 
 	local counter = self.counter
 	self.counter = 0
 
 	return counter
-end
-
-function Simulation:start()
-	return self:startwith(Verbosity.MEDIUM)
 end
 
 function Simulation:calcaverage(maxiteration, verbosity)
@@ -129,29 +136,26 @@ local actions = {
 	play = function(verbosity)
 		if verbosity == nil then
 			Game:play()
+			Game.logger:print(Verbosity.HIGH)
 		else
-			Game:playwith(verbosity)
-			if verbosity == Verbosity.MEDIUM or verbosity == Verbosity.HIGH then
-				print("> final round: " .. Game:stacktostring())
-			elseif verbosity == Verbosity.LOW then
-				print("> " .. Game:stackcompactstr())
-			end
-		end
-		if Game:won() then
-			print("> You won!")
-		else
-			print("> You lost...")
+			Game:play()
+			Game.logger:print(verbosity)
 		end
 	end,
 
 	simulate = function(verbosity)
 		if verbosity == nil then
 			Simulation:start()
+			Simulation.logger:print(Verbosity.MEDIUM)
 		else
-			local count = Simulation:startwith(verbosity)
-			if verbosity == Verbosity.LOWEST then
-				print("> victory after: " .. count .. " rounds")
+			Simulation:start()
+			if verbosity == Verbosity.HIGH then
+				Game.logger:print(Verbosity.HIGH)
 			end
+			Simulation.logger:print(verbosity)
+			-- if verbosity == Verbosity.LOWEST then
+			-- 	print("> victory after: " .. count .. " rounds")
+			-- end
 		end
 	end,
 

@@ -1,11 +1,14 @@
+local Logger = require("logger")
+
 local Verbosity = {
 	LOWEST = "z",
 	LOW = "l",
 	MEDIUM = "m",
 	HIGH = "h",
 }
+local gamelogger = Logger:new()
 
-local Game = { deck = nil, stack = {} }
+local Game = { deck = nil, stack = {}, logger = gamelogger }
 
 function Game:attachdeck(deck)
 	self.deck = deck
@@ -73,7 +76,7 @@ function Game:stackcompactstr()
 	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
-function Game:playwith(verbosity)
+function Game:play()
 	if self.deck == nil then
 		error("no deck associated with game, call Game:attachdeck() to attach")
 	end
@@ -83,32 +86,50 @@ function Game:playwith(verbosity)
 	Game.drawmul(2)
 	local i = 1
 
-	local s = ""
+	-- local s = ""
 	repeat
 		Game:draw()
-		if verbosity == Verbosity.HIGH then
-			s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
-		end
+
+		self.logger:log(Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
+		-- if verbosity == Verbosity.HIGH then
+		-- 	s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
+		-- end
 
 		local cardcount = #self.stack
 		Game:check()
-		if verbosity == Verbosity.HIGH and #self.stack < cardcount then
-			s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
+
+		if #self.stack < cardcount then
+			self.logger:log(Verbosity.HIGH, string.format("> matching: %s\n", self:stackcompactstr()))
 		end
-		if verbosity == Verbosity.HIGH then
-			s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
-		end
+		self.logger:log(Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
+
+		-- if verbosity == Verbosity.HIGH and #self.stack < cardcount then
+		-- 	s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
+		-- end
+		-- if verbosity == Verbosity.HIGH then
+		-- 	s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
+		-- end
 
 		i = i + 1
 	until self.deck.maxcards == 0
 
-	if verbosity == Verbosity.HIGH then
-		io.write(s)
-	end
-end
+	-- if verbosity == Verbosity.HIGH then
+	-- 	io.write(s)
+	-- end
 
-function Game:play()
-	self:playwith(Verbosity.HIGH)
+	self.logger:log({ Verbosity.MEDIUM, Verbosity.HIGH }, "> final round: " .. Game:stacktostring() .. "\n")
+	self.logger:log(Verbosity.LOW, "> " .. Game:stackcompactstr() .. "\n")
+
+	if Game:won() then
+		self.logger:log(Verbosity, "> You won!\n")
+	else
+		self.logger:log(Verbosity, "> You lost...\n")
+	end
+	-- if verbosity == Verbosity.MEDIUM or verbosity == Verbosity.HIGH then
+	-- 	print("> final round: " .. Game:stacktostring())
+	-- elseif verbosity == Verbosity.LOW then
+	-- 	print("> " .. Game:stackcompactstr())
+	-- end
 end
 
 function Game:restart()
