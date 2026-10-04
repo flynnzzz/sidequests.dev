@@ -180,6 +180,9 @@ function Main()
 
 	if isallowed(flag) then
 		verbosity = flag:sub(2, 2)
+	elseif flag ~= nil then
+		print("> unrecognized flag: '" .. flag .. "'")
+		return
 	end
 
 	local runnable = actions[action]
