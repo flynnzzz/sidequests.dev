@@ -43,7 +43,8 @@ local Mahjong = setmetatable({
 	DOTS = "Dots",
 	BAMBOO = "Bamboo",
 	CHARACTERS = "Characters",
-	maxvalue = 36,
+	maxvalue = 9,
+	times = 4,
 }, SeedType)
 
 return { Italian = Italian, Poker = Poker, Mahjong = Mahjong }
