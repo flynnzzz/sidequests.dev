@@ -86,14 +86,10 @@ function Game:play()
 	Game.drawmul(2)
 	local i = 1
 
-	-- local s = ""
 	repeat
 		Game:draw()
 
 		self.logger:log(Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
-		-- if verbosity == Verbosity.HIGH then
-		-- 	s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
-		-- end
 
 		local cardcount = #self.stack
 		Game:check()
@@ -103,33 +99,17 @@ function Game:play()
 		end
 		self.logger:log(Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
 
-		-- if verbosity == Verbosity.HIGH and #self.stack < cardcount then
-		-- 	s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
-		-- end
-		-- if verbosity == Verbosity.HIGH then
-		-- 	s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
-		-- end
-
 		i = i + 1
 	until self.deck.maxcards == 0
-
-	-- if verbosity == Verbosity.HIGH then
-	-- 	io.write(s)
-	-- end
 
 	self.logger:log({ Verbosity.MEDIUM, Verbosity.HIGH }, "> final round: " .. Game:stacktostring() .. "\n")
 	self.logger:log(Verbosity.LOW, "> " .. Game:stackcompactstr() .. "\n")
 
 	if Game:won() then
-		self.logger:log(Verbosity, "> You won!\n")
+		self.logger:log({}, "> You won!\n")
 	else
-		self.logger:log(Verbosity, "> You lost...\n")
+		self.logger:log({}, "> You lost...\n")
 	end
-	-- if verbosity == Verbosity.MEDIUM or verbosity == Verbosity.HIGH then
-	-- 	print("> final round: " .. Game:stacktostring())
-	-- elseif verbosity == Verbosity.LOW then
-	-- 	print("> " .. Game:stackcompactstr())
-	-- end
 end
 
 function Game:restart()

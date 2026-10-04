@@ -19,10 +19,14 @@ Options:
   -h                Set verbosity to HIGH
 
 Default verbosity values:
-  play: HIGH
-  simulate: MEDIUM
-  average: LOWEST
+ - play: HIGH
+ - simulate: MEDIUM
+ - average: LOWEST
+Action 'average's maximum allowed verbosity is MEDIUM, passing '-h' produces the same
+result as '-m'.
 ]]
+
+-- TODO: Fix logger performance
 
 local Deck = require("deck")
 local Logger = require("logger")
@@ -37,11 +41,10 @@ local seedtype = SeedType.Mahjong
 local deck = Deck:new(seedtype)
 Game:attachdeck(deck)
 
-local simulation_logger = Logger:new()
 local Simulation = {
 	game = Game,
 	counter = 0,
-	logger = simulation_logger,
+	logger = Logger:new(),
 }
 
 function Simulation:start()
@@ -50,9 +53,6 @@ function Simulation:start()
 
 	local start = os.clock()
 	self.logger:log(Verbosity.MEDIUM, "> starting simulation...\n")
-	-- if verbosity == Verbosity.MEDIUM then
-	-- 	print("starting simulation...")
-	-- end
 
 	repeat
 		Game:play()
@@ -65,11 +65,6 @@ function Simulation:start()
 		Game:restart()
 
 		self.counter = self.counter + 1
-
-	-- if verbosity == Verbosity.MEDIUM then
-	-- 	tracker = tracker .. string.format("%d. %s\n", self.counter, gameresult)
-	-- end
-
 	until won
 
 	local elapsed = os.clock() - start
@@ -84,29 +79,13 @@ function Simulation:start()
 		)
 	)
 	self.logger:log(Verbosity.LOWEST, "> victory after: " .. self.counter .. " rounds\n")
-
-	-- if verbosity == Verbosity.LOWEST then
-	-- 	print("> victory after: " .. count .. " rounds")
-	-- end
-
-	-- if verbosity ~= Verbosity.LOWEST then
-	-- 	print(
-	-- 		string.format(
-	-- 			"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
-	-- 			self.counter,
-	-- 			elapsed,
-	-- 			winningpiles
-	-- 		)
-	-- 	)
-	-- end
-
 	local counter = self.counter
 	self.counter = 0
 
 	return counter
 end
 
-function Simulation:calcaverage(maxiteration, verbosity)
+function Simulation:calcaverage(maxiteration)
 	print("> running " .. maxiteration .. " simulation loops...")
 
 	local average
@@ -114,13 +93,14 @@ function Simulation:calcaverage(maxiteration, verbosity)
 
 	local start = os.clock()
 	for _ = 1, maxiteration do
-		local gamesplayed = self:startwith(verbosity)
+		local gamesplayed = self:start()
 		totalgames = totalgames + gamesplayed
 	end
 	local elapsed = os.clock() - start
 
 	average = totalgames / maxiteration
-	print(
+	self.logger:log(
+		{},
 		string.format(
 			"\n> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.1f",
 			elapsed,
@@ -134,36 +114,34 @@ end
 
 local actions = {
 	play = function(verbosity)
+		Game:play()
 		if verbosity == nil then
-			Game:play()
 			Game.logger:print(Verbosity.HIGH)
 		else
-			Game:play()
 			Game.logger:print(verbosity)
 		end
 	end,
 
 	simulate = function(verbosity)
+		Simulation:start()
 		if verbosity == nil then
-			Simulation:start()
 			Simulation.logger:print(Verbosity.MEDIUM)
 		else
-			Simulation:start()
 			if verbosity == Verbosity.HIGH then
 				Game.logger:print(Verbosity.HIGH)
 			end
 			Simulation.logger:print(verbosity)
-			-- if verbosity == Verbosity.LOWEST then
-			-- 	print("> victory after: " .. count .. " rounds")
-			-- end
 		end
 	end,
 
 	average = function(verbosity)
-		if verbosity == nil then
-			Simulation:calcaverage(256, Verbosity.LOWEST)
+		Simulation:calcaverage(256)
+		if verbosity == nil or verbosity == Verbosity.LOWEST then
+			Simulation.logger:printlast(1, Verbosity.LOWEST)
+		elseif verbosity == Verbosity.HIGH then
+			Simulation.logger:print(Verbosity.MEDIUM)
 		else
-			Simulation:calcaverage(256, verbosity)
+			Simulation.logger:print(verbosity)
 		end
 	end,
 }
