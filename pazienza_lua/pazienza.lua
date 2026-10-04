@@ -1,11 +1,16 @@
 local USAGE = [[
 Usage:
-  lua pazienza.lua <ACTION> [OPTIONS]
+  lua pazienza.lua <ACTION> <SEEDTYPE> [OPTIONS]
 
 Actions:
   play              Play one game
   simulate          Play games until victory
   average           Calculate the average win rate
+
+Seedtypes:
+  italian           Denare, Coppe, Spade, Bastoni
+  poker             Hearts, Diamonds, Clubs, Spades
+  mahjong           Dots, Bamboo, Characters, Winds, Dragon
 
 Options:
   -z                Set verbosity to LOWEST
@@ -158,39 +163,72 @@ local actions = {
 		end
 	end,
 }
+local VERBOSITY_FLAGS = {
+	["-z"] = Verbosity.LOWEST,
+	["-l"] = Verbosity.LOW,
+	["-m"] = Verbosity.MEDIUM,
+	["-h"] = Verbosity.HIGH,
+}
 
-local flags = "-zlmh"
+local SEEDTYPES = {
+	italian = SeedType.Italian,
+	poker = SeedType.Poker,
+	mahjong = SeedType.Mahjong,
+}
 
-local function isallowed(flag)
-	if flag == nil or string.len(flag) ~= 2 then
-		return false
+local function parseargs(argv)
+	local positionals = {}
+	local verbosity
+
+	for i = 1, #argv do
+		local a = argv[i]
+		if a:sub(1, 1) == "-" then
+			local v = VERBOSITY_FLAGS[a]
+			if v == nil then
+				return nil, "unrecognized flag: '" .. a .. "'"
+			end
+			if verbosity ~= nil then
+				return nil, "only one flag allowed"
+			end
+			verbosity = v
+		else
+			positionals[#positionals + 1] = a
+		end
 	end
 
-	local prefix = flag:sub(1, 1)
-	local content = flag:sub(2, 2)
+	if #positionals < 1 then
+		return nil, "no action specified"
+	end
+	if #positionals < 2 then
+		return nil, "no seed type specified"
+	end
+	if #positionals > 2 then
+		return nil, "unexpected argument: '" .. positionals[3] .. "'"
+	end
 
-	return prefix == "-" and string.find(flags, prefix, 1, true) ~= nil and string.find(flags, content, 1, true) ~= nil
+	local action = actions[positionals[1]]
+	if action == nil then
+		return nil, "unknown action: '" .. positionals[1] .. "'"
+	end
+
+	local seed_t = SEEDTYPES[positionals[2]]
+	if seed_t == nil then
+		return nil, "unknown seed type: '" .. positionals[2] .. "'"
+	end
+
+	return { action = action, seedtype = seed_t, verbosity = verbosity }
 end
 
 function Main()
-	local action = arg[1]
-	local flag = arg[2]
-	local verbosity
-
-	if isallowed(flag) then
-		verbosity = flag:sub(2, 2)
-	elseif flag ~= nil then
-		print("> unrecognized flag: '" .. flag .. "'")
-		return
-	end
-
-	local runnable = actions[action]
-	if runnable ~= nil then
-		runnable(verbosity)
-	else
+	local opts, err = parseargs(arg)
+	if opts == nil then
+		print("> " .. err)
 		print(USAGE)
 		return
 	end
+
+	Game:attachdeck(Deck:new(opts.seedtype))
+	opts.action(opts.verbosity)
 end
 
 Main()
