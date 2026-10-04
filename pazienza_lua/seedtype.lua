@@ -30,4 +30,20 @@ local Italian = setmetatable({
 	maxvalue = 10,
 }, SeedType)
 
-return { Italian = Italian }
+local Poker = setmetatable({
+	HEARTS = "Hearts",
+	DIAMONDS = "Diamonds",
+	CLUBS = "Clubs",
+	SPADES = "Spades",
+	maxvalue = 12,
+}, SeedType)
+
+--  numbered suits only
+local Mahjong = setmetatable({
+	DOTS = "Dots",
+	BAMBOO = "Bamboo",
+	CHARACTERS = "Characters",
+	maxvalue = 36,
+}, SeedType)
+
+return { Italian = Italian, Poker = Poker, Mahjong = Mahjong }

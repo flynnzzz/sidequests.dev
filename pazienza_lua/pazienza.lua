@@ -25,11 +25,11 @@ local G = require("game")
 local Game = G.Game
 local Verbosity = G.Verbosity
 
-local seedtype = require("seedtype")
-local itseedtype = seedtype.Italian
+local SeedType = require("seedtype")
+local seedtype = SeedType.Poker
 
-local itdeck = Deck:new(itseedtype)
-Game:attachdeck(itdeck)
+local deck = Deck:new(seedtype)
+Game:attachdeck(deck)
 
 local Simulation = {
 	game = Game,
@@ -131,12 +131,11 @@ local actions = {
 			elseif verbosity == Verbosity.LOW then
 				print("> " .. Game:stackcompactstr())
 			end
-
-			if Game:won() then
-				print("> You won!")
-			else
-				print("> You lost...")
-			end
+		end
+		if Game:won() then
+			print("> You won!")
+		else
+			print("> You lost...")
 		end
 	end,
 
