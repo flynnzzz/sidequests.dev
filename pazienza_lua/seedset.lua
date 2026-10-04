@@ -1,9 +1,13 @@
 local Card = require("card")
 
-local function cardset(seed, maxvalue)
+local function cardset(seed, maxvalue, names)
 	local values = {}
 	for i = 1, maxvalue do
-		values[i] = Card:of(seed, i)
+		if names ~= nil then
+			values[i] = Card:of(seed, i, names[i])
+		else
+			values[i] = Card:of(seed, i)
+		end
 	end
 	return values
 end
@@ -11,11 +15,11 @@ end
 local SeedSet = {}
 SeedSet.__index = SeedSet
 
-function SeedSet:new(seed, maxvalue)
+function SeedSet:new(seed, maxvalue, names)
 	local newseed = setmetatable({}, self)
 	newseed.seed = seed
 	newseed.maxvalue = maxvalue
-	newseed.values = cardset(seed, maxvalue)
+	newseed.values = cardset(seed, maxvalue, names)
 	return newseed
 end
 

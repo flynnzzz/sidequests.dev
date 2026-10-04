@@ -110,7 +110,7 @@ function Simulation:calcaverage(maxiteration, verbosity)
 	average = totalgames / maxiteration
 	print(
 		string.format(
-			"\n> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.4f",
+			"\n> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.1f",
 			elapsed,
 			1 / average * 100,
 			average

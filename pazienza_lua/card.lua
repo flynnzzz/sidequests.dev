@@ -1,7 +1,7 @@
 local Card = {}
 Card.__index = Card
 
-function Card:of(seed, value)
+function Card:of(seed, value, name)
 	local card = setmetatable({}, self)
 
 	if value <= 0 then
@@ -9,17 +9,28 @@ function Card:of(seed, value)
 	end
 
 	card.seed = seed
+	if name ~= nil then
+		card.name = name
+	end
 	card.value = value
 	return card
 end
 
 function Card:__tostring()
-	return self.value .. " of " .. self.seed
+	if self.name ~= nil then
+		return self.name
+	else
+		return self.value .. " of " .. self.seed
+	end
 end
 
 function Card:compactstr()
-	local pref = math.min(3, #self.seed)
-	return self.value .. " " .. string.sub(self.seed, 1, pref)
+	if self.name ~= nil then
+		return self.name
+	else
+		local pref = math.min(3, #self.seed)
+		return self.value .. " " .. string.sub(self.seed, 1, pref)
+	end
 end
 
 return Card

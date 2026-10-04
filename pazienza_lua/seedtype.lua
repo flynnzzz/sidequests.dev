@@ -7,7 +7,7 @@ SeedType.__pairs = function(self)
 	return function()
 		repeat
 			key, value = next(self, key)
-		until key == nil or (type(value) ~= "function" and type(value) ~= "number")
+		until key == nil or type(value) == "string"
 
 		return key, value
 	end
@@ -38,13 +38,32 @@ local Poker = setmetatable({
 	maxvalue = 12,
 }, SeedType)
 
---  numbered suits only
 local Mahjong = setmetatable({
 	DOTS = "Dots",
 	BAMBOO = "Bamboo",
 	CHARACTERS = "Characters",
 	maxvalue = 9,
 	times = 4,
+
+	unnumbered = {
+		WINDS = {
+			name = "Winds",
+			set = {
+				"North Wind",
+				"South Wind",
+				"East Wind",
+				"West Wind",
+			},
+		},
+		DRAGONS = {
+			name = "Dragons",
+			set = {
+				"Red Dragon",
+				"Green Dragon",
+				"White Dragon",
+			},
+		},
+	},
 }, SeedType)
 
 return { Italian = Italian, Poker = Poker, Mahjong = Mahjong }

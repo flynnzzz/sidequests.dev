@@ -23,6 +23,12 @@ local function generate(deck, times)
 		end
 	end
 
+	for _, entry in pairs(deck.seedtype.unnumbered or {}) do
+		for _, v in ipairs(deck[entry.name].values) do
+			table.insert(stack, v)
+		end
+	end
+
 	return stack
 end
 
@@ -30,23 +36,30 @@ function Deck:new(seedtype, multiplicity)
 	local deck = setmetatable({}, self)
 	local mul = multiplicity or 1
 	local times = seedtype.times or 1
+
 	deck.seedtype = seedtype
 	deck.multiplicity = mul * times
-	deck.maxcards = table.len(seedtype) * seedtype.maxvalue * deck.multiplicity
-	print(deck.maxcards)
+
 	for _, value in pairs(seedtype) do
 		deck[value] = SeedSet:new(value, seedtype.maxvalue)
 	end
+
+	local unnumbered = seedtype.unnumbered or {}
+	for _, entry in pairs(unnumbered) do
+		local namelist = entry.set
+		deck[entry.name] = SeedSet:new(entry.name, #namelist, namelist)
+	end
+
 	deck.cards = generate(deck, deck.multiplicity)
+	deck.maxcards = #deck.cards
 
 	return deck
 end
 
 function Deck:regenerate()
-	local new = generate(self, self.multiplicity)
-	self.maxcards = table.len(self.seedtype) * self.seedtype.maxvalue
-	self.cards = new
-	return new
+	self.cards = generate(self, self.multiplicity)
+	self.maxcards = #self.cards
+	return self.cards
 end
 
 function Deck:draw()
