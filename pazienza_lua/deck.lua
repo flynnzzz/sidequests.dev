@@ -21,15 +21,29 @@ local function generate(deck, times)
 				table.insert(stack, v)
 			end
 		end
-	end
-
-	for _, entry in pairs(deck.seedtype.unnumbered or {}) do
-		for _, v in ipairs(deck[entry.name].values) do
-			table.insert(stack, v)
+		for _, entry in pairs(deck.seedtype.unnumbered or {}) do
+			for _, v in ipairs(deck[entry.name].values) do
+				table.insert(stack, v)
+			end
 		end
 	end
 
 	return stack
+end
+
+function Deck:printcards()
+	for _ = 1, self.seedtype.times or 1 do
+		for _, s in pairs(self.seedtype) do
+			for _, v in pairs(self[s].values) do
+				print(tostring(v))
+			end
+		end
+		for _, entry in pairs(self.seedtype.unnumbered or {}) do
+			for _, v in ipairs(self[entry.name].values) do
+				print(tostring(v))
+			end
+		end
+	end
 end
 
 function Deck:new(seedtype, multiplicity)

@@ -34,10 +34,6 @@ local Game = G.Game
 local Verbosity = G.Verbosity
 
 local SeedType = require("seedtype")
-local seedtype = SeedType.Mahjong
-
-local deck = Deck:new(seedtype)
-Game:attachdeck(deck)
 
 local Simulation = {
 	game = Game,

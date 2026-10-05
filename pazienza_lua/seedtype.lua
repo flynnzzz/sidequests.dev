@@ -35,7 +35,7 @@ local Poker = setmetatable({
 	DIAMONDS = "Diamonds",
 	CLUBS = "Clubs",
 	SPADES = "Spades",
-	maxvalue = 12,
+	maxvalue = 13,
 }, SeedType)
 
 local Mahjong = setmetatable({
