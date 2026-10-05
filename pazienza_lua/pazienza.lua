@@ -44,63 +44,66 @@ Game:attachdeck(deck)
 local Simulation = {
 	game = Game,
 	counter = 0,
-	logger = Logger:new(),
 }
 
-function Simulation:start()
+function Simulation:startwith(verbosity)
 	local won = false
 	local winningpiles
 
 	local start = os.clock()
-	self.logger:log(Verbosity.MEDIUM, "> starting simulation...\n")
+	Logger.log(verbosity == Verbosity.MEDIUM, "> starting simulation...\n")
 
 	repeat
-		Game:play()
+		Game:playwith(verbosity)
 		won = Game:won()
 		if won then
 			winningpiles = Game:stacktostring()
 		end
-		self.logger:log(Verbosity.MEDIUM, string.format("%d. %s\n", self.counter + 1, Game:stackcompactstr()))
+		Logger:cache(verbosity == Verbosity.MEDIUM, string.format("%d. %s\n", self.counter + 1, Game:stackcompactstr()))
 
 		Game:restart()
 
 		self.counter = self.counter + 1
 	until won
+	Logger:flush(verbosity == Verbosity.MEDIUM)
 
 	local elapsed = os.clock() - start
 
-	self.logger:log(
-		{ Verbosity.LOW, Verbosity.MEDIUM, Verbosity.HIGH },
+	Logger.log(
+		verbosity ~= Verbosity.LOWEST,
 		string.format(
-			"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s\n",
+			"> achieved victory after %d rounds (%.4f seconds)\n> winning piles: %s",
 			self.counter,
 			elapsed,
 			winningpiles
 		)
 	)
-	self.logger:log(Verbosity.LOWEST, "> victory after: " .. self.counter .. " rounds\n")
 	local counter = self.counter
 	self.counter = 0
 
 	return counter
 end
 
-function Simulation:calcaverage(maxiteration)
-	print("> running " .. maxiteration .. " simulation loops...")
+function Simulation:start()
+	self:startwith(Verbosity.MEDIUM)
+end
+
+function Simulation:calcaverage(maxiteration, verbosity)
+	Logger.log(true, "> running " .. maxiteration .. " simulation loops...")
 
 	local average
 	local totalgames = 0
 
 	local start = os.clock()
 	for _ = 1, maxiteration do
-		local gamesplayed = self:start()
+		local gamesplayed = self:startwith(verbosity)
 		totalgames = totalgames + gamesplayed
 	end
 	local elapsed = os.clock() - start
 
 	average = totalgames / maxiteration
-	self.logger:log(
-		{},
+	Logger.log(
+		true,
 		string.format(
 			"\n> time elapsed: %.4f\n> average winchance: %.8f %%\n> average # of games to win: %.1f",
 			elapsed,
@@ -114,34 +117,37 @@ end
 
 local actions = {
 	play = function(verbosity)
-		Game:play()
 		if verbosity == nil then
-			Game.logger:print(Verbosity.HIGH)
+			Game:play()
 		else
-			Game.logger:print(verbosity)
+			Game:playwith(verbosity)
+			Logger.log(
+				verbosity == Verbosity.MEDIUM or verbosity == Verbosity.HIGH,
+				"> final round: " .. Game:stacktostring()
+			)
+			Logger.log(verbosity == Verbosity.LOW, "> " .. Game:stackcompactstr())
+		end
+		if Game:won() then
+			Logger.log(true, "> You won!")
+		else
+			Logger.log(true, "> You lost...")
 		end
 	end,
 
 	simulate = function(verbosity)
-		Simulation:start()
 		if verbosity == nil then
-			Simulation.logger:print(Verbosity.MEDIUM)
+			Simulation:start()
 		else
-			if verbosity == Verbosity.HIGH then
-				Game.logger:print(Verbosity.HIGH)
-			end
-			Simulation.logger:print(verbosity)
+			local counter = Simulation:startwith(verbosity)
+			Logger.log(verbosity == Verbosity.LOWEST, "> victory after: " .. counter .. " rounds\n")
 		end
 	end,
 
 	average = function(verbosity)
-		Simulation:calcaverage(256)
-		if verbosity == nil or verbosity == Verbosity.LOWEST then
-			Simulation.logger:printlast(1, Verbosity.LOWEST)
-		elseif verbosity == Verbosity.HIGH then
-			Simulation.logger:print(Verbosity.MEDIUM)
+		if verbosity == nil then
+			Simulation:calcaverage(256, Verbosity.LOWEST)
 		else
-			Simulation.logger:print(verbosity)
+			Simulation:calcaverage(256, verbosity)
 		end
 	end,
 }

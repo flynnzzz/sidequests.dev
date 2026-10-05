@@ -6,9 +6,8 @@ local Verbosity = {
 	MEDIUM = "m",
 	HIGH = "h",
 }
-local gamelogger = Logger:new()
 
-local Game = { deck = nil, stack = {}, logger = gamelogger }
+local Game = { deck = nil, stack = {} }
 
 function Game:attachdeck(deck)
 	self.deck = deck
@@ -76,12 +75,12 @@ function Game:stackcompactstr()
 	return "{ " .. table.concat(values, ", ") .. " }"
 end
 
-function Game:play()
+function Game:playwith(verbosity)
 	if self.deck == nil then
-		error("no deck associated with game, call Game:attachdeck() to attach")
+		error("> no deck associated with game, call Game:attachdeck() to attach")
 	end
 	if #self.stack > 0 then
-		error("restart game with Game:restart() before playing another round")
+		error("> restart game with Game:restart() before playing another round")
 	end
 	Game.drawmul(2)
 	local i = 1
@@ -89,27 +88,28 @@ function Game:play()
 	repeat
 		Game:draw()
 
-		self.logger:log(Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
+		-- logically redundant, but greatly increases performance
+		if verbosity == Verbosity.HIGH then
+			Logger:cache(verbosity == Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
+		end
 
 		local cardcount = #self.stack
 		Game:check()
 
-		if #self.stack < cardcount then
-			self.logger:log(Verbosity.HIGH, string.format("> matching: %s\n", self:stackcompactstr()))
+		if verbosity == Verbosity.HIGH then
+			if #self.stack < cardcount then
+				Logger:cache(verbosity == Verbosity.HIGH, string.format(" > matching: %s\n", self:stackcompactstr()))
+			end
+			Logger:cache(verbosity == Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
 		end
-		self.logger:log(Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
 
 		i = i + 1
 	until self.deck.maxcards == 0
+	Logger:flush(verbosity == Verbosity.HIGH)
+end
 
-	self.logger:log({ Verbosity.MEDIUM, Verbosity.HIGH }, "> final round: " .. Game:stacktostring() .. "\n")
-	self.logger:log(Verbosity.LOW, "> " .. Game:stackcompactstr() .. "\n")
-
-	if Game:won() then
-		self.logger:log({}, "> You won!\n")
-	else
-		self.logger:log({}, "> You lost...\n")
-	end
+function Game:play()
+	self:playwith(Verbosity.HIGH)
 end
 
 function Game:restart()
