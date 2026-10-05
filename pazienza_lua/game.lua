@@ -1,3 +1,5 @@
+local Logger = require("logger")
+
 local Verbosity = {
 	LOWEST = "z",
 	LOW = "l",
@@ -77,36 +79,35 @@ end
 
 function Game:playwith(verbosity)
 	if self.deck == nil then
-		error("no deck associated with game, call Game:attachdeck() to attach")
+		error("> no deck associated with game, call Game:attachdeck() to attach")
 	end
 	if #self.stack > 0 then
-		error("restart game with Game:restart() before playing another round")
+		error("> restart game with Game:restart() before playing another round")
 	end
 	Game.drawmul(2)
 	local i = 1
 
-	local s = ""
 	repeat
 		Game:draw()
+
+		-- logically redundant, but greatly increases performance
 		if verbosity == Verbosity.HIGH then
-			s = s .. string.format("> drawing: %s\n", self:stackcompactstr())
+			Logger:cache(verbosity == Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
 		end
 
 		local cardcount = #self.stack
 		Game:check()
-		if verbosity == Verbosity.HIGH and #self.stack < cardcount then
-			s = s .. string.format(" > matching: %s\n", self:stackcompactstr())
-		end
+
 		if verbosity == Verbosity.HIGH then
-			s = s .. string.format("> cards left: %d\n\n", self.deck.maxcards)
+			if #self.stack < cardcount then
+				Logger:cache(verbosity == Verbosity.HIGH, string.format(" > matching: %s\n", self:stackcompactstr()))
+			end
+			Logger:cache(verbosity == Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
 		end
 
 		i = i + 1
 	until self.deck.maxcards == 0
-
-	if verbosity == Verbosity.HIGH then
-		io.write(s)
-	end
+	Logger:flush(verbosity == Verbosity.HIGH)
 end
 
 function Game:play()
