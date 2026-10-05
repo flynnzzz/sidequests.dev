@@ -24,6 +24,7 @@ Default verbosity values:
   average: LOWEST
 ]]
 
+local Card = require("card")
 local Deck = require("deck")
 local G = require("game")
 
@@ -230,5 +231,34 @@ function Main()
 	Game:attachdeck(Deck:new(opts.seedtype))
 	opts.action(opts.verbosity)
 end
+
+-- local test = {
+-- 	Card:of("Hea", 11),
+-- 	Card:of("Clu", 12),
+-- 	Card:of("Spa", 5),
+-- 	Card:of("Hea", 6),
+-- 	Card:of("Clu", 5),
+-- 	Card:of("Hea", 12),
+-- 	Card:of("Spa", 6),
+-- 	Card:of("Dia", 11),
+-- 	Card:of("Hea", 10),
+-- 	Card:of("Spa", 8),
+-- 	Card:of("Spa", 4),
+-- 	Card:of("Clu", 3),
+-- 	Card:of("Clu", 6),
+-- 	Card:of("Dia", 1),
+-- 	Card:of("Hea", 4),
+-- 	Card:of("Hea", 7),
+-- 	Card:of("Clu", 10),
+-- 	Card:of("Hea", 9),
+-- }
+--
+-- Game.stack = test
+--
+-- print("before matching: " .. Game:stacktostring())
+--
+-- Game:check()
+--
+-- print("after matching: " .. Game:stacktostring())
 
 Main()

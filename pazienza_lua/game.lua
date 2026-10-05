@@ -15,25 +15,27 @@ function Game.match(head, tail)
 	return head.seed == tail.seed or head.value == tail.value
 end
 
-function Game:checkfrom(pivot)
+function Game:checkfrom(pivot, last)
 	local stack = self.stack
-	if #stack < 3 or pivot < 3 then
+
+	if #stack < 3 or last < 3 then
 		return
 	end
 
-	if not Game.match(stack[pivot], stack[pivot - 2]) then
+	if not self.match(stack[last], stack[last - 2]) then
 		return
 	else
-		table.remove(stack, pivot - 2)
-		pivot = pivot - 1
+		table.remove(stack, last - 2)
+		pivot.value = pivot.value - 1
 
-		Game:checkfrom(pivot - 1)
-		Game:check()
+		Game:checkfrom(pivot, pivot.value - 1)
+		Game:checkfrom(pivot, pivot.value)
 	end
 end
 
 function Game:check()
-	Game:checkfrom(#self.stack)
+	local pivot = { value = #self.stack }
+	Game:checkfrom(pivot, pivot.value)
 end
 
 function Game:draw()
