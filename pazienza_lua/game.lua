@@ -90,9 +90,8 @@ function Game:playwith(verbosity)
 	repeat
 		Game:draw()
 
-		-- logically redundant, but greatly increases performance
 		if verbosity == Verbosity.HIGH then
-			Logger:cache(verbosity == Verbosity.HIGH, string.format("> drawing: %s\n", self:stackcompactstr()))
+			Logger:cache(string.format("> drawing: %s\n", self:stackcompactstr()))
 		end
 
 		local cardcount = #self.stack
@@ -100,9 +99,9 @@ function Game:playwith(verbosity)
 
 		if verbosity == Verbosity.HIGH then
 			if #self.stack < cardcount then
-				Logger:cache(verbosity == Verbosity.HIGH, string.format(" > matching: %s\n", self:stackcompactstr()))
+				Logger:cache(string.format(" > matching: %s\n", self:stackcompactstr()))
 			end
-			Logger:cache(verbosity == Verbosity.HIGH, string.format("> cards left: %d\n\n", self.deck.maxcards))
+			Logger:cache(string.format("> cards left: %d\n\n", self.deck.maxcards))
 		end
 
 		i = i + 1

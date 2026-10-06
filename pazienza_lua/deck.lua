@@ -32,13 +32,17 @@ local function generate(deck, times)
 end
 
 function Deck:printcards()
-	for _ = 1, self.seedtype.times or 1 do
-		for _, s in pairs(self.seedtype) do
-			for _, v in pairs(self[s].values) do
+	if self.seedtype == nil then
+		error("seedtype not set for this deck")
+	end
+	local seedtype = self.seedtype
+	for _ = 1, seedtype.times or 1 do
+		for _, seed in pairs(seedtype) do
+			for _, v in pairs(self[seed].values) do
 				print(tostring(v))
 			end
 		end
-		for _, entry in pairs(self.seedtype.unnumbered or {}) do
+		for _, entry in pairs(seedtype.unnumbered or {}) do
 			for _, v in ipairs(self[entry.name].values) do
 				print(tostring(v))
 			end
@@ -65,34 +69,26 @@ function Deck:new(seedtype, multiplicity)
 	end
 
 	deck.cards = generate(deck, deck.multiplicity)
+	deck.template = table.move(deck.cards, 1, #deck.cards, 1, {})
 	deck.maxcards = #deck.cards
 
 	return deck
 end
 
 function Deck:regenerate()
-	self.cards = generate(self, self.multiplicity)
+	self.cards = table.move(self.template, 1, #self.template, 1, {})
 	self.maxcards = #self.cards
 	return self.cards
 end
 
 function Deck:draw()
 	local i = math.random(1, self.maxcards)
-	self.maxcards = self.maxcards - 1
-	local drawn = table.remove(self.cards, i)
-	return drawn
-end
+	local drawn = self.cards[i]
 
-function Deck:select(i)
-	if i > self.maxcards then
-		error("maxcards exceeded: " .. i)
-	end
-	if i <= 0 then
-		error("card value not allowed: " .. tostring(i))
-	end
-
+	self.cards[i] = self.cards[self.maxcards]
+	self.cards[self.maxcards] = nil
 	self.maxcards = self.maxcards - 1
-	local drawn = table.remove(self.cards, i)
+
 	return drawn
 end
 
