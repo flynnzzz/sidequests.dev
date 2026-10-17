@@ -217,6 +217,8 @@ function Main()
 	opts.action(opts.verbosity)
 end
 
+-- local start = os.clock()
+-- local Card = require("card")
 -- local test = {
 -- 	Card:of("Hea", 11),
 -- 	Card:of("Clu", 12),
@@ -227,7 +229,7 @@ end
 -- 	Card:of("Spa", 6),
 -- 	Card:of("Dia", 11),
 -- 	Card:of("Hea", 10),
--- 	Card:of("Spa", 8),
+-- 	Card:of("Spa", 1),
 -- 	Card:of("Spa", 4),
 -- 	Card:of("Clu", 3),
 -- 	Card:of("Clu", 6),
@@ -245,5 +247,9 @@ end
 -- Game:check()
 --
 -- print("after matching: " .. Game:stacktostring())
+--
+-- local final = os.clock()
+--
+-- print("time elapsed: " .. final - start)
 
 Main()

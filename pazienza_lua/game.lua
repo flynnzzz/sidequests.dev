@@ -17,27 +17,18 @@ function Game.match(head, tail)
 	return head.seed == tail.seed or head.value == tail.value
 end
 
-function Game:checkfrom(pivot, last)
-	local stack = self.stack
-
-	if #stack < 3 or last < 3 then
-		return
-	end
-
-	if not self.match(stack[last], stack[last - 2]) then
-		return
-	else
-		table.remove(stack, last - 2)
-		pivot.value = pivot.value - 1
-
-		Game:checkfrom(pivot, pivot.value - 1)
-		Game:checkfrom(pivot, pivot.value)
-	end
-end
-
 function Game:check()
-	local pivot = { value = #self.stack }
-	Game:checkfrom(pivot, pivot.value)
+	local stack = self.stack
+	local pivot = math.max(#stack, 3)
+
+	while pivot <= #stack do
+		if self.match(stack[pivot], stack[pivot - 2]) then
+			table.remove(stack, pivot - 2)
+			pivot = math.max(pivot - 2, 3)
+		else
+			pivot = pivot + 1
+		end
+	end
 end
 
 function Game:draw()

@@ -1,12 +1,14 @@
 # pazienza.lua
- Simulation of a popular italian card game that goes by many names, one of which is "Solitario della pazienza" (Solitaire of patience).
 
+ Simulation of a popular italian card game that goes by many names, one of which
+ is "Solitario della pazienza" (Solitaire of patience).
 
 ## 1. requirements
 
 - Lua 5.4+
 
 ## 2. usage
+
 ```
 Usage:
   lua pazienza.lua <ACTION> <SEEDTYPE> [OPTIONS]
@@ -34,7 +36,10 @@ Default verbosity values:
 ```
 
 ## 3. notes
-- My first multiple files lua project, this helped me familiarize with the language
-- Implementing the game solver using recursion was very stimulating
-- Digitalizing this card game and "achieving victory" this way was quite satisfying (considering the unlikeliness of winning
-with actual physical cards).
+
+- My first multiple files lua project, this helped me greatly in familiarizing
+with the language
+- ~Implementing the game solver using recursion was very stimulating~
+- Finding flaws and fixing the game solver's logic was very stimulating
+- Digitalizing this card game and "achieving victory" this way was quite
+satisfying (considering the unlikeliness of winning with actual physical cards).
