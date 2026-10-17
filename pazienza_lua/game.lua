@@ -75,9 +75,8 @@ function Game:playwith(verbosity)
 	if #self.stack > 0 then
 		error("> restart game with Game:restart() before playing another round")
 	end
-	Game.drawmul(2)
-	local i = 1
 
+	Game.drawmul(2)
 	repeat
 		Game:draw()
 
@@ -95,7 +94,6 @@ function Game:playwith(verbosity)
 			Logger:cache(string.format("> cards left: %d\n\n", self.deck.maxcards))
 		end
 
-		i = i + 1
 	until self.deck.maxcards == 0
 	Logger:flush(verbosity == Verbosity.HIGH)
 end
