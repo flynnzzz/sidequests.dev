@@ -2,6 +2,8 @@
 
  Simulation of a popular italian card game that goes by many names, one of which
  is "Solitario della pazienza" (Solitaire of patience).
+ 
+*This project has been promoted to have it's own [repo](https://github.com/flynnzzz/pazienza)!*
 
 ## 1. requirements
 
