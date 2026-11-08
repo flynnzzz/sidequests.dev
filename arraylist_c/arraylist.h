@@ -9,14 +9,22 @@ typedef struct arrayhead_t {
   size_t lenght, capacity;
 } arrayhead;
 
-int *al_empty();
+typedef int al_type;
 
-int *al_new(size_t lenght);
+al_type *al_empty();
 
-size_t al_lenght(const int array[]);
+al_type *al_new(size_t lenght);
 
-void al_insert(int array[], const int item);
+size_t al_lenght(const al_type array[]);
 
-void al_print(const int array[]);
+size_t al_capacity(const al_type array[]);
+
+void al_insert(al_type array[], const al_type item);
+
+void al_remove(al_type array[], const al_type item);
+
+void al_iremove(al_type array[], int index);
+
+void al_print(const al_type array[]);
 
 #endif // !ARRAYLIST_H
