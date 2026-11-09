@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define al_head(array) ((arrayhead *)((char *)array - sizeof(arrayhead)))
+#define al_head(array) ((arrayhead *)array - 1)
 #define nullptr_guard(pointer, message)                                        \
   do {                                                                         \
     if (pointer == NULL) {                                                     \
@@ -51,18 +51,18 @@ size_t al_capacity(const al_type array[]) {
 void al_insert(al_type *array[], const al_type item) {
   nullptr_guard(array, "al_insert: NULL pointer");
 
-  al_type *data = *array;
-  arrayhead *head = al_head(data);
+  arrayhead *head = al_head(*array);
 
-  if (head->length == head->capacity) {
+  if (head->length + 1 >= head->capacity) {
+    size_t old_capacity = head->capacity;
     size_t new_size =
-        sizeof(arrayhead) + sizeof(al_type) * (head->capacity * GROWTH_FACTOR);
+        sizeof(arrayhead) + sizeof(al_type) * (old_capacity * GROWTH_FACTOR);
     arrayhead *new_head = realloc(head, new_size);
     if (!new_head) {
       perror("al_insert");
       exit(EXIT_FAILURE);
     }
-    new_head->capacity = head->capacity * GROWTH_FACTOR;
+    new_head->capacity = old_capacity * GROWTH_FACTOR;
     new_head->start = (al_type *)(new_head + 1);
     head = new_head;
   }
