@@ -1,21 +1,24 @@
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
-#include <unistd.h>
+#include <stddef.h>
 
 #define INITIAL_CAPACITY 32
 #define GROWTH_FACTOR 2
 
-typedef struct arrayhead_t {
-  size_t lenght, capacity;
-} arrayhead;
-
 typedef int al_type;
+
+typedef struct arrayhead_t {
+  size_t length, capacity;
+  al_type *start;
+} arrayhead;
 
 al_type *al_empty();
 
-al_type *al_new(size_t lenght);
+al_type *al_new(size_t length);
 
-size_t al_lenght(const al_type array[]);
+void al_free(al_type array[]);
+
+size_t al_length(const al_type array[]);
 
 size_t al_capacity(const al_type array[]);
 

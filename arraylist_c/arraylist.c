@@ -2,9 +2,15 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #define al_head(array) ((arrayhead *)(array - (char)sizeof(arrayhead)))
+#define nullptr_guard(pointer, message)                                        \
+  do {                                                                         \
+    if (pointer == NULL) {                                                     \
+      fprintf(stderr, message);                                                \
+      exit(EXIT_FAILURE);                                                      \
+    }                                                                          \
+  } while (0)
 
 al_type *al_empty() { return al_new(0); }
 
@@ -17,45 +23,62 @@ al_type *al_new(size_t len) {
   }
   arrayhead *head = (arrayhead *)array;
   head->capacity = len == 0 ? INITIAL_CAPACITY : len;
-  head->lenght = 0;
+  head->length = 0;
+  head->start = (al_type *)(array + sizeof(arrayhead));
 
-  array = array + (char)sizeof(arrayhead);
-  return array;
+  return head->start;
 }
 
-size_t al_lenght(const al_type array[]) {
+void al_free(al_type *array) {
+  nullptr_guard(array, "al_free: NULL pointer");
+  free(al_head(array));
+}
+
+size_t al_length(const al_type array[]) {
+  nullptr_guard(array, "al_length: NULL pointer");
+
   arrayhead *head = al_head(array);
-  return head->lenght;
+  return head->length;
 }
 
 size_t al_capacity(const al_type array[]) {
+  nullptr_guard(array, "al_capacity: NULL pointer");
   arrayhead *head = al_head(array);
   return head->capacity;
 }
 
 void al_insert(al_type array[], const al_type item) {
+  nullptr_guard(array, "al_insert: NULL pointer");
+
   arrayhead *head = al_head(array);
 
-  if (head->lenght == head->capacity) {
-    head = realloc(head, sizeof(arrayhead) + (head->capacity * GROWTH_FACTOR));
-    if (!head) {
+  if (head->length == head->capacity) {
+    size_t new_size = sizeof(arrayhead) + (head->capacity * GROWTH_FACTOR);
+    al_type *new_al = realloc(array, new_size);
+    if (!new_al) {
       perror("al_insert");
+      al_free(array);
       exit(EXIT_FAILURE);
     }
+    array = new_al;
   }
 
-  array[head->lenght++] = item;
+  array[head->length++] = item;
 }
 
 static void lshift(al_type array[], int start) {
-  for (int i = start; i < al_lenght(array) - 1; i++) {
+  nullptr_guard(array, "al_shift: NULL pointer");
+
+  for (int i = start; i < al_length(array) - 1; i++) {
     array[i] = array[i + 1];
   }
-  al_head(array)->lenght--;
+  al_head(array)->length--;
 }
 
 void al_remove(al_type array[], const al_type item) {
-  for (int i = 0; i < al_lenght(array); i++) {
+  nullptr_guard(array, "al_remove: NULL pointer");
+
+  for (int i = 0; i < al_length(array); i++) {
     if (array[i] == item) {
       lshift(array, i);
       return;
@@ -63,14 +86,23 @@ void al_remove(al_type array[], const al_type item) {
   }
 }
 
-inline void al_iremove(al_type array[], int index) { lshift(array, index); }
+inline void al_iremove(al_type array[], int index) {
+  nullptr_guard(array, "al_iremove: NULL pointer");
+
+  if (index > al_length(array) || index < 0)
+    return;
+
+  lshift(array, index);
+}
 
 void al_print(const al_type array[]) {
+  nullptr_guard(array, "al_print: NULL pointer");
+
   arrayhead *head = al_head(array);
 
   printf("{ ");
-  for (int i = 0; i < head->lenght; i++) {
-    if (i != head->lenght - 1)
+  for (int i = 0; i < head->length; i++) {
+    if (i != head->length - 1)
       printf("%d, ", array[i]);
     else
       printf("%d", array[i]);
