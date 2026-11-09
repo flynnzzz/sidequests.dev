@@ -52,9 +52,10 @@
     list_##T *head = list;                                                     \
     while (head != NULL) {                                                     \
       free((void *)(head->data));                                              \
-      head = head->next;                                                       \
+      list_##T *next = head->next;                                             \
+      free((void *)head);                                                      \
+      head = next;                                                             \
     }                                                                          \
-    free((void *)list);                                                        \
   }
 
 #define empty_list(T) (list_##T *)NULL
