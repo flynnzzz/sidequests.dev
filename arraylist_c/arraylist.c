@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define al_head(array) ((arrayhead *)(array - (char)sizeof(arrayhead)))
+#define al_head(array) ((arrayhead *)((char *)array - sizeof(arrayhead)))
 #define nullptr_guard(pointer, message)                                        \
   do {                                                                         \
     if (pointer == NULL) {                                                     \
-      fprintf(stderr, message);                                                \
+      fputs(message, stderr);                                                  \
       exit(EXIT_FAILURE);                                                      \
     }                                                                          \
   } while (0)
@@ -15,6 +15,7 @@
 al_type *al_empty() { return al_new(0); }
 
 al_type *al_new(size_t len) {
+  len = len == 0 ? INITIAL_CAPACITY : len;
   al_type *array =
       (al_type *)malloc(sizeof(arrayhead) + (len * sizeof(al_type)));
   if (!array) {
@@ -22,9 +23,9 @@ al_type *al_new(size_t len) {
     exit(EXIT_FAILURE);
   }
   arrayhead *head = (arrayhead *)array;
-  head->capacity = len == 0 ? INITIAL_CAPACITY : len;
+  head->capacity = len;
   head->length = 0;
-  head->start = (al_type *)(array + sizeof(arrayhead));
+  head->start = (al_type *)(head + 1);
 
   return head->start;
 }
@@ -47,23 +48,27 @@ size_t al_capacity(const al_type array[]) {
   return head->capacity;
 }
 
-void al_insert(al_type array[], const al_type item) {
+void al_insert(al_type *array[], const al_type item) {
   nullptr_guard(array, "al_insert: NULL pointer");
 
-  arrayhead *head = al_head(array);
+  al_type *data = *array;
+  arrayhead *head = al_head(data);
 
   if (head->length == head->capacity) {
-    size_t new_size = sizeof(arrayhead) + (head->capacity * GROWTH_FACTOR);
-    al_type *new_al = realloc(array, new_size);
-    if (!new_al) {
+    size_t new_size =
+        sizeof(arrayhead) + sizeof(al_type) * (head->capacity * GROWTH_FACTOR);
+    arrayhead *new_head = realloc(head, new_size);
+    if (!new_head) {
       perror("al_insert");
-      al_free(array);
       exit(EXIT_FAILURE);
     }
-    array = new_al;
+    new_head->capacity = head->capacity * GROWTH_FACTOR;
+    new_head->start = (al_type *)(new_head + 1);
+    head = new_head;
   }
 
-  array[head->length++] = item;
+  *array = head->start;
+  head->start[head->length++] = item;
 }
 
 static void lshift(al_type array[], int start) {
@@ -89,7 +94,7 @@ void al_remove(al_type array[], const al_type item) {
 inline void al_iremove(al_type array[], int index) {
   nullptr_guard(array, "al_iremove: NULL pointer");
 
-  if (index > al_length(array) || index < 0)
+  if (index >= al_length(array) || index < 0)
     return;
 
   lshift(array, index);
