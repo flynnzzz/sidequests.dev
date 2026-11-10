@@ -620,6 +620,16 @@ static void test_insert_exceed_maximum_capacity() {
   PASS();
 }
 
+static void test_nullptr_guard() {
+  TEST("test_nullptr_guard");
+
+  puts("");
+  assert(al_length(NULL) == -1);
+  assert(al_capacity(NULL) == -1);
+
+  PASS();
+}
+
 int main() {
   puts("=== Running ArrayList Tests ===\n");
 
@@ -651,6 +661,7 @@ int main() {
   test_all_functions_used();
   test_new_exceed_maximum_capacity();
   test_insert_exceed_maximum_capacity();
+  test_nullptr_guard();
 
   puts("\n=== All Tests Completed ===");
 
