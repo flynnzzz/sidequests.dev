@@ -23,13 +23,12 @@ al_type *al_new(size_t capacity) {
   }
 
   capacity = capacity == 0 ? INITIAL_CAPACITY : capacity;
-  al_type *array =
-      (al_type *)malloc(sizeof(arrayhead) + (capacity * sizeof(al_type)));
-  if (!array) {
+  arrayhead *head =
+      (arrayhead *)malloc(sizeof(arrayhead) + (capacity * sizeof(al_type)));
+  if (!head) {
     perror("al_new");
     return NULL;
   }
-  arrayhead *head = (arrayhead *)array;
   head->capacity = capacity;
   head->length = 0;
 
@@ -70,6 +69,10 @@ void al_insert(al_type *arrayptr[], const al_type item) {
 
   if (head->length >= head->capacity) {
     size_t new_capacity = head->capacity * GROWTH_FACTOR;
+
+    new_capacity =
+        (new_capacity >= MAX_CAPACITY) ? head->capacity : new_capacity;
+
     arrayhead *new_head =
         realloc(head, sizeof(arrayhead) + sizeof(al_type) * new_capacity);
     if (!new_head) {
