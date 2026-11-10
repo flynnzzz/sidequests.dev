@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define al_head(array) ((arrayhead *)array - 1)
+#define al_head(array) ((arrayhead *)(array) - 1)
+#define skip_head(head) ((al_type *)((arrayhead *)(head) + 1))
+
 #define nullptr_guard(pointer, message)                                        \
   do {                                                                         \
     if (pointer == NULL) {                                                     \
@@ -25,9 +27,8 @@ al_type *al_new(size_t len) {
   arrayhead *head = (arrayhead *)array;
   head->capacity = len;
   head->length = 0;
-  head->start = (al_type *)(head + 1);
 
-  return head->start;
+  return skip_head(head);
 }
 
 void al_free(al_type *array) {
@@ -48,27 +49,25 @@ size_t al_capacity(const al_type array[]) {
   return head->capacity;
 }
 
-void al_insert(al_type *array[], const al_type item) {
-  nullptr_guard(array, "al_insert: NULL pointer");
+void al_insert(al_type *arrayptr[], const al_type item) {
+  nullptr_guard(arrayptr, "al_insert: NULL pointer");
 
-  arrayhead *head = al_head(*array);
+  arrayhead *head = al_head(*arrayptr);
 
   if (head->length >= head->capacity) {
-    size_t old_capacity = head->capacity;
-    size_t new_size =
-        sizeof(arrayhead) + sizeof(al_type) * (old_capacity * GROWTH_FACTOR);
-    arrayhead *new_head = realloc(head, new_size);
+    size_t new_capacity = head->capacity * GROWTH_FACTOR;
+    arrayhead *new_head =
+        realloc(head, sizeof(arrayhead) + sizeof(al_type) * new_capacity);
     if (!new_head) {
       perror("al_insert");
       exit(EXIT_FAILURE);
     }
-    new_head->capacity = old_capacity * GROWTH_FACTOR;
-    new_head->start = (al_type *)(new_head + 1);
+    new_head->capacity = new_capacity;
     head = new_head;
   }
 
-  *array = head->start;
-  head->start[head->length++] = item;
+  *arrayptr = skip_head(head);
+  (*arrayptr)[head->length++] = item;
 }
 
 static void lshift(al_type array[], int start) {
