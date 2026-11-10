@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 #define INITIAL_CAPACITY 32
+#define MAX_CAPACITY ((~(size_t)0) >> 1)
 #define GROWTH_FACTOR 2
 
 typedef int al_type;

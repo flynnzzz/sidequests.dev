@@ -16,7 +16,6 @@ static void test_empty_array() {
   assert(array != NULL);
 
   PASS();
-  al_print(array);
   al_free(array);
 }
 
@@ -56,6 +55,7 @@ static void test_insert_basic() {
   assert(al_length(array) == 3);
   assert(array[2] == 3);
 
+  PASS();
   al_free(array);
 }
 
@@ -96,15 +96,14 @@ static void test_remove_by_value_first_occurrence() {
   assert(al_length(array) == 5);
 
   al_remove(array, 1);
-
   assert(al_length(array) == 4);
+
   assert(array[0] == 2);
   assert(array[1] == 1);
   assert(array[2] == 3);
   assert(array[3] == 1);
 
   PASS();
-  al_print(array);
 
   al_free(array);
 }
@@ -123,6 +122,7 @@ static void test_remove_nonexistent_value() {
   assert(al_length(array) == 1);
   assert(array[0] == 1);
 
+  PASS();
   al_free(array);
 }
 
@@ -216,6 +216,7 @@ static void test_iremove_empty_array() {
   al_remove(array, 10);
   al_remove(array, -10);
 
+  PASS();
   al_free(array);
 }
 
@@ -535,8 +536,6 @@ static void test_print_empty_array() {
 
   printf("Empty array: ");
   al_print(array);
-  printf("\n");
-
   assert(al_length(array) == 0);
 
   PASS();
@@ -551,7 +550,6 @@ static void test_print_single_element() {
 
   printf("Single element array: ");
   al_print(array);
-  printf("\n");
 
   assert(al_length(array) == 1);
 
@@ -597,8 +595,33 @@ static void test_all_functions_used() {
   al_free(array2);
 }
 
+static void test_new_exceed_maximum_capacity() {
+  TEST("test_new_exceed_maximum_capacity");
+
+  al_type *array = al_new(MAX_CAPACITY);
+  assert(array == NULL);
+
+  PASS();
+}
+
+static void test_insert_exceed_maximum_capacity() {
+  TEST("test_insert_exceed_maximum_capacity");
+
+  al_type *array = al_new(MAX_CAPACITY - 1);
+  assert(al_capacity(array) == MAX_CAPACITY - 1);
+  arrayhead *head = (arrayhead *)array - 1;
+  head->length = MAX_CAPACITY - 1;
+
+  al_insert(&array, 0);
+
+  assert(al_capacity(array) == MAX_CAPACITY - 1);
+  assert(array != NULL);
+
+  PASS();
+}
+
 int main() {
-  printf("=== Running ArrayList Tests ===\n\n");
+  puts("=== Running ArrayList Tests ===\n");
 
   test_empty_array();
   test_new_array();
@@ -626,8 +649,10 @@ int main() {
   test_print_empty_array();
   test_print_single_element();
   test_all_functions_used();
+  test_new_exceed_maximum_capacity();
+  test_insert_exceed_maximum_capacity();
 
-  printf("\n=== All Tests Completed ===\n");
+  puts("\n=== All Tests Completed ===");
 
   return 0;
 }

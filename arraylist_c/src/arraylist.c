@@ -17,12 +17,17 @@
 al_type *al_empty() { return al_new(0); }
 
 al_type *al_new(size_t len) {
+  if (len >= MAX_CAPACITY) {
+    fputs("al_new: `len` exceeds maximum capacity\n", stderr);
+    return NULL;
+  }
+
   len = len == 0 ? INITIAL_CAPACITY : len;
   al_type *array =
       (al_type *)malloc(sizeof(arrayhead) + (len * sizeof(al_type)));
   if (!array) {
     perror("al_new");
-    exit(EXIT_FAILURE);
+    return NULL;
   }
   arrayhead *head = (arrayhead *)array;
   head->capacity = len;
@@ -53,6 +58,11 @@ void al_insert(al_type *arrayptr[], const al_type item) {
   nullptr_guard(arrayptr, "al_insert: NULL pointer");
 
   arrayhead *head = al_head(*arrayptr);
+
+  if (head->length + 1 >= MAX_CAPACITY) {
+    fputs("al_insert: array reached maximum capacity\n", stderr);
+    return;
+  }
 
   if (head->length >= head->capacity) {
     size_t new_capacity = head->capacity * GROWTH_FACTOR;
