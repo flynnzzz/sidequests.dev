@@ -53,7 +53,7 @@ void al_insert(al_type *array[], const al_type item) {
 
   arrayhead *head = al_head(*array);
 
-  if (head->length + 1 >= head->capacity) {
+  if (head->length >= head->capacity) {
     size_t old_capacity = head->capacity;
     size_t new_size =
         sizeof(arrayhead) + sizeof(al_type) * (old_capacity * GROWTH_FACTOR);
