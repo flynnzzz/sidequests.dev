@@ -1,3 +1,9 @@
+/*
+ * arraylist.c
+ *
+ * NOTE: Temporary: implementation for arraylist.h
+ */
+
 #include "arraylist.h"
 #include <stddef.h>
 #include <stdio.h>

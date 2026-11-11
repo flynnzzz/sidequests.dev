@@ -1,3 +1,9 @@
+/*
+ * main.c
+ *
+ * API showcase.
+ */
+
 #include "arraylist.h"
 #include <assert.h>
 

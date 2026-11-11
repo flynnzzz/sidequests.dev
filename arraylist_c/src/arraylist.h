@@ -1,3 +1,15 @@
+/*
+ * arraylist.h
+ *
+ * Dynamic array interface.
+ *
+ * This implementation makes use of the `hidden header` method by
+ * storing metadata right before the start of the first item.
+ * NOTE: Not yet implemented:
+ * The API Achieves generics like behaviour through the use of macros,
+ * exchanging code length for simplicity and compile time type checking.
+ */
+
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include <stddef.h>

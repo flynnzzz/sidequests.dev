@@ -1,3 +1,10 @@
+/*
+ * test.c
+ *
+ * Test cases for the API.
+ * Written with the help of a coding agent running locally>
+ */
+
 #include "../src/arraylist.h"
 #include <assert.h>
 #include <stdio.h>
