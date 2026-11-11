@@ -30,9 +30,9 @@ static void alH_lshift(al_type array[], int start) {
   al_head(array)->length--;
 }
 
-inline al_type *al_empty() { return al_new(0); }
+inline al_type *al_empty() { return al_create(0); }
 
-al_type *al_new(size_t capacity) {
+al_type *al_create(size_t capacity) {
   if (capacity >= MAX_CAPACITY) {
     fputs("al_new: `len` exceeds maximum capacity\n", stderr);
     return NULL;
@@ -69,7 +69,7 @@ inline size_t al_capacity(const al_type array[]) {
   return al_head(array)->capacity;
 }
 
-void al_insert(al_type *arrayptr[], const al_type item) {
+void al_push(al_type *arrayptr[], const al_type item) {
   if (alH_checknullptr(arrayptr, "al_insert: NULL pointer"))
     return;
 

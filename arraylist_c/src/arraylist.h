@@ -27,7 +27,7 @@ typedef struct arrayhead_t {
 
 al_type *al_empty();
 
-al_type *al_new(size_t length);
+al_type *al_create(size_t length);
 
 // TODO: change return types to int to signal error statuses
 //
@@ -37,7 +37,7 @@ size_t al_length(const al_type array[]);
 
 size_t al_capacity(const al_type array[]);
 
-void al_insert(al_type *arrayptr[], const al_type item);
+void al_push(al_type *arrayptr[], const al_type item);
 
 void al_remove(al_type array[], const al_type item);
 
