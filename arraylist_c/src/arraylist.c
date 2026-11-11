@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define al_head(array) ((arrayhead *)(array) - 1)
-#define skip_head(head) ((al_type *)((arrayhead *)(head) + 1))
+#define alH_head(array) ((arrayhead *)(array) - 1)
+#define alH_skiphead(head) ((al_type *)((arrayhead *)(head) + 1))
 
 static inline int alH_checknullptr(const void *pointer, const char *message) {
   if (pointer == NULL) {
@@ -27,7 +27,7 @@ static void alH_lshift(al_type array[], int start) {
   for (size_t i = start; i < al_length(array) - 1; i++) {
     array[i] = array[i + 1];
   }
-  al_head(array)->length--;
+  alH_head(array)->length--;
 }
 
 inline al_type *al_empty() { return al_create(0); }
@@ -48,32 +48,32 @@ al_type *al_create(size_t capacity) {
   head->capacity = capacity;
   head->length = 0;
 
-  return skip_head(head);
+  return alH_skiphead(head);
 }
 
 inline void al_free(al_type *array) {
   if (alH_checknullptr(array, "al_free: NULL pointer"))
     return;
-  free(al_head(array));
+  free(alH_head(array));
 }
 
 inline size_t al_length(const al_type array[]) {
   if (alH_checknullptr(array, "al_length: NULL pointer"))
     return 0;
-  return al_head(array)->length;
+  return alH_head(array)->length;
 }
 
 inline size_t al_capacity(const al_type array[]) {
   if (alH_checknullptr(array, "al_capacity: NULL pointer"))
     return 0;
-  return al_head(array)->capacity;
+  return alH_head(array)->capacity;
 }
 
 void al_push(al_type *arrayptr[], const al_type item) {
   if (alH_checknullptr(arrayptr, "al_insert: NULL pointer"))
     return;
 
-  arrayhead *head = al_head(*arrayptr);
+  arrayhead *head = alH_head(*arrayptr);
 
   if (head->length + 1 >= MAX_CAPACITY) {
     fputs("al_insert: array reached maximum capacity\n", stderr);
@@ -97,7 +97,7 @@ void al_push(al_type *arrayptr[], const al_type item) {
     head = new_head;
   }
 
-  *arrayptr = skip_head(head);
+  *arrayptr = alH_skiphead(head);
   (*arrayptr)[head->length++] = item;
 }
 
@@ -125,7 +125,7 @@ void al_print(const al_type array[]) {
   if (alH_checknullptr(array, "al_print: NULL pointer"))
     return;
 
-  arrayhead *head = al_head(array);
+  arrayhead *head = alH_head(array);
   printf("{ ");
   size_t last_i = head->length - 1;
   for (size_t i = 0; i < head->length; i++) {
