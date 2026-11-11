@@ -1,3 +1,11 @@
+--
+-- pazienza.lua
+--
+-- Main entrypoint of the program.
+--
+-- Handles argument parsing and coordinates every module.
+--
+
 local USAGE = [[
 Usage:
   lua pazienza.lua <ACTION> <SEEDTYPE> [OPTIONS]

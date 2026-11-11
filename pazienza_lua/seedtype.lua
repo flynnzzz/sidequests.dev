@@ -1,3 +1,11 @@
+--
+-- seedtype.lua
+--
+-- Here are defined all default decks' seedtypes.
+--
+-- Used by `SeedSet` to simplify card generation.
+--
+
 local SeedType = {}
 SeedType.__index = SeedType
 SeedType.__pairs = function(self)

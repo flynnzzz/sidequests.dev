@@ -1,3 +1,13 @@
+--
+-- game.lua
+--
+-- Represents a single match of the game.
+--
+-- Every `Game` is associated with a `Deck`, all cards are generated
+-- automatically during instantiation.
+-- Holds all the game logic.
+--
+
 local Logger = require("logger")
 
 local Verbosity = {

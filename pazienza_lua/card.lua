@@ -1,3 +1,12 @@
+--
+-- card.lua
+--
+-- Represents the concept of card.
+--
+-- Each card holds a (string) seed type, a value, and an
+-- optional unique card name.
+--
+
 local Card = {}
 Card.__index = Card
 
