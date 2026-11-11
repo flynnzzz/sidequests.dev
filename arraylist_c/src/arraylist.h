@@ -41,7 +41,7 @@ void al_insert(al_type *arrayptr[], const al_type item);
 
 void al_remove(al_type array[], const al_type item);
 
-void al_iremove(al_type array[], int index);
+void al_iremove(al_type array[], size_t index);
 
 void al_print(const al_type array[]);
 

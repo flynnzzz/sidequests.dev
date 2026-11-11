@@ -7,6 +7,7 @@
 
 #include "../src/arraylist.h"
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -81,14 +82,14 @@ static void test_insert_capacity_growth() {
   for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
     al_insert(&array, i);
     assert(al_length(array) == i + 1);
-    assert(array[i] == i);
+    assert(array[i] == (int)i);
   }
 
-  int original_capacity = al_capacity(array);
+  size_t original_capacity = al_capacity(array);
   for (size_t i = INITIAL_CAPACITY; i < INITIAL_CAPACITY + 10; i++) {
     al_insert(&array, i);
     assert(al_length(array) == i + 1);
-    assert(array[i] == i);
+    assert(array[i] == (int)i);
     assert(al_capacity(array) >= original_capacity);
   }
 
@@ -589,8 +590,8 @@ static void test_nullptr_guard() {
   TEST("test_nullptr_guard");
 
   puts("");
-  assert(al_length(NULL) == -1);
-  assert(al_capacity(NULL) == -1);
+  assert(al_length(NULL) == 0);
+  assert(al_capacity(NULL) == 0);
 
   PASS();
 }

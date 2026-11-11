@@ -24,7 +24,7 @@ static void alH_lshift(al_type array[], int start) {
   if (alH_checknullptr(array, "al_shift: NULL pointer"))
     return;
 
-  for (int i = start; i < al_length(array) - 1; i++) {
+  for (size_t i = start; i < al_length(array) - 1; i++) {
     array[i] = array[i + 1];
   }
   al_head(array)->length--;
@@ -59,13 +59,13 @@ inline void al_free(al_type *array) {
 
 inline size_t al_length(const al_type array[]) {
   if (alH_checknullptr(array, "al_length: NULL pointer"))
-    return -1;
+    return 0;
   return al_head(array)->length;
 }
 
 inline size_t al_capacity(const al_type array[]) {
   if (alH_checknullptr(array, "al_capacity: NULL pointer"))
-    return -1;
+    return 0;
   return al_head(array)->capacity;
 }
 
@@ -105,7 +105,7 @@ void al_remove(al_type array[], const al_type item) {
   if (alH_checknullptr(array, "al_remove: NULL pointer"))
     return;
 
-  for (int i = 0; i < al_length(array); i++) {
+  for (size_t i = 0; i < al_length(array); i++) {
     if (array[i] == item) {
       alH_lshift(array, i);
       return;
@@ -113,10 +113,10 @@ void al_remove(al_type array[], const al_type item) {
   }
 }
 
-inline void al_iremove(al_type array[], int index) {
+inline void al_iremove(al_type array[], size_t index) {
   if (alH_checknullptr(array, "al_iremove: NULL pointer"))
     return;
-  if (index >= al_length(array) || index < 0)
+  if (index >= al_length(array))
     return;
   alH_lshift(array, index);
 }
