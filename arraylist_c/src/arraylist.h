@@ -29,6 +29,8 @@ al_type *al_empty();
 
 al_type *al_new(size_t length);
 
+// TODO: change return types to int to signal error statuses
+//
 void al_free(al_type array[]);
 
 size_t al_length(const al_type array[]);
