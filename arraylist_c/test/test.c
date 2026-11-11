@@ -2,7 +2,7 @@
  * test.c
  *
  * Test cases for the API.
- * Written with the help of a coding agent running locally>
+ * Written with the help of a coding agent running locally
  */
 
 #include "../src/arraylist.h"
@@ -21,9 +21,11 @@ static void test_empty_array() {
   al_type *array = al_empty();
 
   assert(array != NULL);
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == INITIAL_CAPACITY);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_new_array() {
@@ -41,8 +43,13 @@ static void test_new_array() {
   array = al_new(INITIAL_CAPACITY);
   assert(al_length(array) == 0);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
-  PASS();
+
+  array = al_new(44);
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == 44);
+
   al_free(array);
+  PASS();
 }
 
 static void test_insert_basic() {
@@ -62,8 +69,8 @@ static void test_insert_basic() {
   assert(al_length(array) == 3);
   assert(array[2] == 3);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_insert_capacity_growth() {
@@ -71,22 +78,22 @@ static void test_insert_capacity_growth() {
 
   al_type *array = al_empty();
 
-  for (int i = 0; i < INITIAL_CAPACITY; i++) {
+  for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
     al_insert(&array, i);
     assert(al_length(array) == i + 1);
     assert(array[i] == i);
   }
 
   int original_capacity = al_capacity(array);
-  for (int i = INITIAL_CAPACITY; i < INITIAL_CAPACITY + 10; i++) {
+  for (size_t i = INITIAL_CAPACITY; i < INITIAL_CAPACITY + 10; i++) {
     al_insert(&array, i);
     assert(al_length(array) == i + 1);
     assert(array[i] == i);
     assert(al_capacity(array) >= original_capacity);
   }
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_remove_by_value_first_occurrence() {
@@ -111,7 +118,6 @@ static void test_remove_by_value_first_occurrence() {
   assert(array[3] == 1);
 
   PASS();
-
   al_free(array);
 }
 
@@ -123,17 +129,17 @@ static void test_remove_nonexistent_value() {
   al_insert(&array, 1);
   assert(al_length(array) == 1);
 
-  // Try to remove a value that doesn't exist
   al_remove(array, 999);
+  // TODO: finish
 
   assert(al_length(array) == 1);
   assert(array[0] == 1);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
-static void test_remove_all_occurrences() {
+static void test_remove_more_occurrences() {
   TEST("test_remove_all_occurrences");
 
   al_type *array = al_empty();
@@ -146,19 +152,16 @@ static void test_remove_all_occurrences() {
 
   assert(al_length(array) == 5);
 
-  // Remove all occurrences of 5 by calling al_remove multiple times
   al_remove(array, 5);
   al_remove(array, 5);
 
   assert(al_length(array) == 3);
   assert(array[0] == 3);
   assert(array[1] == 7);
+  assert(array[2] == 5);
 
-  // Third occurrence should be gone (only removed first two times)
-  // The current behavior only removes first iteration
-
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_iremove_basic() {
@@ -180,8 +183,8 @@ static void test_iremove_basic() {
   assert(al_length(array) == 4);
   assert(array[2] == 4); // Element shifted from index 3
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_iremove_first_and_last() {
@@ -197,22 +200,19 @@ static void test_iremove_first_and_last() {
 
   assert(al_length(array) == 5);
 
-  // Remove first element (index 0)
   al_iremove(array, 0);
   assert(al_length(array) == 4);
   assert(array[0] == 20);
 
-  // Remove last element (which is now at index 3)
   al_iremove(array, 3);
   assert(al_length(array) == 3);
   assert(array[2] == 40);
 
-  // Remove single remaining middle element
   al_iremove(array, 1);
   assert(al_length(array) == 2);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_iremove_empty_array() {
@@ -222,9 +222,10 @@ static void test_iremove_empty_array() {
   al_remove(array, 0);
   al_remove(array, 10);
   al_remove(array, -10);
+  // TODO: finish
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_iremove_middle_element() {
@@ -240,15 +241,14 @@ static void test_iremove_middle_element() {
 
   assert(al_length(array) == 5);
 
-  // Remove middle element (index 2, value 300)
   al_iremove(array, 2);
 
   assert(al_length(array) == 4);
   assert(array[1] == 200);
   assert(array[2] == 400); // Was at index 3
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_insert_remove_same_value() {
@@ -259,13 +259,13 @@ static void test_insert_remove_same_value() {
   al_insert(&array, 10);
   assert(al_length(array) == 1);
 
-  // Remove the same value (only one occurrence exists)
   al_remove(array, 10);
+  // TODO: finish
 
   assert(al_length(array) == 0);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_insert_remove_interleaved() {
@@ -291,8 +291,8 @@ static void test_insert_remove_interleaved() {
   assert(array[1] == 3);
   assert(array[2] == 4);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_capacity_boundary() {
@@ -301,7 +301,7 @@ static void test_capacity_boundary() {
   al_type *array = al_empty();
 
   // Insert many elements to near capacity
-  for (int i = 0; i < INITIAL_CAPACITY - 1; i++) {
+  for (size_t i = 0; i < INITIAL_CAPACITY - 1; i++) {
     al_insert(&array, i);
   }
 
@@ -314,8 +314,8 @@ static void test_capacity_boundary() {
   assert(al_length(array) == INITIAL_CAPACITY);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_remove_at_boundary() {
@@ -323,11 +323,9 @@ static void test_remove_at_boundary() {
 
   al_type *array = al_empty();
 
-  // Create array with few elements for easier boundary testing
-  for (int i = 1; i <= 5; i++) {
+  for (size_t i = 1; i <= 5; i++) {
     al_insert(&array, i);
   }
-
   assert(al_length(array) == 5);
 
   // Remove last element
@@ -338,8 +336,8 @@ static void test_remove_at_boundary() {
   al_remove(array, 4);
   assert(al_length(array) == 3);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_iremove_out_of_bounds() {
@@ -347,22 +345,22 @@ static void test_iremove_out_of_bounds() {
 
   al_type *array = al_empty();
 
-  for (int i = 0; i < 10; i++) {
+  for (size_t i = 0; i < 10; i++) {
     al_insert(&array, i);
   }
 
   assert(al_length(array) == 10);
 
-  // Try to remove out of bounds index (should handle gracefully)
-  // Note: current implementation may not check bounds
   al_iremove(array, -1);
+  // TODO: finish
+
   assert(al_length(array) == 10); // Should still be 10
 
   al_iremove(array, 99);
   assert(al_length(array) == 10); // Should still be 10
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_remove_first_occurrence_edge_case() {
@@ -371,7 +369,7 @@ static void test_remove_first_occurrence_edge_case() {
   al_type *array = al_empty();
 
   // All elements are the same value
-  for (int i = 0; i < 5; i++) {
+  for (size_t i = 0; i < 5; i++) {
     al_insert(&array, 42);
   }
 
@@ -387,8 +385,8 @@ static void test_remove_first_occurrence_edge_case() {
   al_remove(array, 42);
   assert(al_length(array) == 3);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_mixed_operations() {
@@ -419,8 +417,8 @@ static void test_mixed_operations() {
   al_iremove(array, al_length(array) - 1);
   assert(al_length(array) == 2);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_empty_value_removal() {
@@ -440,8 +438,8 @@ static void test_empty_value_removal() {
   assert(array[0] == 1);
   assert(array[1] == 2);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_negative_value_removal() {
@@ -461,8 +459,8 @@ static void test_negative_value_removal() {
   assert(array[0] == 0);
   assert(array[1] == 100);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_large_number_of_items() {
@@ -470,46 +468,21 @@ static void test_large_number_of_items() {
 
   al_type *array = al_empty();
 
-  // Insert many items
-  for (int i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 1000; i++) {
     al_insert(&array, i);
   }
 
   assert(al_length(array) == 1000);
 
-  // Remove a value from middle
   al_remove(array, 500);
   assert(al_length(array) == 999);
   assert(array[500] == 501);
 
-  // Remove another
   al_iremove(array, 100);
   assert(al_length(array) == 998);
 
-  PASS();
   al_free(array);
-}
-
-static void test_alternating_values() {
-  TEST("test_alternating_values");
-
-  al_type *array = al_empty();
-
-  for (int i = 0; i < 20; i++) {
-    if (i % 2 == 0) {
-      al_insert(&array, i);
-    } else {
-      al_insert(&array, -i);
-    }
-  }
-
-  assert(al_length(array) == 20);
-
-  // Remove a specific value that appears multiple times if any
-  // In this case, no duplicates exist
-
   PASS();
-  al_free(array);
 }
 
 static void test_remove_then_insert_same() {
@@ -532,8 +505,8 @@ static void test_remove_then_insert_same() {
   al_remove(array, 5);
   assert(al_length(array) == 0);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_print_empty_array() {
@@ -545,8 +518,8 @@ static void test_print_empty_array() {
   al_print(array);
   assert(al_length(array) == 0);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_print_single_element() {
@@ -560,34 +533,26 @@ static void test_print_single_element() {
 
   assert(al_length(array) == 1);
 
-  PASS();
   al_free(array);
+  PASS();
 }
 
 static void test_all_functions_used() {
   TEST("test_all_functions_used");
 
-  // al_empty - used above
   al_type *array = al_empty();
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == INITIAL_CAPACITY);
 
-  // al_new - not strictly necessary since al_empty handles it, but let's use it
   al_type *array2 = al_new(0);
+  assert(al_length(array2) == 0);
+  assert(al_capacity(array2) == INITIAL_CAPACITY);
 
-  // al_free - will be called below
-
-  // al_length - checked in many tests above
-  size_t len = al_length(array);
-
-  // al_capacity - checked in many tests above
-  size_t cap = al_capacity(array);
-
-  // al_insert - used extensively
   al_insert(&array, 99);
-
-  // al_remove - used to remove by value
+  assert(al_length(array) == 1);
   al_remove(array, 99);
+  assert(al_length(array) == 0);
 
-  // al_iremove - use to remove by index
   al_insert(&array, 1);
   al_insert(&array, 2);
   al_insert(&array, 3);
@@ -595,11 +560,9 @@ static void test_all_functions_used() {
   al_iremove(array, 1);
   assert(al_length(array) == 2);
 
-  // al_print - will be called below
-
-  PASS();
   al_free(array);
   al_free(array2);
+  PASS();
 }
 
 static void test_new_exceed_maximum_capacity() {
@@ -641,7 +604,7 @@ int main() {
   test_insert_capacity_growth();
   test_remove_by_value_first_occurrence();
   test_remove_nonexistent_value();
-  test_remove_all_occurrences();
+  test_remove_more_occurrences();
   test_iremove_basic();
   test_iremove_first_and_last();
   test_iremove_empty_array();
@@ -656,7 +619,6 @@ int main() {
   test_empty_value_removal();
   test_negative_value_removal();
   test_large_number_of_items();
-  test_alternating_values();
   test_remove_then_insert_same();
   test_print_empty_array();
   test_print_single_element();
