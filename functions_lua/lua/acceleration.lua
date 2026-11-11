@@ -1,3 +1,7 @@
+--
+-- test function 3
+--
+
 local cmath = require("lua.cmath")
 
 local function y(x0, v0, a, t)

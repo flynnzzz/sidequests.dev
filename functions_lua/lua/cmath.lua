@@ -1,7 +1,8 @@
 -- cmath.lua
 --
 -- Wrapper module for "libcmath"
--- Provides a clean Lua interface to optimized C mathematical functions
+-- Provides a clean Lua interface to optimized C mathematical functions.
+-- *Written with the help of an LLM chatbot*
 --
 
 local libcmath = require("libcmath")
