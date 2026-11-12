@@ -25,7 +25,7 @@ static void test_empty_array() {
   assert(al_length(array) == 0);
   assert(al_capacity(array) == INITIAL_CAPACITY);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -34,22 +34,22 @@ static void test_new_array() {
 
   al_type *array = al_empty();
   assert(al_length(array) == 0);
-  al_free(array);
+  assert(al_free(array));
 
   array = al_create(0);
   assert(al_length(array) == 0);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
-  al_free(array);
+  assert(al_free(array));
 
   array = al_create(INITIAL_CAPACITY);
   assert(al_length(array) == 0);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
-  al_free(array);
+  assert(al_free(array));
 
   array = al_create(44);
   assert(al_length(array) == 0);
   assert(al_capacity(array) == 44);
-  al_free(array);
+  assert(al_free(array));
 
   PASS();
 }
@@ -71,7 +71,7 @@ static void test_push_basic() {
   assert(al_length(array) == 3);
   assert(array[2] == 3);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -94,7 +94,7 @@ static void test_push_capacity_growth() {
     assert(al_capacity(array) >= original_capacity);
   }
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -120,7 +120,7 @@ static void test_remove_by_value_first_occurrence() {
   assert(array[3] == 1);
 
   PASS();
-  al_free(array);
+  assert(al_free(array));
 }
 
 static void test_remove_nonexistent_value() {
@@ -131,13 +131,12 @@ static void test_remove_nonexistent_value() {
   al_push(&array, 1);
   assert(al_length(array) == 1);
 
-  al_remove(array, 999);
-  // TODO: finish
+  assert(!al_remove(array, 999));
 
   assert(al_length(array) == 1);
   assert(array[0] == 1);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -162,7 +161,7 @@ static void test_remove_more_occurrences() {
   assert(array[1] == 7);
   assert(array[2] == 5);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -185,7 +184,7 @@ static void test_iremove_basic() {
   assert(al_length(array) == 4);
   assert(array[2] == 4); // Element shifted from index 3
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -213,7 +212,7 @@ static void test_iremove_first_and_last() {
   al_iremove(array, 1);
   assert(al_length(array) == 2);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -221,12 +220,11 @@ static void test_iremove_empty_array() {
   TEST("test_iremove_empty_array");
 
   al_type *array = al_empty();
-  al_remove(array, 0);
-  al_remove(array, 10);
-  al_remove(array, -10);
-  // TODO: finish
+  assert(!al_remove(array, 0));
+  assert(!al_remove(array, 10));
+  assert(!al_remove(array, -10));
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -249,7 +247,7 @@ static void test_iremove_middle_element() {
   assert(array[1] == 200);
   assert(array[2] == 400); // Was at index 3
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -260,13 +258,15 @@ static void test_push_remove_same_value() {
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
-
-  al_remove(array, 10);
-  // TODO: finish
-
+  assert(al_remove(array, 10));
   assert(al_length(array) == 0);
 
-  al_free(array);
+  al_push(&array, 10);
+  assert(al_length(array) == 1);
+  assert(al_remove(array, 10));
+  assert(al_length(array) == 0);
+
+  assert(al_free(array));
   PASS();
 }
 
@@ -293,7 +293,7 @@ static void test_push_remove_interleaved() {
   assert(array[1] == 3);
   assert(array[2] == 4);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -316,7 +316,7 @@ static void test_capacity_boundary() {
   assert(al_length(array) == INITIAL_CAPACITY);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -338,7 +338,7 @@ static void test_remove_at_boundary() {
   al_remove(array, 4);
   assert(al_length(array) == 3);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -350,18 +350,15 @@ static void test_iremove_out_of_bounds() {
   for (size_t i = 0; i < 10; i++) {
     al_push(&array, i);
   }
-
   assert(al_length(array) == 10);
 
-  al_iremove(array, -1);
-  // TODO: finish
-
+  assert(!al_iremove(array, -1));
   assert(al_length(array) == 10); // Should still be 10
 
-  al_iremove(array, 99);
+  assert(!al_iremove(array, 99));
   assert(al_length(array) == 10); // Should still be 10
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -387,7 +384,7 @@ static void test_remove_first_occurrence_edge_case() {
   al_remove(array, 42);
   assert(al_length(array) == 3);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -419,7 +416,7 @@ static void test_mixed_operations() {
   al_iremove(array, al_length(array) - 1);
   assert(al_length(array) == 2);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -440,7 +437,7 @@ static void test_empty_value_removal() {
   assert(array[0] == 1);
   assert(array[1] == 2);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -461,7 +458,7 @@ static void test_negative_value_removal() {
   assert(array[0] == 0);
   assert(array[1] == 100);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -483,7 +480,7 @@ static void test_large_number_of_items() {
   al_iremove(array, 100);
   assert(al_length(array) == 998);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -507,7 +504,7 @@ static void test_remove_then_push_same() {
   al_remove(array, 5);
   assert(al_length(array) == 0);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -520,7 +517,7 @@ static void test_print_empty_array() {
   al_print(array);
   assert(al_length(array) == 0);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -535,7 +532,7 @@ static void test_print_single_element() {
 
   assert(al_length(array) == 1);
 
-  al_free(array);
+  assert(al_free(array));
   PASS();
 }
 
@@ -562,8 +559,8 @@ static void test_all_functions_used() {
   al_iremove(array, 1);
   assert(al_length(array) == 2);
 
-  al_free(array);
-  al_free(array2);
+  assert(al_free(array));
+  assert(al_free(array2));
   PASS();
 }
 
@@ -576,13 +573,12 @@ static void test_new_exceed_maximum_capacity() {
   PASS();
 }
 
-static void test_push_exceed_maximum_capacity() {
-  TEST("test_push_exceed_maximum_capacity");
+static void test_create_large_number() {
+  TEST("test_create_large_number");
 
   al_type *array = al_create(MAX_CAPACITY - 1);
   assert(!array);
-
-  // TODO: finish
+  assert(!al_free(array));
 
   PASS();
 }
@@ -626,7 +622,7 @@ int main() {
   test_print_single_element();
   test_all_functions_used();
   test_new_exceed_maximum_capacity();
-  test_push_exceed_maximum_capacity();
+  test_create_large_number();
   test_nullptr_guard();
 
   puts("\n=== All Tests Completed ===");
