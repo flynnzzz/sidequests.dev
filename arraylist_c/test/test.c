@@ -44,12 +44,13 @@ static void test_new_array() {
   array = al_create(INITIAL_CAPACITY);
   assert(al_length(array) == 0);
   assert(al_capacity(array) >= INITIAL_CAPACITY);
+  al_free(array);
 
   array = al_create(44);
   assert(al_length(array) == 0);
   assert(al_capacity(array) == 44);
-
   al_free(array);
+
   PASS();
 }
 

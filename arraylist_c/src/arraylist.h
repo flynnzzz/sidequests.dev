@@ -31,18 +31,18 @@ al_type *al_create(size_t length);
 
 // TODO: change return types to int to signal error statuses
 //
-void al_free(al_type array[]);
+int al_free(al_type array[]);
 
 size_t al_length(const al_type array[]);
 
 size_t al_capacity(const al_type array[]);
 
-void al_push(al_type *arrayptr[], const al_type item);
+int al_push(al_type *arrayptr[], const al_type item);
 
-void al_remove(al_type array[], const al_type item);
+int al_remove(al_type array[], const al_type item);
 
-void al_iremove(al_type array[], size_t index);
+int al_iremove(al_type array[], size_t index);
 
-void al_print(const al_type array[]);
+int al_print(const al_type array[]);
 
 #endif // !ARRAYLIST_H
