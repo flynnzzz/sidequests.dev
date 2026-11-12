@@ -37,10 +37,34 @@ size_t al_capacity(const al_type array[]);
 
 int al_push(al_type *arrayptr[], const al_type item);
 
+al_type al_pop(al_type array[]);
+
+int al_insert(al_type array[], size_t index, al_type item);
+
+int al_contains(al_type array[], al_type item);
+
+size_t al_find(al_type array[], al_type item);
+
 int al_remove(al_type array[], const al_type item);
+
+// TODO: change so it returns the removed item
 
 int al_iremove(al_type array[], size_t index);
 
 int al_print(const al_type array[]);
+
+int al_clear(al_type array[]);
+
+int al_fclear(al_type array[]);
+
+int al_resize(al_type array[], size_t capacity);
+
+int al_grow(al_type array[]);
+
+int al_swap(al_type array[], size_t index1, size_t index2);
+
+int al_sort(al_type array[], int (*comparator)(al_type, al_type));
+
+int al_reverse(al_type array[]);
 
 #endif // !ARRAYLIST_H
