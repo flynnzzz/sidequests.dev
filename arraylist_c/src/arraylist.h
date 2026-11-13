@@ -10,7 +10,6 @@
  * exchanging code length for simplicity and compile time type checking.
  */
 
-
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include <stddef.h>
@@ -19,6 +18,10 @@
 #define MAX_SIZE ((~(size_t)0) >> 1)
 #define MAX_CAPACITY ((MAX_SIZE - sizeof(arrayhead)) / sizeof(al_type))
 #define GROWTH_FACTOR 2
+
+#define AL_ERRSIZE ((size_t)-1)
+
+enum alH_errstatus { AL_FAIL, AL_SUCCESS };
 
 typedef int al_type;
 

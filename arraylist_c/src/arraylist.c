@@ -14,8 +14,6 @@
 #define alH_head(array) ((arrayhead *)(array) - 1)
 #define alH_skiphead(head) ((al_type *)((arrayhead *)(head) + 1))
 
-enum alH_errstatus { AL_FAIL, AL_SUCCESS };
-
 static inline int alH_isnullptr(const void *pointer, const char *message) {
   if (pointer == NULL) {
     fprintf(stderr, "%s\n", message);
@@ -69,18 +67,19 @@ inline int al_free(al_type *array) {
 
 inline size_t al_length(const al_type array[]) {
   if (alH_isnullptr(array, "al_length: NULL pointer"))
-    return AL_FAIL;
+    return AL_ERRSIZE;
   return alH_head(array)->length;
 }
 
 inline size_t al_capacity(const al_type array[]) {
   if (alH_isnullptr(array, "al_capacity: NULL pointer"))
-    return AL_FAIL;
+    return AL_ERRSIZE;
   return alH_head(array)->capacity;
 }
 
 int al_push(al_type *arrayptr[], const al_type item) {
-  if (alH_isnullptr(arrayptr, "al_insert: NULL pointer"))
+  if (alH_isnullptr(arrayptr, "al_insert: NULL pointer") ||
+      alH_isnullptr(*arrayptr, "al_insert: NULL pointer"))
     return AL_FAIL;
 
   arrayhead *head = alH_head(*arrayptr);
@@ -133,8 +132,9 @@ int al_remove(al_type array[], const al_type item) {
 inline int al_iremove(al_type array[], size_t index) {
   if (alH_isnullptr(array, "al_iremove: NULL pointer"))
     return AL_FAIL;
-  if (index >= al_length(array))
+  if (index >= al_length(array)) {
     return AL_FAIL;
+  }
   alH_lshift(array, index);
   return AL_SUCCESS;
 }

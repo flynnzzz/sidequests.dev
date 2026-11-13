@@ -587,8 +587,8 @@ static void test_nullptr_guard() {
   TEST("test_nullptr_guard");
 
   puts("");
-  assert(al_length(NULL) == 0);
-  assert(al_capacity(NULL) == 0);
+  assert(al_length(NULL) == AL_ERRSIZE);
+  assert(al_capacity(NULL) == AL_ERRSIZE);
 
   PASS();
 }
