@@ -10,6 +10,7 @@
  * exchanging code length for simplicity and compile time type checking.
  */
 
+
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include <stddef.h>

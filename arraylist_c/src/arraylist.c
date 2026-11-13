@@ -4,6 +4,8 @@
  * NOTE: Temporary: implementation for arraylist.h
  */
 
+#define AL_DEBUG
+
 #include "arraylist.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -45,6 +47,11 @@ al_type *al_create(size_t capacity) {
       (arrayhead *)malloc(sizeof(arrayhead) + (capacity * sizeof(al_type)));
   if (!head) {
     perror("al_new");
+
+#ifndef AL_DEBUG
+    exit(EXIT_FAILURE);
+#endif
+
     return NULL;
   }
   head->capacity = capacity;
@@ -94,6 +101,10 @@ int al_push(al_type *arrayptr[], const al_type item) {
     if (!new_head) {
       perror("al_insert");
       free(head);
+
+#ifndef AL_DEBUG
+      exit(EXIT_FAILURE);
+#endif
       return AL_FAIL;
     }
     new_head->capacity = new_capacity;
