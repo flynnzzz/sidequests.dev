@@ -57,6 +57,8 @@ int al_clear(al_type array[]);
 
 int al_fclear(al_type array[]);
 
+al_type *al_copy(al_type array[]);
+
 int al_resize(al_type array[], size_t capacity);
 
 int al_grow(al_type array[]);
