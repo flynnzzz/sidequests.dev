@@ -22,16 +22,25 @@ static inline int alH_isnullptr(const void *pointer, const char *message) {
   return 0;
 }
 
-static void alH_lshift(al_type array[], int start) {
+static void alH_lshift(al_type array[], size_t start, size_t end) {
   if (alH_isnullptr(array, "al_shift: NULL pointer"))
     return;
 
-  for (size_t i = start; i < al_length(array) - 1; i++) {
+  for (size_t i = start; i < end && i < al_length(array) - 1; i++) {
     array[i] = array[i + 1];
   }
   alH_head(array)->length--;
 }
 
+static void alH_rshift(al_type array[], size_t start, size_t end) {
+  if (alH_isnullptr(array, "al_shift: NULL pointer"))
+    return;
+
+  for (size_t i = start; i < end && i < al_length(array) - 1; i++) {
+    array[i + 1] = array[i];
+  }
+  alH_head(array)->length--;
+}
 inline al_type *al_empty() { return al_create(0); }
 
 al_type *al_create(size_t capacity) {
@@ -116,26 +125,55 @@ int al_push(al_type *arrayptr[], const al_type item) {
   return AL_SUCCESS;
 }
 
-int al_remove(al_type array[], const al_type item) {
+inline al_type al_pop(al_type array[]) {
+  return al_rmfirst(array, al_length(array) - 1);
+}
+
+int al_insert(al_type array[], size_t index, al_type item) {
+  // TODO: test
+  int err = al_push(&array, item);
+  if (err == AL_FAIL) {
+    return err;
+  }
+
+  alH_rshift(array, index, al_length(array) - 2);
+  array[index] = array[al_length(array) - 1];
+
+  return err;
+}
+
+al_type al_rmfirst(al_type array[], const al_type item) {
   if (!alH_isnullptr(array, "al_remove: NULL pointer")) {
     for (size_t i = 0; i < al_length(array); i++) {
       if (array[i] == item) {
-        alH_lshift(array, i);
+        alH_lshift(array, i, al_length(array) - 1);
         return AL_SUCCESS;
       }
     }
   }
-
-  return AL_FAIL;
+  return AL_ERRTYPE;
 }
 
-inline int al_iremove(al_type array[], size_t index) {
-  if (alH_isnullptr(array, "al_iremove: NULL pointer"))
-    return AL_FAIL;
-  if (index >= al_length(array)) {
-    return AL_FAIL;
+al_type al_rmall(al_type array[], const al_type item) {
+  // TODO: test
+  size_t found = 0;
+  if (!alH_isnullptr(array, "al_remove: NULL pointer")) {
+    for (size_t i = 0; i < al_length(array); i++) {
+      if (array[i] == item) {
+        alH_lshift(array, i, al_length(array) - 1);
+        found++;
+      }
+    }
   }
-  alH_lshift(array, index);
+  return (found > 0) ? AL_SUCCESS : AL_ERRTYPE;
+}
+
+inline al_type al_rmat(al_type array[], size_t index) {
+  if (alH_isnullptr(array, "al_iremove: NULL pointer") ||
+      index >= al_length(array))
+    return AL_ERRTYPE;
+
+  alH_lshift(array, index, al_length(array) - 1);
   return AL_SUCCESS;
 }
 

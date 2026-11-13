@@ -19,7 +19,8 @@
 #define MAX_CAPACITY ((MAX_SIZE - sizeof(arrayhead)) / sizeof(al_type))
 #define GROWTH_FACTOR 2
 
-#define AL_ERRSIZE ((size_t)-1)
+#define AL_ERRSIZE (~(size_t)0)
+#define AL_ERRTYPE (~(al_type)0)
 
 enum alH_errstatus { AL_FAIL, AL_SUCCESS };
 
@@ -45,32 +46,36 @@ al_type al_pop(al_type array[]);
 
 int al_insert(al_type array[], size_t index, al_type item);
 
-int al_contains(al_type array[], al_type item);
+al_type al_rmfirst(al_type array[], const al_type item);
 
-size_t al_find(al_type array[], al_type item);
+al_type al_rmall(al_type array[], const al_type item);
 
-int al_remove(al_type array[], const al_type item);
-
-// TODO: change so it returns the removed item
-
-int al_iremove(al_type array[], size_t index);
+al_type al_rmat(al_type array[], size_t index);
 
 int al_print(const al_type array[]);
 
+// TODO: implement
 int al_clear(al_type array[]);
 
+// TODO: implement
 int al_fclear(al_type array[]);
 
+// TODO: implement
 al_type *al_copy(al_type array[]);
 
+// TODO: implement
 int al_resize(al_type array[], size_t capacity);
 
+// TODO: implement
 int al_grow(al_type array[]);
 
+// TODO: implement
 int al_swap(al_type array[], size_t index1, size_t index2);
 
+// TODO: implement
 int al_sort(al_type array[], int (*comparator)(al_type, al_type));
 
+// TODO: implement
 int al_reverse(al_type array[]);
 
 #endif // !ARRAYLIST_H

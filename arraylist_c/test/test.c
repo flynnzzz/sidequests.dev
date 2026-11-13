@@ -111,7 +111,7 @@ static void test_remove_by_value_first_occurrence() {
 
   assert(al_length(array) == 5);
 
-  al_remove(array, 1);
+  al_rmfirst(array, 1);
   assert(al_length(array) == 4);
 
   assert(array[0] == 2);
@@ -131,7 +131,7 @@ static void test_remove_nonexistent_value() {
   al_push(&array, 1);
   assert(al_length(array) == 1);
 
-  assert(!al_remove(array, 999));
+  assert(al_rmfirst(array, 999) == AL_ERRTYPE);
 
   assert(al_length(array) == 1);
   assert(array[0] == 1);
@@ -153,8 +153,8 @@ static void test_remove_more_occurrences() {
 
   assert(al_length(array) == 5);
 
-  al_remove(array, 5);
-  al_remove(array, 5);
+  al_rmfirst(array, 5);
+  al_rmfirst(array, 5);
 
   assert(al_length(array) == 3);
   assert(array[0] == 3);
@@ -179,7 +179,7 @@ static void test_iremove_basic() {
   assert(al_length(array) == 5);
 
   // Remove element at index 2 (value 3)
-  al_iremove(array, 2);
+  al_rmat(array, 2);
 
   assert(al_length(array) == 4);
   assert(array[2] == 4); // Element shifted from index 3
@@ -201,15 +201,15 @@ static void test_iremove_first_and_last() {
 
   assert(al_length(array) == 5);
 
-  al_iremove(array, 0);
+  al_rmat(array, 0);
   assert(al_length(array) == 4);
   assert(array[0] == 20);
 
-  al_iremove(array, 3);
+  al_rmat(array, 3);
   assert(al_length(array) == 3);
   assert(array[2] == 40);
 
-  al_iremove(array, 1);
+  al_rmat(array, 1);
   assert(al_length(array) == 2);
 
   assert(al_free(array));
@@ -220,9 +220,9 @@ static void test_iremove_empty_array() {
   TEST("test_iremove_empty_array");
 
   al_type *array = al_empty();
-  assert(!al_remove(array, 0));
-  assert(!al_remove(array, 10));
-  assert(!al_remove(array, -10));
+  assert(al_rmfirst(array, 0) == AL_ERRTYPE);
+  assert(al_rmfirst(array, 10) == AL_ERRTYPE);
+  assert(al_rmfirst(array, -10) == AL_ERRTYPE);
 
   assert(al_free(array));
   PASS();
@@ -241,7 +241,7 @@ static void test_iremove_middle_element() {
 
   assert(al_length(array) == 5);
 
-  al_iremove(array, 2);
+  al_rmat(array, 2);
 
   assert(al_length(array) == 4);
   assert(array[1] == 200);
@@ -258,12 +258,12 @@ static void test_push_remove_same_value() {
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
-  assert(al_remove(array, 10));
+  assert(al_rmfirst(array, 10));
   assert(al_length(array) == 0);
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
-  assert(al_remove(array, 10));
+  assert(al_rmfirst(array, 10));
   assert(al_length(array) == 0);
 
   assert(al_free(array));
@@ -282,7 +282,7 @@ static void test_push_remove_interleaved() {
   assert(al_length(array) == 3);
 
   // Remove middle value
-  al_remove(array, 2);
+  al_rmfirst(array, 2);
   assert(al_length(array) == 2);
   assert(array[0] == 1);
   assert(array[1] == 3);
@@ -331,11 +331,11 @@ static void test_remove_at_boundary() {
   assert(al_length(array) == 5);
 
   // Remove last element
-  al_remove(array, 5);
+  al_rmfirst(array, 5);
   assert(al_length(array) == 4);
 
   // Remove new last element
-  al_remove(array, 4);
+  al_rmfirst(array, 4);
   assert(al_length(array) == 3);
 
   assert(al_free(array));
@@ -352,10 +352,10 @@ static void test_iremove_out_of_bounds() {
   }
   assert(al_length(array) == 10);
 
-  assert(!al_iremove(array, -1));
+  assert(al_rmat(array, -1) == AL_ERRTYPE);
   assert(al_length(array) == 10); // Should still be 10
 
-  assert(!al_iremove(array, 99));
+  assert(al_rmat(array, 99) == AL_ERRTYPE);
   assert(al_length(array) == 10); // Should still be 10
 
   assert(al_free(array));
@@ -375,13 +375,13 @@ static void test_remove_first_occurrence_edge_case() {
   assert(al_length(array) == 5);
 
   // Remove should only remove first occurrence
-  al_remove(array, 42);
+  al_rmfirst(array, 42);
 
   assert(al_length(array) == 4);
   assert(array[0] == 42); // Still has 42 at index 0 (was the second original)
 
   // Remove again - should still be first remaining occurrence
-  al_remove(array, 42);
+  al_rmfirst(array, 42);
   assert(al_length(array) == 3);
 
   assert(al_free(array));
@@ -401,7 +401,7 @@ static void test_mixed_operations() {
   assert(al_length(array) == 4);
 
   // Remove middle value
-  al_remove(array, 30);
+  al_rmfirst(array, 30);
   assert(al_length(array) == 3);
 
   // Insert new value
@@ -409,11 +409,11 @@ static void test_mixed_operations() {
   assert(al_length(array) == 4);
 
   // Remove first value
-  al_iremove(array, 0);
+  al_rmat(array, 0);
   assert(al_length(array) == 3);
 
   // Remove last value
-  al_iremove(array, al_length(array) - 1);
+  al_rmat(array, al_length(array) - 1);
   assert(al_length(array) == 2);
 
   assert(al_free(array));
@@ -432,7 +432,7 @@ static void test_empty_value_removal() {
   assert(al_length(array) == 3);
 
   // Remove 0 (valid integer value, not empty array)
-  al_remove(array, 0);
+  al_rmfirst(array, 0);
   assert(al_length(array) == 2);
   assert(array[0] == 1);
   assert(array[1] == 2);
@@ -453,7 +453,7 @@ static void test_negative_value_removal() {
   assert(al_length(array) == 3);
 
   // Remove negative value
-  al_remove(array, -100);
+  al_rmfirst(array, -100);
   assert(al_length(array) == 2);
   assert(array[0] == 0);
   assert(array[1] == 100);
@@ -473,11 +473,11 @@ static void test_large_number_of_items() {
 
   assert(al_length(array) == 1000);
 
-  al_remove(array, 500);
+  al_rmfirst(array, 500);
   assert(al_length(array) == 999);
   assert(array[500] == 501);
 
-  al_iremove(array, 100);
+  al_rmat(array, 100);
   assert(al_length(array) == 998);
 
   assert(al_free(array));
@@ -492,7 +492,7 @@ static void test_remove_then_push_same() {
   al_push(&array, 5);
   assert(al_length(array) == 1);
 
-  al_remove(array, 5);
+  al_rmfirst(array, 5);
   assert(al_length(array) == 0);
 
   // Insert same value again
@@ -501,7 +501,7 @@ static void test_remove_then_push_same() {
   assert(array[0] == 5);
 
   // Remove again - should be empty
-  al_remove(array, 5);
+  al_rmfirst(array, 5);
   assert(al_length(array) == 0);
 
   assert(al_free(array));
@@ -549,14 +549,14 @@ static void test_all_functions_used() {
 
   al_push(&array, 99);
   assert(al_length(array) == 1);
-  al_remove(array, 99);
+  al_rmfirst(array, 99);
   assert(al_length(array) == 0);
 
   al_push(&array, 1);
   al_push(&array, 2);
   al_push(&array, 3);
   assert(al_length(array) == 3);
-  al_iremove(array, 1);
+  al_rmat(array, 1);
   assert(al_length(array) == 2);
 
   assert(al_free(array));
