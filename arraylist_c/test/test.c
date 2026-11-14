@@ -19,7 +19,7 @@
 static void test_empty_array() {
   TEST("test_empty_array");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   assert(array != NULL);
   assert(al_length(array) == 0);
@@ -32,7 +32,7 @@ static void test_empty_array() {
 static void test_new_array() {
   TEST("test_new_array");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
   assert(al_length(array) == 0);
   assert(al_free(array));
 
@@ -57,7 +57,7 @@ static void test_new_array() {
 static void test_push_basic() {
   TEST("test_push_basic");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 1);
   assert(al_length(array) == 1);
@@ -78,7 +78,7 @@ static void test_push_basic() {
 static void test_push_capacity_growth() {
   TEST("test_push_capacity_growth");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
     al_push(&array, i);
@@ -101,7 +101,7 @@ static void test_push_capacity_growth() {
 static void test_remove_by_value_first_occurrence() {
   TEST("test_remove_by_value_first_occurrence");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -126,7 +126,7 @@ static void test_remove_by_value_first_occurrence() {
 static void test_remove_nonexistent_value() {
   TEST("test_remove_nonexistent_value");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 1);
   assert(al_length(array) == 1);
@@ -143,7 +143,7 @@ static void test_remove_nonexistent_value() {
 static void test_remove_more_occurrences() {
   TEST("test_remove_all_occurrences");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 5);
   al_push(&array, 3);
@@ -168,7 +168,7 @@ static void test_remove_more_occurrences() {
 static void test_iremove_basic() {
   TEST("test_iremove_basic");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -191,7 +191,7 @@ static void test_iremove_basic() {
 static void test_iremove_first_and_last() {
   TEST("test_iremove_first_and_last");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 10);
   al_push(&array, 20);
@@ -219,7 +219,7 @@ static void test_iremove_first_and_last() {
 static void test_iremove_empty_array() {
   TEST("test_iremove_empty_array");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
   assert(al_rmfirst(array, 0) == AL_ERRTYPE);
   assert(al_rmfirst(array, 10) == AL_ERRTYPE);
   assert(al_rmfirst(array, -10) == AL_ERRTYPE);
@@ -231,7 +231,7 @@ static void test_iremove_empty_array() {
 static void test_iremove_middle_element() {
   TEST("test_iremove_middle_element");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 100);
   al_push(&array, 200);
@@ -254,7 +254,7 @@ static void test_iremove_middle_element() {
 static void test_push_remove_same_value() {
   TEST("test_push_remove_same_value");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
@@ -273,7 +273,7 @@ static void test_push_remove_same_value() {
 static void test_push_remove_interleaved() {
   TEST("test_push_remove_interleaved");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -300,7 +300,7 @@ static void test_push_remove_interleaved() {
 static void test_capacity_boundary() {
   TEST("test_capacity_boundary");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   // Insert many elements to near capacity
   for (size_t i = 0; i < INITIAL_CAPACITY - 1; i++) {
@@ -323,7 +323,7 @@ static void test_capacity_boundary() {
 static void test_remove_at_boundary() {
   TEST("test_remove_at_boundary");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   for (size_t i = 1; i <= 5; i++) {
     al_push(&array, i);
@@ -345,7 +345,7 @@ static void test_remove_at_boundary() {
 static void test_iremove_out_of_bounds() {
   TEST("test_iremove_out_of_bounds");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   for (size_t i = 0; i < 10; i++) {
     al_push(&array, i);
@@ -365,7 +365,7 @@ static void test_iremove_out_of_bounds() {
 static void test_remove_first_occurrence_edge_case() {
   TEST("test_remove_first_occurrence_edge_case");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   // All elements are the same value
   for (size_t i = 0; i < 5; i++) {
@@ -391,7 +391,7 @@ static void test_remove_first_occurrence_edge_case() {
 static void test_mixed_operations() {
   TEST("test_mixed_operations");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 10);
   al_push(&array, 20);
@@ -423,7 +423,7 @@ static void test_mixed_operations() {
 static void test_empty_value_removal() {
   TEST("test_empty_value_removal");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 0);
   al_push(&array, 1);
@@ -444,7 +444,7 @@ static void test_empty_value_removal() {
 static void test_negative_value_removal() {
   TEST("test_negative_value_removal");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, -100);
   al_push(&array, 0);
@@ -465,7 +465,7 @@ static void test_negative_value_removal() {
 static void test_large_number_of_items() {
   TEST("test_large_number_of_items");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   for (size_t i = 0; i < 1000; i++) {
     al_push(&array, i);
@@ -487,7 +487,7 @@ static void test_large_number_of_items() {
 static void test_remove_then_push_same() {
   TEST("test_remove_then_push_same");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   al_push(&array, 5);
   assert(al_length(array) == 1);
@@ -511,7 +511,7 @@ static void test_remove_then_push_same() {
 static void test_print_empty_array() {
   TEST("test_print_empty_array");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
 
   printf("Empty array: ");
   al_print(array);
@@ -524,7 +524,7 @@ static void test_print_empty_array() {
 static void test_print_single_element() {
   TEST("test_print_single_element");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
   al_push(&array, 42);
 
   printf("Single element array: ");
@@ -539,11 +539,11 @@ static void test_print_single_element() {
 static void test_all_functions_used() {
   TEST("test_all_functions_used");
 
-  al_type *array = al_empty();
+  T *array = al_empty();
   assert(al_length(array) == 0);
   assert(al_capacity(array) == INITIAL_CAPACITY);
 
-  al_type *array2 = al_create(0);
+  T *array2 = al_create(0);
   assert(al_length(array2) == 0);
   assert(al_capacity(array2) == INITIAL_CAPACITY);
 
@@ -567,7 +567,7 @@ static void test_all_functions_used() {
 static void test_new_exceed_maximum_capacity() {
   TEST("test_new_exceed_maximum_capacity");
 
-  al_type *array = al_create(MAX_CAPACITY);
+  T *array = al_create(MAX_CAPACITY);
   assert(array == NULL);
 
   PASS();
@@ -576,7 +576,7 @@ static void test_new_exceed_maximum_capacity() {
 static void test_create_large_number() {
   TEST("test_create_large_number");
 
-  al_type *array = al_create(MAX_CAPACITY - 1);
+  T *array = al_create(MAX_CAPACITY - 1);
   assert(!array);
   assert(!al_free(array));
 
