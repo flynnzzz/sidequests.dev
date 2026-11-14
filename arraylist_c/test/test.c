@@ -111,8 +111,9 @@ static void test_remove_by_value_first_occurrence() {
 
   assert(al_length(array) == 5);
 
-  al_rmfirst(array, 1);
+  al_rm(array, 1);
   assert(al_length(array) == 4);
+  assert(array[al_length(array)] == 0);
 
   assert(array[0] == 2);
   assert(array[1] == 1);
@@ -131,7 +132,7 @@ static void test_remove_nonexistent_value() {
   al_push(&array, 1);
   assert(al_length(array) == 1);
 
-  assert(al_rmfirst(array, 999) == AL_ERRTYPE);
+  assert(al_rm(array, 999) == AL_ERRTYPE);
 
   assert(al_length(array) == 1);
   assert(array[0] == 1);
@@ -153,8 +154,8 @@ static void test_remove_more_occurrences() {
 
   assert(al_length(array) == 5);
 
-  al_rmfirst(array, 5);
-  al_rmfirst(array, 5);
+  al_rm(array, 5);
+  al_rm(array, 5);
 
   assert(al_length(array) == 3);
   assert(array[0] == 3);
@@ -220,9 +221,9 @@ static void test_iremove_empty_array() {
   TEST("test_iremove_empty_array");
 
   T *array = al_init();
-  assert(al_rmfirst(array, 0) == AL_ERRTYPE);
-  assert(al_rmfirst(array, 10) == AL_ERRTYPE);
-  assert(al_rmfirst(array, -10) == AL_ERRTYPE);
+  assert(al_rm(array, 0) == AL_ERRTYPE);
+  assert(al_rm(array, 10) == AL_ERRTYPE);
+  assert(al_rm(array, -10) == AL_ERRTYPE);
 
   assert(al_free(array));
   PASS();
@@ -258,12 +259,12 @@ static void test_push_remove_same_value() {
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
-  assert(al_rmfirst(array, 10));
+  assert(al_rm(array, 10));
   assert(al_length(array) == 0);
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
-  assert(al_rmfirst(array, 10));
+  assert(al_rm(array, 10));
   assert(al_length(array) == 0);
 
   assert(al_free(array));
@@ -282,7 +283,7 @@ static void test_push_remove_interleaved() {
   assert(al_length(array) == 3);
 
   // Remove middle value
-  al_rmfirst(array, 2);
+  al_rm(array, 2);
   assert(al_length(array) == 2);
   assert(array[0] == 1);
   assert(array[1] == 3);
@@ -331,11 +332,11 @@ static void test_remove_at_boundary() {
   assert(al_length(array) == 5);
 
   // Remove last element
-  al_rmfirst(array, 5);
+  al_rm(array, 5);
   assert(al_length(array) == 4);
 
   // Remove new last element
-  al_rmfirst(array, 4);
+  al_rm(array, 4);
   assert(al_length(array) == 3);
 
   assert(al_free(array));
@@ -375,13 +376,13 @@ static void test_remove_first_occurrence_edge_case() {
   assert(al_length(array) == 5);
 
   // Remove should only remove first occurrence
-  al_rmfirst(array, 42);
+  al_rm(array, 42);
 
   assert(al_length(array) == 4);
   assert(array[0] == 42); // Still has 42 at index 0 (was the second original)
 
   // Remove again - should still be first remaining occurrence
-  al_rmfirst(array, 42);
+  al_rm(array, 42);
   assert(al_length(array) == 3);
 
   assert(al_free(array));
@@ -401,7 +402,7 @@ static void test_mixed_operations() {
   assert(al_length(array) == 4);
 
   // Remove middle value
-  al_rmfirst(array, 30);
+  al_rm(array, 30);
   assert(al_length(array) == 3);
 
   // Insert new value
@@ -432,7 +433,7 @@ static void test_empty_value_removal() {
   assert(al_length(array) == 3);
 
   // Remove 0 (valid integer value, not empty array)
-  al_rmfirst(array, 0);
+  al_rm(array, 0);
   assert(al_length(array) == 2);
   assert(array[0] == 1);
   assert(array[1] == 2);
@@ -453,7 +454,7 @@ static void test_negative_value_removal() {
   assert(al_length(array) == 3);
 
   // Remove negative value
-  al_rmfirst(array, -100);
+  al_rm(array, -100);
   assert(al_length(array) == 2);
   assert(array[0] == 0);
   assert(array[1] == 100);
@@ -473,7 +474,7 @@ static void test_large_number_of_items() {
 
   assert(al_length(array) == 1000);
 
-  al_rmfirst(array, 500);
+  al_rm(array, 500);
   assert(al_length(array) == 999);
   assert(array[500] == 501);
 
@@ -492,7 +493,7 @@ static void test_remove_then_push_same() {
   al_push(&array, 5);
   assert(al_length(array) == 1);
 
-  al_rmfirst(array, 5);
+  al_rm(array, 5);
   assert(al_length(array) == 0);
 
   // Insert same value again
@@ -501,7 +502,7 @@ static void test_remove_then_push_same() {
   assert(array[0] == 5);
 
   // Remove again - should be empty
-  al_rmfirst(array, 5);
+  al_rm(array, 5);
   assert(al_length(array) == 0);
 
   assert(al_free(array));
@@ -513,8 +514,10 @@ static void test_print_empty_array() {
 
   T *array = al_init();
 
+#ifdef AL_DEBUG_PRINT
   printf("Empty array: ");
   al_print(array);
+#endif
   assert(al_length(array) == 0);
 
   assert(al_free(array));
@@ -527,8 +530,10 @@ static void test_print_single_element() {
   T *array = al_init();
   al_push(&array, 42);
 
+#ifdef AL_DEBUG_PRINT
   printf("Single element array: ");
   al_print(array);
+#endif
 
   assert(al_length(array) == 1);
 
@@ -549,7 +554,7 @@ static void test_all_functions_used() {
 
   al_push(&array, 99);
   assert(al_length(array) == 1);
-  al_rmfirst(array, 99);
+  al_rm(array, 99);
   assert(al_length(array) == 0);
 
   assert(al_push(&array, 1));
@@ -566,6 +571,7 @@ static void test_all_functions_used() {
 
 static void test_new_exceed_maximum_capacity() {
   TEST("test_new_exceed_maximum_capacity");
+  puts("");
 
   T *array = al_create(MAX_CAPACITY);
   assert(array == NULL);
@@ -575,6 +581,7 @@ static void test_new_exceed_maximum_capacity() {
 
 static void test_create_large_number() {
   TEST("test_create_large_number");
+  puts("");
 
   T *array = al_create(MAX_CAPACITY - 1);
   assert(!array);
@@ -713,6 +720,7 @@ static void test_insert_middle() {
 
 static void test_insert_fail() {
   TEST("test_insert_fail");
+  puts("");
 
   T *array = al_init();
 
@@ -793,6 +801,7 @@ static void test_remove_all_same() {
   TEST("test_remove_all_same");
 
   T *array = al_init();
+  size_t orig_len = 14;
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
@@ -807,9 +816,13 @@ static void test_remove_all_same() {
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
-  assert(al_length(array) == 14);
-  assert(al_rmall(array, 8) == 14);
+  assert(al_length(array) == orig_len);
+  assert(al_rmall(array, 8) == orig_len);
   assert(al_length(array) == 0);
+
+  for (size_t i = 0; i < orig_len; i++) {
+    assert(array[i] == 0);
+  }
 
 #ifdef AL_DEBUG_PRINT
   puts("");

@@ -145,7 +145,7 @@ int al_push(T *arrayptr[], const T item) {
   return AL_SUCCESS;
 }
 
-inline T al_pop(T array[]) { return al_rmfirst(array, al_length(array) - 1); }
+inline T al_pop(T array[]) { return al_rm(array, al_length(array) - 1); }
 
 int al_insert(T *arrayptr[], size_t index, const T item) {
   if (alH_isnullptr(arrayptr, "al_insert: NULL pointer") ||
@@ -167,14 +167,16 @@ int al_insert(T *arrayptr[], size_t index, const T item) {
   return AL_SUCCESS;
 }
 
-T al_rmfirst(T array[], const T item) {
-  if (!alH_isnullptr(array, "al_remove: NULL pointer")) {
-    for (size_t i = 0; i < al_length(array); i++) {
-      if (array[i] == item) {
-        alH_lshift(array, i, al_length(array), 1);
-        alH_head(array)->length--;
-        return AL_SUCCESS;
-      }
+T al_rm(T array[], const T item) {
+  if (alH_isnullptr(array, "al_rm: NULL pointer")) {
+    return AL_ERRTYPE;
+  }
+  for (size_t i = 0; i < al_length(array); i++) {
+    if (array[i] == item) {
+      alH_lshift(array, i, al_length(array), 1);
+      array[al_length(array) - 1] = 0;
+      alH_head(array)->length--;
+      return AL_SUCCESS;
     }
   }
   return AL_ERRTYPE;
@@ -209,6 +211,7 @@ inline T al_rmat(T array[], size_t index) {
     return AL_ERRTYPE;
 
   alH_lshift(array, index, al_length(array), 1);
+  array[al_length(array) - 1] = 0;
   alH_head(array)->length--;
   return AL_SUCCESS;
 }

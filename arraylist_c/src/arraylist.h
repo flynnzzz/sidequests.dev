@@ -90,7 +90,7 @@ int al_insert(T *arrayptr[], size_t index, const T item);
  * Returns `AL_ERRTYPE` if no item was found or in case an error was
  * encountered.
  */
-T al_rmfirst(T array[], const T item);
+T al_rm(T array[], const T item);
 
 /*
  * Removes all instances of the specified `item` in the arraylist.
