@@ -94,15 +94,15 @@ inline int al_free(T *array) {
 }
 
 inline size_t al_length(const T array[]) {
-  if (alH_isnullptr(array, "al_length: NULL pointer"))
-    return AL_ERRSIZE;
-  return alH_head(array)->length;
+  return (alH_isnullptr(array, "al_length: NULL pointer"))
+             ? AL_ERRSIZE
+             : alH_head(array)->length;
 }
 
 inline size_t al_capacity(const T array[]) {
-  if (alH_isnullptr(array, "al_capacity: NULL pointer"))
-    return AL_ERRSIZE;
-  return alH_head(array)->capacity;
+  return (alH_isnullptr(array, "al_capacity: NULL pointer"))
+             ? AL_ERRSIZE
+             : alH_head(array)->capacity;
 }
 
 int al_push(T *arrayptr[], const T item) {

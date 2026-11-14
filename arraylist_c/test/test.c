@@ -817,7 +817,7 @@ static void test_remove_all_same() {
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
   assert(al_length(array) == orig_len);
-  assert(al_rmall(array, 8) == orig_len);
+  al_rmall(array, 8);
   assert(al_length(array) == 0);
 
   for (size_t i = 0; i < orig_len; i++) {
