@@ -817,12 +817,41 @@ static void test_remove_all_same() {
   assert(al_push(&array, 8));
   assert(al_push(&array, 8));
   assert(al_length(array) == orig_len);
+
   al_rmall(array, 8);
   assert(al_length(array) == 0);
 
   for (size_t i = 0; i < orig_len; i++) {
     assert(array[i] == 0);
   }
+
+#ifdef AL_DEBUG_PRINT
+  puts("");
+  for (size_t i = al_length(array); i < al_capacity(array); i++) {
+    printf("array[%zu]: %d\n", i, array[i]);
+  }
+#endif
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_remove_all_alternating() {
+  TEST("test_remove_all_alternating");
+
+  // {8, 8, 1, 8, 8, 8, 2, 8}
+  T *array = al_init();
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 1));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 2));
+  assert(al_push(&array, 8));
+  assert(al_length(array) == 7);
+
+  al_rmall(array, 8);
+  assert(al_length(array) == 2);
 
 #ifdef AL_DEBUG_PRINT
   puts("");
@@ -872,6 +901,7 @@ int main() {
   test_insert_middle();
   test_remove_all();
   test_remove_all_same();
+  test_remove_all_alternating();
 
   puts("\n=== All Tests Completed ===");
 

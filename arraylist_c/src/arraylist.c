@@ -35,7 +35,7 @@ static int alH_lshift(T array[], size_t start, size_t end, int step) {
     return AL_FAIL;
   }
 
-  for (size_t i = start; i < end - step && i < al_length(array) - step; i++) {
+  for (size_t i = start; i < al_length(array) - step && i < end - step; i++) {
     array[i] = array[i + step];
   }
 
@@ -187,19 +187,20 @@ int al_rmall(T array[], const T item) {
   if (alH_isnullptr(array, "al_rmall: NULL pointer")) {
     return AL_FAIL;
   }
-
-  for (size_t i = 0; i < al_length(array); i++) {
+  size_t i = 0;
+  while (i < al_length(array)) {
     if (array[i] == item) {
       size_t found = 1;
 
-      for (size_t j = i; array[j + 1] == item && j < al_length(array) - 1; j++)
+      for (size_t j = i; j < al_length(array) - 1 && array[j + 1] == item; j++)
         found++;
 
       alH_lshift(array, i, al_length(array), found);
 
       alH_head(array)->length -= found;
       removed += found;
-    }
+    } else
+      i++;
   }
   memset(&(array[al_length(array)]), 0, removed * sizeof(T));
   return removed;
