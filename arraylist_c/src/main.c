@@ -10,7 +10,7 @@
 
 int main() {
 
-  T *array = al_empty();
+  T *array = al_init();
 
   puts("al_push():");
   puts(" al_push(&array, 100);\n"

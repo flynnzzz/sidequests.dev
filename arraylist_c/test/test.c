@@ -19,7 +19,7 @@
 static void test_empty_array() {
   TEST("test_empty_array");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   assert(array != NULL);
   assert(al_length(array) == 0);
@@ -32,7 +32,7 @@ static void test_empty_array() {
 static void test_new_array() {
   TEST("test_new_array");
 
-  T *array = al_empty();
+  T *array = al_init();
   assert(al_length(array) == 0);
   assert(al_free(array));
 
@@ -57,7 +57,7 @@ static void test_new_array() {
 static void test_push_basic() {
   TEST("test_push_basic");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 1);
   assert(al_length(array) == 1);
@@ -78,7 +78,7 @@ static void test_push_basic() {
 static void test_push_capacity_growth() {
   TEST("test_push_capacity_growth");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
     al_push(&array, i);
@@ -101,7 +101,7 @@ static void test_push_capacity_growth() {
 static void test_remove_by_value_first_occurrence() {
   TEST("test_remove_by_value_first_occurrence");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -126,7 +126,7 @@ static void test_remove_by_value_first_occurrence() {
 static void test_remove_nonexistent_value() {
   TEST("test_remove_nonexistent_value");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 1);
   assert(al_length(array) == 1);
@@ -143,7 +143,7 @@ static void test_remove_nonexistent_value() {
 static void test_remove_more_occurrences() {
   TEST("test_remove_all_occurrences");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 5);
   al_push(&array, 3);
@@ -168,7 +168,7 @@ static void test_remove_more_occurrences() {
 static void test_iremove_basic() {
   TEST("test_iremove_basic");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -191,7 +191,7 @@ static void test_iremove_basic() {
 static void test_iremove_first_and_last() {
   TEST("test_iremove_first_and_last");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 10);
   al_push(&array, 20);
@@ -219,7 +219,7 @@ static void test_iremove_first_and_last() {
 static void test_iremove_empty_array() {
   TEST("test_iremove_empty_array");
 
-  T *array = al_empty();
+  T *array = al_init();
   assert(al_rmfirst(array, 0) == AL_ERRTYPE);
   assert(al_rmfirst(array, 10) == AL_ERRTYPE);
   assert(al_rmfirst(array, -10) == AL_ERRTYPE);
@@ -231,7 +231,7 @@ static void test_iremove_empty_array() {
 static void test_iremove_middle_element() {
   TEST("test_iremove_middle_element");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 100);
   al_push(&array, 200);
@@ -254,7 +254,7 @@ static void test_iremove_middle_element() {
 static void test_push_remove_same_value() {
   TEST("test_push_remove_same_value");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 10);
   assert(al_length(array) == 1);
@@ -273,7 +273,7 @@ static void test_push_remove_same_value() {
 static void test_push_remove_interleaved() {
   TEST("test_push_remove_interleaved");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 1);
   al_push(&array, 2);
@@ -300,7 +300,7 @@ static void test_push_remove_interleaved() {
 static void test_capacity_boundary() {
   TEST("test_capacity_boundary");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   // Insert many elements to near capacity
   for (size_t i = 0; i < INITIAL_CAPACITY - 1; i++) {
@@ -323,7 +323,7 @@ static void test_capacity_boundary() {
 static void test_remove_at_boundary() {
   TEST("test_remove_at_boundary");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   for (size_t i = 1; i <= 5; i++) {
     al_push(&array, i);
@@ -345,7 +345,7 @@ static void test_remove_at_boundary() {
 static void test_iremove_out_of_bounds() {
   TEST("test_iremove_out_of_bounds");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   for (size_t i = 0; i < 10; i++) {
     al_push(&array, i);
@@ -365,7 +365,7 @@ static void test_iremove_out_of_bounds() {
 static void test_remove_first_occurrence_edge_case() {
   TEST("test_remove_first_occurrence_edge_case");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   // All elements are the same value
   for (size_t i = 0; i < 5; i++) {
@@ -391,7 +391,7 @@ static void test_remove_first_occurrence_edge_case() {
 static void test_mixed_operations() {
   TEST("test_mixed_operations");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 10);
   al_push(&array, 20);
@@ -423,7 +423,7 @@ static void test_mixed_operations() {
 static void test_empty_value_removal() {
   TEST("test_empty_value_removal");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 0);
   al_push(&array, 1);
@@ -444,7 +444,7 @@ static void test_empty_value_removal() {
 static void test_negative_value_removal() {
   TEST("test_negative_value_removal");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, -100);
   al_push(&array, 0);
@@ -465,7 +465,7 @@ static void test_negative_value_removal() {
 static void test_large_number_of_items() {
   TEST("test_large_number_of_items");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   for (size_t i = 0; i < 1000; i++) {
     al_push(&array, i);
@@ -487,7 +487,7 @@ static void test_large_number_of_items() {
 static void test_remove_then_push_same() {
   TEST("test_remove_then_push_same");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   al_push(&array, 5);
   assert(al_length(array) == 1);
@@ -511,7 +511,7 @@ static void test_remove_then_push_same() {
 static void test_print_empty_array() {
   TEST("test_print_empty_array");
 
-  T *array = al_empty();
+  T *array = al_init();
 
   printf("Empty array: ");
   al_print(array);
@@ -524,7 +524,7 @@ static void test_print_empty_array() {
 static void test_print_single_element() {
   TEST("test_print_single_element");
 
-  T *array = al_empty();
+  T *array = al_init();
   al_push(&array, 42);
 
   printf("Single element array: ");
@@ -539,7 +539,7 @@ static void test_print_single_element() {
 static void test_all_functions_used() {
   TEST("test_all_functions_used");
 
-  T *array = al_empty();
+  T *array = al_init();
   assert(al_length(array) == 0);
   assert(al_capacity(array) == INITIAL_CAPACITY);
 
@@ -552,11 +552,11 @@ static void test_all_functions_used() {
   al_rmfirst(array, 99);
   assert(al_length(array) == 0);
 
-  al_push(&array, 1);
-  al_push(&array, 2);
-  al_push(&array, 3);
+  assert(al_push(&array, 1));
+  assert(al_push(&array, 2));
+  assert(al_push(&array, 3));
   assert(al_length(array) == 3);
-  al_rmat(array, 1);
+  assert(al_rmat(array, 1));
   assert(al_length(array) == 2);
 
   assert(al_free(array));
@@ -592,6 +592,235 @@ static void test_nullptr_guard() {
 
   PASS();
 }
+static void test_insert_start() {
+  TEST("test_insert_start");
+
+  T *array = al_init();
+
+  assert(al_push(&array, 100));
+  assert(al_push(&array, 200));
+  assert(al_push(&array, 300));
+  assert(al_push(&array, 400));
+
+  assert(al_length(array) == 4);
+
+  assert(al_insert(&array, 0, 1000));
+  assert(al_length(array) == 5);
+  assert(array[0] == 1000);
+  assert(array[1] == 100);
+
+  assert(al_insert(&array, 0, 2000));
+  assert(al_length(array) == 6);
+  assert(array[0] == 2000);
+  assert(array[1] == 1000);
+  assert(array[2] == 100);
+
+  assert(al_insert(&array, 0, 3000));
+  assert(al_insert(&array, 0, 4000));
+  assert(al_insert(&array, 0, 5000));
+  assert(array[0] == 5000);
+  assert(array[1] == 4000);
+  assert(array[2] == 3000);
+  assert(al_length(array) == 9);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_insert_end() {
+  TEST("test_insert_end");
+
+  T *array = al_init();
+
+  assert(al_push(&array, 100));
+  assert(al_push(&array, 200));
+  assert(al_push(&array, 300));
+  assert(al_push(&array, 400));
+
+  assert(al_length(array) == 4);
+
+  assert(al_insert(&array, al_length(array), 1000));
+  assert(al_length(array) == 5);
+  assert(array[0] == 100);
+  assert(array[1] == 200);
+  assert(array[2] == 300);
+  assert(array[3] == 400);
+  assert(array[4] == 1000);
+
+  assert(al_insert(&array, al_length(array), 2000));
+  assert(al_length(array) == 6);
+  assert(array[4] == 1000);
+  assert(array[5] == 2000);
+
+  assert(al_insert(&array, al_length(array), 3000));
+  assert(al_insert(&array, al_length(array), 4000));
+  assert(al_insert(&array, al_length(array), 5000));
+  assert(array[6] == 3000);
+  assert(array[7] == 4000);
+  assert(array[8] == 5000);
+  assert(al_length(array) == 9);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_insert_middle() {
+  TEST("test_insert_middle");
+
+  T *array = al_init();
+
+  assert(al_push(&array, 100));
+  assert(al_push(&array, 200));
+  assert(al_push(&array, 300));
+  assert(al_push(&array, 400));
+
+  assert(al_length(array) == 4);
+
+  assert(al_insert(&array, 2, 1000));
+  assert(al_length(array) == 5);
+  assert(array[0] == 100);
+  assert(array[1] == 200);
+  assert(array[2] == 1000);
+  assert(array[3] == 300);
+  assert(array[4] == 400);
+
+  assert(al_insert(&array, 3, 2000));
+  assert(al_length(array) == 6);
+  assert(array[0] == 100);
+  assert(array[1] == 200);
+  assert(array[2] == 1000);
+  assert(array[3] == 2000);
+  assert(array[4] == 300);
+  assert(array[5] == 400);
+
+  assert(al_insert(&array, al_length(array), 3000));
+  assert(al_insert(&array, al_length(array), 4000));
+  assert(al_insert(&array, al_length(array), 5000));
+  assert(al_length(array) == 9);
+  assert(array[6] == 3000);
+  assert(array[7] == 4000);
+  assert(array[8] == 5000);
+
+  assert(al_insert(&array, 0, 6000));
+  assert(al_insert(&array, 1, 7000));
+  assert(al_length(array) == 11);
+  assert(array[0] == 6000);
+  assert(array[1] == 7000);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_insert_fail() {
+  TEST("test_insert_fail");
+
+  T *array = al_init();
+
+  assert(al_push(&array, 100));
+  assert(al_push(&array, 200));
+  assert(al_push(&array, 300));
+  assert(al_push(&array, 400));
+
+  assert(al_length(array) == 4);
+
+  assert(al_insert(&array, 999, 0) == AL_FAIL);
+  assert(al_length(array) == 4);
+  assert(array[0] == 100);
+  assert(array[1] == 200);
+  assert(array[2] == 300);
+  assert(array[3] == 400);
+
+  assert(al_insert(NULL, 0, 0) == AL_FAIL);
+  assert(al_length(array) == 4);
+
+  T *nullarray = NULL;
+  assert(al_insert(&nullarray, 0, 0) == AL_FAIL);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_remove_all() {
+  TEST("test_remove_all");
+
+  T *array = al_init();
+
+  assert(al_push(&array, 100));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 200));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 300));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 400));
+  assert(al_push(&array, 88888888));
+
+  assert(al_length(array) == 8);
+  assert(al_rmall(array, 88888888) == 4);
+  assert(al_length(array) == 4);
+
+  assert(al_rmall(array, 100) == 1);
+  assert(al_length(array) == 3);
+  assert(al_rmall(array, 200) == 1);
+  assert(al_length(array) == 2);
+  assert(al_rmall(array, 300) == 1);
+  assert(al_length(array) == 1);
+  assert(al_rmall(array, 400) == 1);
+  assert(al_length(array) == 0);
+
+  assert(al_push(&array, 666666));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 666666));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 666666));
+  assert(al_push(&array, 88888888));
+  assert(al_push(&array, 666666));
+  assert(al_push(&array, 88888888));
+  assert(al_length(array) == 8);
+
+  assert(al_rmall(array, 0) == 0);
+  assert(al_length(array) == 8);
+
+  assert(al_rmall(array, 666666) == 4);
+  assert(al_length(array) == 4);
+  assert(al_rmall(array, 88888888) == 4);
+  assert(al_length(array) == 0);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_remove_all_same() {
+  TEST("test_remove_all_same");
+
+  T *array = al_init();
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_push(&array, 8));
+  assert(al_length(array) == 14);
+  assert(al_rmall(array, 8) == 14);
+  assert(al_length(array) == 0);
+
+#ifdef AL_DEBUG_PRINT
+  puts("");
+  for (size_t i = al_length(array); i < al_capacity(array); i++) {
+    printf("array[%zu]: %d\n", i, array[i]);
+  }
+#endif
+
+  assert(al_free(array));
+  PASS();
+}
 
 int main() {
   puts("=== Running ArrayList Tests ===\n");
@@ -624,6 +853,12 @@ int main() {
   test_new_exceed_maximum_capacity();
   test_create_large_number();
   test_nullptr_guard();
+  test_insert_start();
+  test_insert_end();
+  test_insert_fail();
+  test_insert_middle();
+  test_remove_all();
+  test_remove_all_same();
 
   puts("\n=== All Tests Completed ===");
 

@@ -40,7 +40,7 @@ typedef struct alH_head_t {
 /*
  * Allocates an empty arraylist of `INITIAL_CAPACITY`.
  */
-T *al_empty();
+T *al_init();
 
 /*
  * Allocates an empty arraylist of a specified `capacity`.
@@ -48,7 +48,7 @@ T *al_empty();
 T *al_create(size_t capacity);
 
 /*
- * Frees an arraylist allocated with either `al_create()` or `al_empty()`.
+ * Frees an arraylist allocated with either `al_create()` or `al_init()`.
  *
  * It is strongly discouraged to use this function for anything but arraylists
  * since it produces undefined behaviour.
@@ -78,12 +78,13 @@ int al_push(T *arrayptr[], const T item);
 T al_pop(T array[]);
 
 /*
- * Inserts the specified `item` to the specified `index`.
+ * Inserts the specified `item` at `index`, automatically shifting
+ * all items.
  */
-int al_insert(T *arrayptr[], size_t index, T item);
+int al_insert(T *arrayptr[], size_t index, const T item);
 
 /*
- * Removes and returns the first instance of the specified `item`` in the
+ * Removes and returns the first instance of the specified `item` in the
  * arraylist.
  *
  * Returns `AL_ERRTYPE` if no item was found or in case an error was
@@ -92,9 +93,9 @@ int al_insert(T *arrayptr[], size_t index, T item);
 T al_rmfirst(T array[], const T item);
 
 /*
- * Removes all instances of the specified `item`` in the arraylist.
+ * Removes all instances of the specified `item` in the arraylist.
  *
- * Returns `AL_SUCCESS` or `AL_FAIL` depending on the success of the operation.
+ * Returns the number of removed items.
  */
 int al_rmall(T array[], const T item);
 
