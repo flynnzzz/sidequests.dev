@@ -4,60 +4,42 @@
  * API showcase.
  */
 
+#include <stdio.h>
+
 #include "arraylist.h"
-#include <assert.h>
-
-static void test() {
-  al_type *array0 = al_empty();
-  assert(al_length(array0) == 0);
-  assert(al_capacity(array0) == INITIAL_CAPACITY);
-
-  al_push(&array0, 8);
-  al_push(&array0, 8);
-  al_push(&array0, 8);
-
-  assert(al_length(array0) == 3);
-
-  al_print(array0);
-
-  al_type *array1 = al_create(1);
-  assert(al_length(array1) == 0);
-
-  al_push(&array1, 9);
-  assert(al_length(array1) == 1);
-
-  al_print(array1);
-
-  al_free(array0);
-  al_free(array1);
-}
-
-static void remove_test() {
-  al_type *array = al_empty();
-  al_push(&array, 1);
-  al_push(&array, 2);
-  al_push(&array, 3);
-  al_push(&array, 4);
-  assert(al_length(array) == 4);
-
-  al_remove(array, 3);
-  al_print(array);
-  assert(al_length(array) == 3);
-  al_iremove(array, 0);
-  al_print(array);
-  assert(al_length(array) == 2);
-  al_remove(array, 4);
-  al_print(array);
-  assert(al_length(array) == 1);
-  al_iremove(array, 0);
-  al_print(array);
-  assert(al_length(array) == 0);
-
-  al_free(array);
-}
 
 int main() {
-  test();
-  remove_test();
+
+  al_type *array = al_empty();
+
+  puts("al_push():");
+  puts(" al_push(&array, 100);\n"
+       " al_push(&array, 101);\n"
+       " al_push(&array, 102);");
+
+  al_push(&array, 100);
+  al_push(&array, 101);
+  al_push(&array, 102);
+
+  puts("\nal_print():");
+  al_print(array);
+
+  puts("\naccessing items:");
+  printf(" array[0]: %d\n", array[0]);
+  printf(" array[1]: %d\n", array[1]);
+  printf(" array[2]: %d\n", array[2]);
+
+  puts("\nmodifying items:");
+  array[0] = 103;
+  array[1] = 104;
+  array[2] = 105;
+  printf("array[0] = %d, array[1] = %d, array[2] = %d\n", 103, 104, 105);
+  printf(" array[0]: %d\n", array[0]);
+  printf(" array[1]: %d\n", array[1]);
+  printf(" array[2]: %d\n", array[2]);
+  puts("al_print():");
+  al_print(array);
+
+  al_free(array);
   return 0;
 }
