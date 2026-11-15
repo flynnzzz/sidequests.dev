@@ -50,8 +50,8 @@ T *al_create(size_t capacity);
 /*
  * Frees an arraylist allocated with either `al_create()` or `al_init()`.
  *
- * It is strongly discouraged to use this function for anything but arraylists
- * since it produces undefined behaviour.
+ * It is strongly discouraged to use this function for anything but
+ * "arraylists", doing so would cause undefined behaviour.
  */
 int al_free(T array[]);
 
@@ -125,7 +125,7 @@ T *al_copy(T array[]);
 int al_resize(T array[], size_t capacity);
 
 // TODO: implement
-int al_grow(T array[]);
+int al_grow(T *arrayptr[]);
 
 // TODO: implement
 int al_swap(T array[], size_t index1, size_t index2);
