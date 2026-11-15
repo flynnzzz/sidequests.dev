@@ -23,7 +23,7 @@ static void test_empty_array() {
 
   assert(array != NULL);
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == INITIAL_CAPACITY);
+  assert(al_capacity(array) == AL_INIT_CAPACITY);
 
   assert(al_free(array));
   PASS();
@@ -38,12 +38,12 @@ static void test_new_array() {
 
   array = al_create(0);
   assert(al_length(array) == 0);
-  assert(al_capacity(array) >= INITIAL_CAPACITY);
+  assert(al_capacity(array) >= AL_INIT_CAPACITY);
   assert(al_free(array));
 
-  array = al_create(INITIAL_CAPACITY);
+  array = al_create(AL_INIT_CAPACITY);
   assert(al_length(array) == 0);
-  assert(al_capacity(array) >= INITIAL_CAPACITY);
+  assert(al_capacity(array) >= AL_INIT_CAPACITY);
   assert(al_free(array));
 
   array = al_create(44);
@@ -80,14 +80,14 @@ static void test_push_capacity_growth() {
 
   T *array = al_init();
 
-  for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
+  for (size_t i = 0; i < AL_INIT_CAPACITY; i++) {
     al_push(&array, i);
     assert(al_length(array) == i + 1);
     assert(array[i] == (int)i);
   }
 
   size_t original_capacity = al_capacity(array);
-  for (size_t i = INITIAL_CAPACITY; i < INITIAL_CAPACITY + 10; i++) {
+  for (size_t i = AL_INIT_CAPACITY; i < AL_INIT_CAPACITY + 10; i++) {
     al_push(&array, i);
     assert(al_length(array) == i + 1);
     assert(array[i] == (int)i);
@@ -304,18 +304,18 @@ static void test_capacity_boundary() {
   T *array = al_init();
 
   // Insert many elements to near capacity
-  for (size_t i = 0; i < INITIAL_CAPACITY - 1; i++) {
+  for (size_t i = 0; i < AL_INIT_CAPACITY - 1; i++) {
     al_push(&array, i);
   }
 
-  assert(al_length(array) == INITIAL_CAPACITY - 1);
-  assert(al_capacity(array) >= INITIAL_CAPACITY);
+  assert(al_length(array) == AL_INIT_CAPACITY - 1);
+  assert(al_capacity(array) >= AL_INIT_CAPACITY);
 
   // Insert one more to trigger growth
-  al_push(&array, INITIAL_CAPACITY - 1);
+  al_push(&array, AL_INIT_CAPACITY - 1);
 
-  assert(al_length(array) == INITIAL_CAPACITY);
-  assert(al_capacity(array) >= INITIAL_CAPACITY);
+  assert(al_length(array) == AL_INIT_CAPACITY);
+  assert(al_capacity(array) >= AL_INIT_CAPACITY);
 
   assert(al_free(array));
   PASS();
@@ -546,11 +546,11 @@ static void test_all_functions_used() {
 
   T *array = al_init();
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == INITIAL_CAPACITY);
+  assert(al_capacity(array) == AL_INIT_CAPACITY);
 
   T *array2 = al_create(0);
   assert(al_length(array2) == 0);
-  assert(al_capacity(array2) == INITIAL_CAPACITY);
+  assert(al_capacity(array2) == AL_INIT_CAPACITY);
 
   al_push(&array, 99);
   assert(al_length(array) == 1);
@@ -573,7 +573,7 @@ static void test_new_exceed_maximum_capacity() {
   TEST("test_new_exceed_maximum_capacity");
   puts("");
 
-  T *array = al_create(MAX_CAPACITY);
+  T *array = al_create(AL_MAXCAP);
   assert(array == NULL);
 
   PASS();
@@ -583,7 +583,7 @@ static void test_create_large_number() {
   TEST("test_create_large_number");
   puts("");
 
-  T *array = al_create(MAX_CAPACITY - 1);
+  T *array = al_create(AL_MAXCAP - 1);
   assert(!array);
   assert(!al_free(array));
 
@@ -868,18 +868,18 @@ static void test_grow_basic() {
   TEST("test_grow_generic");
 
   T *array = al_init();
-  for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
+  for (size_t i = 0; i < AL_INIT_CAPACITY; i++) {
     al_push(&array, 90);
   }
-  assert(al_length(array) == INITIAL_CAPACITY);
-  assert(al_capacity(array) == INITIAL_CAPACITY);
+  assert(al_length(array) == AL_INIT_CAPACITY);
+  assert(al_capacity(array) == AL_INIT_CAPACITY);
 
   al_push(&array, 91);
-  assert(al_length(array) == INITIAL_CAPACITY + 1);
-  assert(al_capacity(array) == GROWTH_FACTOR * INITIAL_CAPACITY);
+  assert(al_length(array) == AL_INIT_CAPACITY + 1);
+  assert(al_capacity(array) == AL_GROWTH_FACTOR * AL_INIT_CAPACITY);
 
   size_t j;
-  for (j = 0; j < INITIAL_CAPACITY; j++) {
+  for (j = 0; j < AL_INIT_CAPACITY; j++) {
     assert(array[j] == 90);
   }
   assert(array[j] == 91);
@@ -901,19 +901,19 @@ static void test_grow_manual() {
 
   T *array = al_init();
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == INITIAL_CAPACITY);
+  assert(al_capacity(array) == AL_INIT_CAPACITY);
 
   assert(al_grow(&array));
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == GROWTH_FACTOR * INITIAL_CAPACITY);
+  assert(al_capacity(array) == AL_GROWTH_FACTOR * AL_INIT_CAPACITY);
 
   assert(al_grow(&array));
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == 2 * GROWTH_FACTOR * INITIAL_CAPACITY);
+  assert(al_capacity(array) == 2 * AL_GROWTH_FACTOR * AL_INIT_CAPACITY);
 
   assert(al_grow(&array));
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == 4 * GROWTH_FACTOR * INITIAL_CAPACITY);
+  assert(al_capacity(array) == 4 * AL_GROWTH_FACTOR * AL_INIT_CAPACITY);
 
   assert(al_grow(NULL) == AL_FAIL);
 
@@ -926,7 +926,7 @@ static void test_resize_basic() {
 
   T *array = al_init();
   assert(al_length(array) == 0);
-  assert(al_capacity(array) == INITIAL_CAPACITY);
+  assert(al_capacity(array) == AL_INIT_CAPACITY);
 
   assert(al_resize(&array, 10));
   assert(al_length(array) == 0);
@@ -960,29 +960,29 @@ static void test_resize_edge_cases() {
 
   T *arr = al_init();
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
   puts("");
 
   assert(al_resize(&arr, -1) == AL_FAIL);
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
-  assert(al_resize(&arr, MAX_CAPACITY) == AL_FAIL);
+  assert(al_resize(&arr, AL_MAXCAP) == AL_FAIL);
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
-  assert(al_resize(NULL, MAX_CAPACITY) == AL_FAIL);
+  assert(al_resize(NULL, AL_MAXCAP) == AL_FAIL);
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
   T *nullarr = NULL;
-  assert(al_resize(&nullarr, MAX_CAPACITY) == AL_FAIL);
+  assert(al_resize(&nullarr, AL_MAXCAP) == AL_FAIL);
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
   assert(al_resize(&arr, 0));
   assert(al_length(arr) == 0);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
   assert(al_resize(&arr, 1));
   assert(al_length(arr) == 0);
@@ -997,7 +997,7 @@ static void test_resize_edge_cases() {
 
   assert(al_resize(&arr, 0));
   assert(al_length(arr) == 3);
-  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
   assert(al_push(&arr, 100));
   assert(al_push(&arr, 101));

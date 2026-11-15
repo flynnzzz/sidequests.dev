@@ -20,14 +20,10 @@
 #define ARRAYLIST_H
 #include <stddef.h>
 
-// TODO: rename to `AL_INIT_CAPACITY`
-#define INITIAL_CAPACITY 32
-// TODO: rename to `AL_MAXSIZE`
-#define MAX_SIZE ((~(size_t)0) >> 1)
-// TODO: rename to `AL_MAXCAP
-#define MAX_CAPACITY ((MAX_SIZE - sizeof(alH_head)) / sizeof(T))
-// TODO: rename to `AL_GROWTH_FACTOR
-#define GROWTH_FACTOR 2
+#define AL_INIT_CAPACITY 32
+#define AL_MAXSIZE ((~(size_t)0) >> 1)
+#define AL_MAXCAP ((AL_MAXSIZE - sizeof(alH_head)) / sizeof(T))
+#define AL_GROWTH_FACTOR 2
 
 #define AL_ERRSIZE (~(size_t)0)
 #define AL_ERRTYPE (~(T)0)
@@ -42,7 +38,7 @@ typedef struct alH_head_t {
 } alH_head;
 
 /*
- * Allocates an empty arraylist of `INITIAL_CAPACITY`.
+ * Allocates an empty arraylist of `AL_INIT_CAPACITY`.
  */
 T *al_init();
 
@@ -70,7 +66,7 @@ size_t al_length(const T array[]);
 size_t al_capacity(const T array[]);
 
 /*
- * Increases the capacity of an arraylist by `GROWTH_FACTOR`.
+ * Increases the capacity of an arraylist by `AL_GROWTH_FACTOR`.
  */
 int al_grow(T *arrptr[]);
 
@@ -81,7 +77,7 @@ int al_grow(T *arrptr[]);
  * the new decrased capacity.
  *
  * Passing in 0 as `capacity` will set the new capacity to
- * `INITIAL_CAPACITY`.
+ * `AL_INIT_CAPACITY`.
  */
 int al_resize(T *arrptr[], size_t capacity);
 

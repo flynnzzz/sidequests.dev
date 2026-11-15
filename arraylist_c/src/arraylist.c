@@ -74,12 +74,12 @@ static int alH_rshift(T array[], size_t start, size_t end, int step) {
 inline T *al_init() { return al_create(0); }
 
 T *al_create(size_t capacity) {
-  if (capacity >= MAX_CAPACITY) {
+  if (capacity >= AL_MAXCAP) {
     alH_log("al_create: `capacity` exceeds maximum capacity\n");
     return NULL;
   }
 
-  capacity = capacity == 0 ? INITIAL_CAPACITY : capacity;
+  capacity = capacity == 0 ? AL_INIT_CAPACITY : capacity;
   alH_head *head =
       (alH_head *)malloc(sizeof(alH_head) + (capacity * sizeof(T)));
   if (!head) {
@@ -120,21 +120,21 @@ inline int al_grow(T *arrptr[]) {
   if (alH_isnullptr(arrptr, "al_grow: NULL pointer\n") ||
       alH_isnullptr(*arrptr, "al_grow: pointer to array points to NULL\n"))
     return AL_FAIL;
-  return al_resize(arrptr, alH_head(*arrptr)->capacity * GROWTH_FACTOR);
+  return al_resize(arrptr, alH_head(*arrptr)->capacity * AL_GROWTH_FACTOR);
 }
 
 int al_resize(T *arrptr[], size_t capacity) {
   if (alH_isnullptr(arrptr, "al_resize: NULL pointer\n") ||
       alH_isnullptr(*arrptr, "al_resize: pointer to array points to NULL\n"))
     return AL_FAIL;
-  if (capacity >= MAX_CAPACITY) {
+  if (capacity >= AL_MAXCAP) {
     alH_log("al_resize: `capacity` exceeds maximum capacity\n");
     return AL_FAIL;
   }
   alH_head *head = alH_head(*arrptr), *new_head;
   size_t oldlen = head->length;
 
-  capacity = (capacity == 0) ? INITIAL_CAPACITY : capacity;
+  capacity = (capacity == 0) ? AL_INIT_CAPACITY : capacity;
   new_head = realloc(head, sizeof(alH_head) + sizeof(T) * capacity);
   if (!new_head) {
     perror("al_resize");
@@ -160,7 +160,7 @@ int al_push(T *arrptr[], const T item) {
   T *array = *arrptr;
 
   alH_head *head = alH_head(array);
-  if (head->length + 1 >= MAX_CAPACITY) {
+  if (head->length + 1 >= AL_MAXCAP) {
     alH_log("al_push: array reached maximum capacity\n");
     return AL_FAIL;
   }
