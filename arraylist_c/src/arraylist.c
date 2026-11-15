@@ -18,18 +18,20 @@
 #define alH_skiphead(head) ((T *)((alH_head *)(head) + 1))
 
 static inline void alH_log(const char *message) {
-#ifndef AL_DEBUG_LOG
-  message = "";
-#endif
+#ifdef AL_DEBUG_LOG
   fputs(message, stderr);
+#endif
+}
+
+static inline void alH_set(T array[], T c, size_t start, size_t end) {
+  memset(array + start, 0, (end - start) * sizeof(T));
 }
 
 static inline int alH_isnullptr(const void *pointer, const char *message) {
   if (pointer == NULL) {
-#ifndef AL_DEBUG_LOG
-    message = "";
-#endif
+#ifdef AL_DEBUG_LOG
     fputs(message, stderr);
+#endif
     return 1;
   }
   return 0;
@@ -148,7 +150,9 @@ int al_resize(T *arrptr[], size_t capacity) {
 
   new_head->capacity = capacity;
   new_head->length = (capacity < oldlen) ? capacity : oldlen;
+
   *arrptr = alH_skiphead(new_head);
+  alH_set(*arrptr, 0, al_length(*arrptr), al_capacity(*arrptr));
   return AL_SUCCESS;
 }
 
@@ -182,15 +186,15 @@ int al_insert(T *arrptr[], size_t index, const T item) {
       alH_isnullptr(*arrptr, "al_insert: pointer to array points to NULL\n"))
     return AL_FAIL;
 
-  T *array = *arrptr;
-  if (index > al_length(array)) {
+  if (index > al_length(*arrptr)) {
     alH_log("al_insert: `index` exceeds arraylist length\n");
     return AL_FAIL;
   }
-  if (!al_push(arrptr, item) || !alH_rshift(array, index, al_length(array), 1))
+  if (!al_push(arrptr, item) ||
+      !alH_rshift(*arrptr, index, al_length(*arrptr), 1))
     return AL_FAIL;
 
-  array[index] = item;
+  (*arrptr)[index] = item;
   return AL_SUCCESS;
 }
 
@@ -229,7 +233,7 @@ int al_rmall(T array[], const T item) {
     } else
       i++;
   }
-  memset(&(array[al_length(array)]), 0, removed * sizeof(T));
+  alH_set(array, 0, al_length(array), al_capacity(array));
   return removed;
 }
 
