@@ -864,7 +864,7 @@ static void test_remove_all_alternating() {
   PASS();
 }
 
-static void test_grow_generic() {
+static void test_grow_basic() {
   TEST("test_grow_generic");
 
   T *array = al_init();
@@ -921,6 +921,93 @@ static void test_grow_manual() {
   PASS();
 }
 
+static void test_resize_basic() {
+  TEST("test_resize_basic");
+
+  T *array = al_init();
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == INITIAL_CAPACITY);
+
+  assert(al_resize(&array, 10));
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == 10);
+
+  assert(al_resize(&array, 100));
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == 100);
+
+  for (size_t i = 0; i < 100; i++) {
+    assert(al_push(&array, 7));
+  }
+
+  assert(al_length(array) == 100);
+  assert(al_capacity(array) == 100);
+
+  assert(al_resize(&array, 50));
+  assert(al_length(array) == 50);
+  assert(al_capacity(array) == 50);
+
+  assert(al_resize(&array, 50));
+  assert(al_length(array) == 50);
+  assert(al_capacity(array) == 50);
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_resize_edge_cases() {
+  TEST("test_resize_edge_cases");
+
+  T *arr = al_init();
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+  puts("");
+
+  assert(al_resize(&arr, -1) == AL_FAIL);
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  assert(al_resize(&arr, MAX_CAPACITY) == AL_FAIL);
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  assert(al_resize(NULL, MAX_CAPACITY) == AL_FAIL);
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  T *nullarr = NULL;
+  assert(al_resize(&nullarr, MAX_CAPACITY) == AL_FAIL);
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  assert(al_resize(&arr, 0));
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  assert(al_resize(&arr, 1));
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == 1);
+
+  assert(al_push(&arr, 100));
+  assert(al_push(&arr, 101));
+  assert(al_push(&arr, 102));
+  assert(al_length(arr) == 3);
+
+  assert(al_capacity(arr) == 1 * 2 * 2);
+
+  assert(al_resize(&arr, 0));
+  assert(al_length(arr) == 3);
+  assert(al_capacity(arr) == INITIAL_CAPACITY);
+
+  assert(al_push(&arr, 100));
+  assert(al_push(&arr, 101));
+  assert(al_push(&arr, 102));
+  assert(al_length(arr) == 6);
+
+  assert(al_free(arr));
+  PASS();
+}
+
 int main() {
   puts("=== Running ArrayList Tests ===\n");
 
@@ -959,8 +1046,10 @@ int main() {
   test_remove_all();
   test_remove_all_same();
   test_remove_all_alternating();
-  test_grow_generic();
+  test_grow_basic();
   test_grow_manual();
+  test_resize_basic();
+  test_resize_edge_cases();
 
   puts("\n=== All Tests Completed ===");
 

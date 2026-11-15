@@ -20,9 +20,13 @@
 #define ARRAYLIST_H
 #include <stddef.h>
 
+// TODO: rename to `AL_INIT_CAPACITY`
 #define INITIAL_CAPACITY 32
+// TODO: rename to `AL_MAXSIZE`
 #define MAX_SIZE ((~(size_t)0) >> 1)
+// TODO: rename to `AL_MAXCAP
 #define MAX_CAPACITY ((MAX_SIZE - sizeof(alH_head)) / sizeof(T))
+// TODO: rename to `AL_GROWTH_FACTOR
 #define GROWTH_FACTOR 2
 
 #define AL_ERRSIZE (~(size_t)0)
@@ -68,12 +72,23 @@ size_t al_capacity(const T array[]);
 /*
  * Increases the capacity of an arraylist by `GROWTH_FACTOR`.
  */
-int al_grow(T *arrayptr[]);
+int al_grow(T *arrptr[]);
+
+/*
+ * Resizes the capacity of an arraylist by the specified amount.
+ *
+ * Shrinking the arraylist will permanently delete (if present) all items past
+ * the new decrased capacity.
+ *
+ * Passing in 0 as `capacity` will set the new capacity to
+ * `INITIAL_CAPACITY`.
+ */
+int al_resize(T *arrptr[], size_t capacity);
 
 /*
  * Appends the specified `item` to the tail of the arraylist.
  */
-int al_push(T *arrayptr[], const T item);
+int al_push(T *arrptr[], const T item);
 
 /*
  * Removes and returns last item in the arraylist.
@@ -86,7 +101,7 @@ T al_pop(T array[]);
  * Inserts the specified `item` at `index`, automatically shifting
  * all items.
  */
-int al_insert(T *arrayptr[], size_t index, const T item);
+int al_insert(T *arrptr[], size_t index, const T item);
 
 /*
  * Removes and returns the first instance of the specified `item` in the
@@ -125,9 +140,6 @@ int al_fclear(T array[]);
 
 // TODO: implement
 T *al_copy(T array[]);
-
-// TODO: implement
-int al_resize(T array[], size_t capacity);
 
 // TODO: implement
 int al_swap(T array[], size_t index1, size_t index2);
