@@ -514,7 +514,7 @@ static void test_print_empty_array() {
 
   T *array = al_init();
 
-#ifdef AL_DEBUG_PRINT
+#ifdef AL_TEST_LOG
   printf("Empty array: ");
   al_print(array);
 #endif
@@ -530,7 +530,7 @@ static void test_print_single_element() {
   T *array = al_init();
   al_push(&array, 42);
 
-#ifdef AL_DEBUG_PRINT
+#ifdef AL_TEST_LOG
   printf("Single element array: ");
   al_print(array);
 #endif
@@ -825,7 +825,7 @@ static void test_remove_all_same() {
     assert(array[i] == 0);
   }
 
-#ifdef AL_DEBUG_PRINT
+#ifdef AL_TEST_LOG
   puts("");
   for (size_t i = al_length(array); i < al_capacity(array); i++) {
     printf("array[%zu]: %d\n", i, array[i]);
@@ -853,12 +853,69 @@ static void test_remove_all_alternating() {
   al_rmall(array, 8);
   assert(al_length(array) == 2);
 
-#ifdef AL_DEBUG_PRINT
+#ifdef AL_TEST_LOG
   puts("");
-  for (size_t i = al_length(array); i < al_capacity(array); i++) {
+  for (size_t i = 0; i < al_length(array); i++) {
     printf("array[%zu]: %d\n", i, array[i]);
   }
 #endif
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_grow_generic() {
+  TEST("test_grow_generic");
+
+  T *array = al_init();
+  for (size_t i = 0; i < INITIAL_CAPACITY; i++) {
+    al_push(&array, 90);
+  }
+  assert(al_length(array) == INITIAL_CAPACITY);
+  assert(al_capacity(array) == INITIAL_CAPACITY);
+
+  al_push(&array, 91);
+  assert(al_length(array) == INITIAL_CAPACITY + 1);
+  assert(al_capacity(array) == GROWTH_FACTOR * INITIAL_CAPACITY);
+
+  size_t j;
+  for (j = 0; j < INITIAL_CAPACITY; j++) {
+    assert(array[j] == 90);
+  }
+  assert(array[j] == 91);
+
+// #define AL_TEST_LOG()
+#ifdef AL_TEST_LOG
+  puts("");
+  for (size_t i = 0; i < al_length(array); i++) {
+    printf("array[%zu]: %d\n", i, array[i]);
+  }
+#endif
+
+  assert(al_free(array));
+  PASS();
+}
+
+static void test_grow_manual() {
+  TEST("test_grow_manual");
+
+  T *array = al_init();
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == INITIAL_CAPACITY);
+
+  assert(al_grow(&array));
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == GROWTH_FACTOR * INITIAL_CAPACITY);
+
+  assert(al_grow(&array));
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == 2 * GROWTH_FACTOR * INITIAL_CAPACITY);
+
+  assert(al_grow(&array));
+  assert(al_length(array) == 0);
+  assert(al_capacity(array) == 4 * GROWTH_FACTOR * INITIAL_CAPACITY);
+
+  assert(al_grow(NULL) == AL_FAIL);
 
   assert(al_free(array));
   PASS();
@@ -902,6 +959,8 @@ int main() {
   test_remove_all();
   test_remove_all_same();
   test_remove_all_alternating();
+  test_grow_generic();
+  test_grow_manual();
 
   puts("\n=== All Tests Completed ===");
 

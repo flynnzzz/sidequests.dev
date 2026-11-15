@@ -66,6 +66,11 @@ size_t al_length(const T array[]);
 size_t al_capacity(const T array[]);
 
 /*
+ * Increases the capacity of an arraylist by `GROWTH_FACTOR`.
+ */
+int al_grow(T *arrayptr[]);
+
+/*
  * Appends the specified `item` to the tail of the arraylist.
  */
 int al_push(T *arrayptr[], const T item);
@@ -123,9 +128,6 @@ T *al_copy(T array[]);
 
 // TODO: implement
 int al_resize(T array[], size_t capacity);
-
-// TODO: implement
-int al_grow(T *arrayptr[]);
 
 // TODO: implement
 int al_swap(T array[], size_t index1, size_t index2);
