@@ -15,6 +15,7 @@
 #define alH_head(array) ((alH_head *)(array) - 1)
 #define alH_skiphead(head) ((T *)((alH_head *)(head) + 1))
 #define IS_POINTER(p) (__builtin_classify_type(p) == 5)
+#define AL_MAXBUF 256
 
 static inline void alH_log(const char *message) { fputs(message, stderr); }
 
@@ -241,20 +242,22 @@ inline T al_rmat(T array[], size_t index) {
   return AL_SUCCESS;
 }
 
-int al_print(const T array[]) {
+int al_print(const T array[], int (*to_string)(T, char *)) {
   if (alH_isnullptr(array, "al_print: NULL pointer\n"))
     return AL_FAIL;
 
   alH_head *head = alH_head(array);
+  char buffer[AL_MAXBUF] = "\0";
   printf("{ ");
-  size_t last_i = head->length - 1;
   for (size_t i = 0; i < head->length; i++) {
-    if (i != last_i)
-      printf("%d, ", array[i]);
-    else
-      printf("%d", array[i]);
+    if (to_string(array[i], buffer))
+      printf("%s ", buffer);
+    else {
+      alH_log("al_print: string conversion failed");
+      return AL_FAIL;
+    }
   }
-  puts(" }");
+  puts("}");
 
   return AL_SUCCESS;
 }

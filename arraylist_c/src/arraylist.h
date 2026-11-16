@@ -123,7 +123,7 @@ T al_rmat(T array[], size_t index);
 /*
  * Prints the contents of an arraylist, followed by a newline separator.
  */
-int al_print(const T array[]);
+int al_print(const T array[], int (*to_string)(T, char *));
 
 /*
  * Clears every item in the arraylist.

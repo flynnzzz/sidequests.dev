@@ -8,6 +8,8 @@
 
 #include "arraylist.h"
 
+int T_to_string(T t, char *buf) { return snprintf(buf, 32, "%d", t); }
+
 int main() {
 
   T *array = al_init();
@@ -22,7 +24,7 @@ int main() {
   al_push(&array, 102);
 
   puts("\nal_print():");
-  al_print(array);
+  al_print(array, T_to_string);
 
   puts("\naccessing items:");
   printf(" array[0]: %d\n", array[0]);
@@ -38,7 +40,7 @@ int main() {
   printf(" array[1]: %d\n", array[1]);
   printf(" array[2]: %d\n", array[2]);
   puts("al_print():");
-  al_print(array);
+  al_print(array, T_to_string);
 
   al_free(array);
   return 0;
