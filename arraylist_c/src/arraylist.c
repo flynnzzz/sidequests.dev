@@ -14,6 +14,7 @@
 
 #define alH_head(array) ((alH_head *)(array) - 1)
 #define alH_skiphead(head) ((T *)((alH_head *)(head) + 1))
+#define IS_POINTER(p) (__builtin_classify_type(p) == 5)
 
 static inline void alH_log(const char *message) { fputs(message, stderr); }
 
@@ -255,5 +256,14 @@ int al_print(const T array[]) {
   }
   puts(" }");
 
+  return AL_SUCCESS;
+}
+
+inline int al_clear(T array[]) {
+  // TODO: test
+  if (alH_isnullptr(array, "al_clear: NULL pointer\n"))
+    return AL_FAIL;
+  alH_set(array, 0, 0, al_capacity(array));
+  alH_head(array)->length = 0;
   return AL_SUCCESS;
 }

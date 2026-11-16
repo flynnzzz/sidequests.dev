@@ -125,17 +125,16 @@ T al_rmat(T array[], size_t index);
  */
 int al_print(const T array[]);
 
-// TODO: implement
+/*
+ * Clears every item in the arraylist.
+ */
 int al_clear(T array[]);
-
-// TODO: implement
-int al_fclear(T array[]);
 
 // TODO: implement
 T *al_copy(T array[]);
 
 // TODO: implement
-int al_swap(T array[], size_t index1, size_t index2);
+int al_swap(T array[], size_t a, size_t b);
 
 // TODO: implement
 int al_sort(T array[], int (*comparator)(T, T));
