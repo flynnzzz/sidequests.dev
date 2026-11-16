@@ -122,6 +122,9 @@ T al_rmat(T array[], size_t index);
 
 /*
  * Prints the contents of an arraylist, followed by a newline separator.
+ *
+ * Callback `int to_string(T item, char* buf)`, returning int, should write the
+ * string representation of an item on the buffer `buf`.
  */
 int al_print(const T array[], int (*to_string)(T, char *));
 
