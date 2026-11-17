@@ -12,9 +12,9 @@
 #include <stdlib.h>
 
 #define TEST(name)                                                             \
-  printf("Running %s... ", #name);                                             \
+  printf("Running %s...\n", #name);                                            \
   fflush(stdout);
-#define PASS() printf("PASSED\n")
+#define PASS() printf(" > PASSED\n")
 
 static void test_empty_array() {
   TEST("test_empty_array");
@@ -571,7 +571,6 @@ static void test_all_functions_used() {
 
 static void test_new_exceed_maximum_capacity() {
   TEST("test_new_exceed_maximum_capacity");
-  puts("");
 
   T *array = al_create(AL_MAXCAP);
   assert(array == NULL);
@@ -581,7 +580,6 @@ static void test_new_exceed_maximum_capacity() {
 
 static void test_create_large_number() {
   TEST("test_create_large_number");
-  puts("");
 
   T *array = al_create(AL_MAXCAP - 1);
   assert(!array);
@@ -593,7 +591,6 @@ static void test_create_large_number() {
 static void test_nullptr_guard() {
   TEST("test_nullptr_guard");
 
-  puts("");
   assert(al_length(NULL) == AL_ERRSIZE);
   assert(al_capacity(NULL) == AL_ERRSIZE);
 
@@ -720,7 +717,6 @@ static void test_insert_middle() {
 
 static void test_insert_fail() {
   TEST("test_insert_fail");
-  puts("");
 
   T *array = al_init();
 
@@ -961,7 +957,6 @@ static void test_resize_edge_cases() {
   T *arr = al_init();
   assert(al_length(arr) == 0);
   assert(al_capacity(arr) == AL_INIT_CAPACITY);
-  puts("");
 
   assert(al_resize(&arr, -1) == AL_FAIL);
   assert(al_length(arr) == 0);

@@ -25,10 +25,12 @@
 #define AL_MAXCAP ((AL_MAXSIZE - sizeof(alH_head)) / sizeof(T))
 #define AL_GROWTH_FACTOR 2
 
-enum alH_errstatus { AL_FAIL, AL_SUCCESS, AL_ERRTYPE, AL_ERRSIZE };
-
 // NOTE: temporary
 typedef int T;
+
+enum alH_errstatus { AL_FAIL, AL_SUCCESS };
+#define AL_ERRSIZE (~(size_t)0)
+#define AL_ERRTYPE (~(T)0)
 
 typedef struct alH_head_t {
   size_t length, capacity;
