@@ -4,6 +4,8 @@
  * NOTE: Temporary: implementation for arraylist.h
  */
 
+// TODO: be kinder to the user and don't always abort the program
+
 #define AL_ENABLE_TESTS
 #include "arraylist.h"
 #include <assert.h>
