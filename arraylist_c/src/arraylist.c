@@ -202,6 +202,7 @@ int al_insert(T *arrptr[], size_t index, const T item) {
   return AL_SUCCESS;
 }
 
+// TODO: refactor to accept a comparator function
 T al_rm(T array[], const T item) {
   if (alH_isnullptr(array, "al_rm: NULL pointer")) {
 #ifndef AL_ENABLE_TESTS

@@ -19,6 +19,7 @@
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include <stddef.h>
+#include <stdint.h>
 
 #define AL_INIT_CAPACITY 32
 #define AL_MAXSIZE ((~(size_t)0) >> 1)
@@ -134,6 +135,9 @@ int al_print(const T array[], int (*to_string)(T, char *));
  * Clears every item in the arraylist.
  */
 int al_clear(T array[]);
+
+// TODO: implement
+uint8_t al_contains(T array[], T item);
 
 // TODO: implement
 T *al_copy(T array[]);
