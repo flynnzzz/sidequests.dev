@@ -205,9 +205,6 @@ int al_insert(T *arrptr[], size_t index, const T item) {
 // TODO: refactor to accept a comparator function
 T al_rm(T array[], const T item) {
   if (alH_isnullptr(array, "al_rm: NULL pointer")) {
-#ifndef AL_ENABLE_TESTS
-    exit(EXIT_FAILURE);
-#endif
     return AL_ERRTYPE;
   }
   for (size_t i = 0; i < al_length(array); i++) {
@@ -241,7 +238,7 @@ int al_rmall(T array[], const T item) {
     } else
       i++;
   }
-  alH_set(array, 0, al_length(array), al_capacity(array));
+  alH_set(array, 0, al_length(array), al_length(array) + removed);
   return removed;
 }
 
@@ -285,7 +282,7 @@ inline int al_clear(T array[]) {
   if (alH_isnullptr(array, "al_clear: NULL pointer"))
     return AL_FAIL;
 
-  alH_set(array, 0, 0, al_capacity(array));
+  alH_set(array, 0, 0, al_length(array));
   alH_head(array)->length = 0;
   return AL_SUCCESS;
 }
