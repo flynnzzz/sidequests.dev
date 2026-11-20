@@ -21,6 +21,8 @@
 
 static inline int alH_isnullptr(const void *pointer, const char *message) {
   if (pointer == NULL) {
+    // TODO: fix this function causing logging inconsistency
+    // alH_log(message);
     fprintf(stderr, "%s\n", message);
     return 1;
   }
