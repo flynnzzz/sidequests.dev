@@ -1002,7 +1002,30 @@ static void test_resize_edge_cases() {
   assert(al_free(arr));
   PASS();
 }
+static void test_clear() {
+  TEST("test_clear");
 
+  T *arr = al_init();
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  for (size_t i = 0; i < 100; i++) {
+    assert(al_push(&arr, 100));
+  }
+  assert(al_length(arr) == 100);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY * 2 * 2);
+
+  assert(al_clear(arr));
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY * 2 * 2);
+
+  for (size_t i = 0; i < al_capacity(arr); i++) {
+    assert(arr[i] == 0);
+  }
+
+  assert(al_free(arr));
+  PASS();
+}
 int main() {
   puts("=== Running ArrayList Tests ===\n");
 
@@ -1045,6 +1068,7 @@ int main() {
   test_grow_manual();
   test_resize_basic();
   test_resize_edge_cases();
+  test_clear();
 
   puts("\n=== All Tests Completed ===");
 

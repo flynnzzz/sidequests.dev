@@ -145,10 +145,4 @@ T *al_copy(T array[]);
 // TODO: implement
 int al_swap(T array[], size_t a, size_t b);
 
-// TODO: implement
-int al_sort(T array[], int (*comparator)(T, T));
-
-// TODO: implement
-int al_reverse(T array[]);
-
 #endif // !ARRAYLIST_H

@@ -280,7 +280,6 @@ int al_print(const T array[], int (*to_string)(T, char *)) {
 }
 
 inline int al_clear(T array[]) {
-  // TODO: test
   if (alH_isnullptr(array, "al_clear: NULL pointer"))
     return AL_FAIL;
 
