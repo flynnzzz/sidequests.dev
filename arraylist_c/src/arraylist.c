@@ -19,19 +19,17 @@
 #define alH_log(message)                                                       \
   (fprintf(stderr, "line %d %s: %s\n", __LINE__, __FUNCTION__, message))
 
-static inline int alH_isnullptr(const void *pointer, const char *message) {
-  if (pointer == NULL) {
-    // TODO: fix this function causing logging inconsistency
-    // alH_log(message);
-    fprintf(stderr, "%s\n", message);
-    return 1;
-  }
-  return 0;
-}
+#define alH_nullguard(pointer, message, errcode)                               \
+  do {                                                                         \
+    if (pointer == NULL) {                                                     \
+      alH_log(message);                                                        \
+      return errcode;                                                          \
+    }                                                                          \
+  } while (0)
 
 /*
- * Simply returns error `code` if `AL_ENABLE_TESTS` is defined, else aborts the
- * program.
+ * Simply returns error `code` if `AL_ENABLE_TESTS` is defined, else aborts
+ * the program.
  */
 static inline int alH_fail(int code) {
 #ifndef AL_ENABLE_TESTS
@@ -51,10 +49,10 @@ static inline void alH_set(T array[], T c, size_t start, size_t end) {
  * [start, end[
  */
 static int alH_lshift(T array[], size_t start, size_t end, int step) {
-  if (alH_isnullptr(array, "alH_lshift: NULL pointer"))
-    return AL_FAIL;
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
+
   if (end < start) {
-    fputs("alH_lshift: `end` < `start`", stderr);
+    alH_log("`end` < `start`");
     return AL_FAIL;
   }
 
@@ -69,8 +67,8 @@ static int alH_lshift(T array[], size_t start, size_t end, int step) {
  * [start, end[
  */
 static int alH_rshift(T array[], size_t start, size_t end, int step) {
-  if (alH_isnullptr(array, "alH_rshift: NULL pointer"))
-    return AL_FAIL;
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
+
   if (end < start) {
     alH_log("alH_rshift: `end` < `start`");
     return AL_FAIL;
@@ -108,37 +106,31 @@ T *al_create(size_t capacity) {
 }
 
 inline int al_free(T *array) {
-  if (alH_isnullptr(array, "al_free: NULL pointer"))
-    return AL_FAIL;
-
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
   free(alH_head(array));
   return AL_SUCCESS;
 }
 
 inline size_t al_length(const T array[]) {
-  return (alH_isnullptr(array, "al_length: NULL pointer"))
-             ? AL_ERRSIZE
-             : alH_head(array)->length;
+  alH_nullguard(array, "NULL pointer", AL_ERRSIZE);
+  return alH_head(array)->length;
 }
 
 inline size_t al_capacity(const T array[]) {
-  return (alH_isnullptr(array, "al_capacity: NULL pointer"))
-             ? AL_ERRSIZE
-             : alH_head(array)->capacity;
+  alH_nullguard(array, "NULL pointer", AL_ERRSIZE);
+  return alH_head(array)->capacity;
 }
 
 inline int al_grow(T *arrptr[]) {
-  if (alH_isnullptr(arrptr, "al_grow: NULL pointer") ||
-      alH_isnullptr(*arrptr, "al_grow: pointer to array points to NULL"))
-    return AL_FAIL;
-
+  alH_nullguard(arrptr, "NULL pointer", AL_FAIL);
+  alH_nullguard(*arrptr, "pointer to array points to NULL", AL_FAIL);
   return al_resize(arrptr, alH_head(*arrptr)->capacity * AL_GROWTH_FACTOR);
 }
 
 int al_resize(T *arrptr[], size_t capacity) {
-  if (alH_isnullptr(arrptr, "al_resize: NULL pointer") ||
-      alH_isnullptr(*arrptr, "al_resize: pointer to array points to NULL"))
-    return AL_FAIL;
+  alH_nullguard(arrptr, "NULL pointer", AL_FAIL);
+  alH_nullguard(*arrptr, "pointer to array points to NULL", AL_FAIL);
+
   if (capacity >= AL_MAXCAP) {
     alH_log("`capacity` exceeds maximum capacity");
     return AL_FAIL;
@@ -163,9 +155,8 @@ int al_resize(T *arrptr[], size_t capacity) {
 }
 
 int al_push(T *arrptr[], const T item) {
-  if (alH_isnullptr(arrptr, "al_push: NULL pointer") ||
-      alH_isnullptr(*arrptr, "al_push: pointer to array points to NULL"))
-    return AL_FAIL;
+  alH_nullguard(arrptr, "NULL pointer", AL_FAIL);
+  alH_nullguard(*arrptr, "pointer to array points to NULL", AL_FAIL);
 
   T *array = *arrptr;
 
@@ -188,9 +179,8 @@ int al_push(T *arrptr[], const T item) {
 inline T al_pop(T array[]) { return al_rm(array, al_length(array) - 1, NULL); }
 
 int al_insert(T *arrptr[], size_t index, const T item) {
-  if (alH_isnullptr(arrptr, "al_insert: NULL pointer") ||
-      alH_isnullptr(*arrptr, "al_insert: pointer to array points to NULL"))
-    return AL_FAIL;
+  alH_nullguard(arrptr, "NULL pointer", AL_FAIL);
+  alH_nullguard(*arrptr, "pointer to array points to NULL", AL_FAIL);
 
   if (index > al_length(*arrptr)) {
     alH_log("`index` exceeds arraylist length");
@@ -205,9 +195,8 @@ int al_insert(T *arrptr[], size_t index, const T item) {
 }
 
 T al_rm(T array[], const T item, int (*cmp)(T a, T b)) {
-  if (alH_isnullptr(array, "al_rm: NULL pointer")) {
-    return AL_ERRTYPE;
-  }
+  alH_nullguard(array, "NULL pointer", AL_ERRTYPE);
+
   size_t index = al_contains(array, item, cmp);
   if (index == AL_ERRSIZE) {
     return AL_ERRTYPE;
@@ -220,10 +209,9 @@ T al_rm(T array[], const T item, int (*cmp)(T a, T b)) {
 }
 
 int al_rmall(T array[], const T item, int (*cmp)(T a, T b)) {
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
+
   int removed = 0;
-  if (alH_isnullptr(array, "al_rmall: NULL pointer")) {
-    return AL_FAIL;
-  }
   size_t i = 0;
   while (i < al_length(array)) {
     int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
@@ -250,9 +238,8 @@ int al_rmall(T array[], const T item, int (*cmp)(T a, T b)) {
 }
 
 inline T al_rmat(T array[], size_t index) {
-  if (alH_isnullptr(array, "al_rmat: NULL pointer")) {
-    return AL_ERRTYPE;
-  }
+  alH_nullguard(array, "NULL pointer", AL_ERRTYPE);
+
   if (index >= al_length(array)) {
     alH_log("`index` exceeds array length");
     return AL_ERRTYPE;
@@ -265,8 +252,7 @@ inline T al_rmat(T array[], size_t index) {
 }
 
 int al_print(const T array[], int (*to_string)(T, char *)) {
-  if (alH_isnullptr(array, "al_print: NULL pointer"))
-    return AL_FAIL;
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
 
   alH_head *head = alH_head(array);
   char buffer[AL_MAXBUF] = "\0";
@@ -285,9 +271,7 @@ int al_print(const T array[], int (*to_string)(T, char *)) {
 }
 
 inline int al_clear(T array[]) {
-  if (alH_isnullptr(array, "al_clear: NULL pointer"))
-    return AL_FAIL;
-
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
   alH_set(array, 0, 0, al_length(array));
   alH_head(array)->length = 0;
   return AL_SUCCESS;
@@ -295,8 +279,7 @@ inline int al_clear(T array[]) {
 
 size_t al_contains(T array[], T item, int (*cmp)(T a, T b)) {
   // TODO: test
-  if (alH_isnullptr(array, "al_contains: NULL pointer"))
-    return AL_ERRSIZE;
+  alH_nullguard(array, "NULL pointer", AL_ERRSIZE);
 
   for (size_t i = 0; i < al_length(array); i++) {
     int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
