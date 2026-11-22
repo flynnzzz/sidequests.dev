@@ -288,3 +288,25 @@ size_t al_contains(T array[], T item, int (*cmp)(T a, T b)) {
   }
   return AL_ERRSIZE;
 }
+
+T *al_copy(T array[]) {
+  // TODO: test
+  alH_nullguard(array, "NULL pointer", NULL);
+
+  T *copy = al_create(al_capacity(array));
+  for (size_t i = 0; i < al_length(array); i++)
+    copy[i] = array[i];
+
+  return copy;
+}
+
+int al_swap(T array[], size_t a, size_t b) {
+  // TODO: test
+  alH_nullguard(array, "NULL pointer", AL_FAIL);
+
+  T tmp = array[a];
+  array[a] = array[b];
+  array[b] = tmp;
+
+  return AL_SUCCESS;
+}

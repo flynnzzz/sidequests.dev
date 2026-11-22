@@ -169,10 +169,18 @@ int al_clear(T array[]);
  */
 size_t al_contains(T array[], T item, int (*cmp)(T a, T b));
 
-// TODO: implement
+/*
+ * Returns a shallow copy of `array`
+ *
+ * Returns `NULL` in case of failure.
+ */
 T *al_copy(T array[]);
 
-// TODO: implement
+/*
+ * Swaps two items in the `array`.
+ *
+ * Returns generic error codes `AL_SUCCESS` / `AL_FAIL`.
+ */
 int al_swap(T array[], size_t a, size_t b);
 
 #endif // !ARRAYLIST_H
