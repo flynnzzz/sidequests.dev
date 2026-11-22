@@ -22,3 +22,7 @@ run-main: clean $(BINDIR)/main
 # Clean, compile and run test
 run-test: clean $(BINDIR)/test
 	./$(BINDIR)/test
+
+# run-test with valgrind
+val-test: clean $(BINDIR)/test
+	valgrind ./$(BINDIR)/test
