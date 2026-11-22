@@ -294,6 +294,7 @@ T *al_copy(T array[]) {
   alH_nullguard(array, "NULL pointer", NULL);
 
   T *copy = al_create(al_capacity(array));
+  alH_head(copy)->length = alH_head(array)->length;
   for (size_t i = 0; i < al_length(array); i++)
     copy[i] = array[i];
 

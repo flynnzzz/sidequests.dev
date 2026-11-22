@@ -1065,6 +1065,40 @@ static void test_contains() {
   PASS();
 }
 
+static void test_copy() {
+  TEST("test_copy");
+
+  T *arr = al_init();
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_push(&arr, 100));
+  assert(al_push(&arr, 101));
+  assert(al_push(&arr, 102));
+  assert(al_push(&arr, 103));
+
+  assert(arr[0] == 100);
+  assert(arr[1] == 101);
+  assert(arr[2] == 102);
+  assert(arr[3] == 103);
+
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  T *arr1 = al_copy(arr);
+
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(arr1[0] == 100);
+  assert(arr1[1] == 101);
+  assert(arr1[2] == 102);
+  assert(arr1[3] == 103);
+
+  assert(al_free(arr));
+  PASS();
+}
+
 int main() {
   puts("=== Running ArrayList Tests ===\n");
 
@@ -1109,6 +1143,7 @@ int main() {
   test_resize_edge_cases();
   test_clear();
   test_contains();
+  test_copy();
 
   puts("\n=== All Tests Completed ===");
 
