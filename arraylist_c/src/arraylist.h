@@ -102,6 +102,8 @@ int al_insert(T *arrptr[], size_t index, const T item);
  * Removes and returns the first instance of the specified `item` in the
  * arraylist.
  *
+ * This function accepts a comparator callback, it can be set to `NULL` for
+ * plain value comparison.
  * Returns `AL_ERRTYPE` if no item was found or in case an error was
  * encountered.
  */
@@ -110,6 +112,8 @@ T al_rm(T array[], const T item, int (*cmp)(T a, T b));
 /*
  * Removes all instances of the specified `item` in the arraylist.
  *
+ * This function accepts a comparator callback, it can be set to `NULL` for
+ * plain value comparison.
  * Returns the number of removed items.
  */
 int al_rmall(T array[], const T item, int (*cmp)(T a, T b));
