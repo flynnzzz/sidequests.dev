@@ -1092,7 +1092,8 @@ static void test_copy() {
   assert(al_length(arr) == 4);
   assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
-  T *emptycopy = al_copy(al_init());
+  T *empty = al_init();
+  T *emptycopy = al_copy(empty);
   assert(al_length(emptycopy) == 0);
   assert(al_capacity(emptycopy) == AL_INIT_CAPACITY);
 
@@ -1102,6 +1103,9 @@ static void test_copy() {
   assert(arr1[3] == 103);
 
   assert(al_free(arr));
+  assert(al_free(arr1));
+  assert(al_free(empty));
+  assert(al_free(emptycopy));
   PASS();
 }
 
