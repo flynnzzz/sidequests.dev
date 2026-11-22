@@ -290,7 +290,6 @@ size_t al_contains(T array[], T item, int (*cmp)(T a, T b)) {
 }
 
 T *al_copy(T array[]) {
-  // TODO: test
   alH_nullguard(array, "NULL pointer", NULL);
 
   T *copy = al_create(al_capacity(array));
@@ -302,8 +301,16 @@ T *al_copy(T array[]) {
 }
 
 int al_swap(T array[], size_t a, size_t b) {
-  // TODO: test
   alH_nullguard(array, "NULL pointer", AL_FAIL);
+
+  if (a >= al_length(array)) {
+    alH_log("index `a` out of bounds");
+    return AL_FAIL;
+  }
+  if (b >= al_length(array)) {
+    alH_log("index `b` out of bounds");
+    return AL_FAIL;
+  }
 
   T tmp = array[a];
   array[a] = array[b];

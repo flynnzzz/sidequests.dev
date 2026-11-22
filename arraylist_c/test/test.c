@@ -16,6 +16,8 @@
   fflush(stdout);
 #define PASS() printf(" > PASSED\n")
 
+int T_to_string(T t, char *buf) { return snprintf(buf, 32, "%d", t); }
+
 static void test_empty_array() {
   TEST("test_empty_array");
 
@@ -1090,10 +1092,74 @@ static void test_copy() {
   assert(al_length(arr) == 4);
   assert(al_capacity(arr) == AL_INIT_CAPACITY);
 
+  T *emptycopy = al_copy(al_init());
+  assert(al_length(emptycopy) == 0);
+  assert(al_capacity(emptycopy) == AL_INIT_CAPACITY);
+
   assert(arr1[0] == 100);
   assert(arr1[1] == 101);
   assert(arr1[2] == 102);
   assert(arr1[3] == 103);
+
+  assert(al_free(arr));
+  PASS();
+}
+
+static void test_swap() {
+  TEST("test_swap");
+
+  T *arr = al_init();
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_push(&arr, 100));
+  assert(al_push(&arr, 101));
+  assert(al_push(&arr, 102));
+  assert(al_push(&arr, 103));
+
+  assert(arr[0] == 100);
+  assert(arr[1] == 101);
+  assert(arr[2] == 102);
+  assert(arr[3] == 103);
+
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_swap(arr, 3, 0));
+
+  assert(arr[0] == 103);
+  assert(arr[1] == 101);
+  assert(arr[2] == 102);
+  assert(arr[3] == 100);
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_swap(arr, 0, 3));
+  assert(arr[0] == 100);
+  assert(arr[1] == 101);
+  assert(arr[2] == 102);
+  assert(arr[3] == 103);
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_swap(arr, 1, 2));
+  assert(arr[0] == 100);
+  assert(arr[1] == 102);
+  assert(arr[2] == 101);
+  assert(arr[3] == 103);
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_swap(arr, 2, 0));
+  assert(arr[0] == 101);
+  assert(arr[1] == 102);
+  assert(arr[2] == 100);
+  assert(arr[3] == 103);
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_swap(arr, al_length(arr), 103) == AL_FAIL);
+  assert(al_swap(arr, 0, al_length(arr)) == AL_FAIL);
 
   assert(al_free(arr));
   PASS();
@@ -1144,6 +1210,7 @@ int main() {
   test_clear();
   test_contains();
   test_copy();
+  test_swap();
 
   puts("\n=== All Tests Completed ===");
 

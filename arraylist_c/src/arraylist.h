@@ -170,9 +170,7 @@ int al_clear(T array[]);
 size_t al_contains(T array[], T item, int (*cmp)(T a, T b));
 
 /*
- * Returns a shallow copy of `array`
- *
- * Returns `NULL` in case of failure.
+ * Returns a shallow copy of `array` or `NULL` in case of failure.
  */
 T *al_copy(T array[]);
 
