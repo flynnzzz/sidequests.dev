@@ -160,12 +160,12 @@ int al_print(const T array[], int (*to_string)(T, char *));
 int al_clear(T array[]);
 
 /*
- * Returns the index if `item` was found.
+ * Returns the index of the `item` if found.
  *
  * This function accepts a comparator callback, it can be set to `NULL` for
  * plain value comparison.
  *
- * Returns `AL_ERRSIZE` in case of failure.
+ * Returns `AL_ERRSIZE` in case of failure or item not found.
  */
 size_t al_contains(T array[], T item, int (*cmp)(T a, T b));
 
