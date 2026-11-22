@@ -19,7 +19,6 @@
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include <stddef.h>
-#include <stdint.h>
 
 #define AL_INIT_CAPACITY 32
 #define AL_MAXSIZE ((~(size_t)0) >> 1)
@@ -106,14 +105,14 @@ int al_insert(T *arrptr[], size_t index, const T item);
  * Returns `AL_ERRTYPE` if no item was found or in case an error was
  * encountered.
  */
-T al_rm(T array[], const T item);
+T al_rm(T array[], const T item, int (*cmp)(T a, T b));
 
 /*
  * Removes all instances of the specified `item` in the arraylist.
  *
  * Returns the number of removed items.
  */
-int al_rmall(T array[], const T item);
+int al_rmall(T array[], const T item, int (*cmp)(T a, T b));
 
 /*
  * Removes and returns the item at the specified `index`.
@@ -136,8 +135,14 @@ int al_print(const T array[], int (*to_string)(T, char *));
  */
 int al_clear(T array[]);
 
-// TODO: implement
-uint8_t al_contains(T array[], T item);
+/*
+ * Returns the index if `item` was found.
+ *
+ * This function accepts a comparator callback, it can be set to `NULL` for
+ * plain value comparison.
+ * Returns `AL_ERRSIZE` in case of failure.
+ */
+size_t al_contains(T array[], T item, int (*cmp)(T a, T b));
 
 // TODO: implement
 T *al_copy(T array[]);

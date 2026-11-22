@@ -185,7 +185,7 @@ int al_push(T *arrptr[], const T item) {
   return AL_SUCCESS;
 }
 
-inline T al_pop(T array[]) { return al_rm(array, al_length(array) - 1); }
+inline T al_pop(T array[]) { return al_rm(array, al_length(array) - 1, NULL); }
 
 int al_insert(T *arrptr[], size_t index, const T item) {
   if (alH_isnullptr(arrptr, "al_insert: NULL pointer") ||
@@ -204,39 +204,44 @@ int al_insert(T *arrptr[], size_t index, const T item) {
   return AL_SUCCESS;
 }
 
-// TODO: refactor to accept a comparator function
-T al_rm(T array[], const T item) {
+T al_rm(T array[], const T item, int (*cmp)(T a, T b)) {
   if (alH_isnullptr(array, "al_rm: NULL pointer")) {
     return AL_ERRTYPE;
   }
-  for (size_t i = 0; i < al_length(array); i++) {
-    if (array[i] == item) {
-      alH_lshift(array, i, al_length(array), 1);
-      array[al_length(array) - 1] = 0;
-      alH_head(array)->length--;
-      return AL_SUCCESS;
-    }
+  size_t index = al_contains(array, item, cmp);
+  if (index == AL_ERRSIZE) {
+    return AL_ERRTYPE;
   }
-  return AL_ERRTYPE;
+
+  alH_lshift(array, index, al_length(array), 1);
+  array[al_length(array) - 1] = 0;
+  alH_head(array)->length--;
+  return AL_SUCCESS;
 }
 
-int al_rmall(T array[], const T item) {
+int al_rmall(T array[], const T item, int (*cmp)(T a, T b)) {
   int removed = 0;
   if (alH_isnullptr(array, "al_rmall: NULL pointer")) {
     return AL_FAIL;
   }
   size_t i = 0;
   while (i < al_length(array)) {
-    if (array[i] == item) {
-      size_t found = 1;
+    int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
+    if (found) {
+      size_t n_found = 1;
+      for (size_t j = i; j < al_length(array) - 1; j++) {
+        int found_adjacent =
+            (cmp == NULL) ? array[j + 1] == item : cmp(array[j + 1], item);
+        if (found_adjacent)
+          n_found++;
+        else
+          break;
+      }
 
-      for (size_t j = i; j < al_length(array) - 1 && array[j + 1] == item; j++)
-        found++;
+      alH_lshift(array, i, al_length(array), n_found);
 
-      alH_lshift(array, i, al_length(array), found);
-
-      alH_head(array)->length -= found;
-      removed += found;
+      alH_head(array)->length -= n_found;
+      removed += n_found;
     } else
       i++;
   }
@@ -286,4 +291,18 @@ inline int al_clear(T array[]) {
   alH_set(array, 0, 0, al_length(array));
   alH_head(array)->length = 0;
   return AL_SUCCESS;
+}
+
+size_t al_contains(T array[], T item, int (*cmp)(T a, T b)) {
+  // TODO: test
+  if (alH_isnullptr(array, "al_contains: NULL pointer"))
+    return AL_ERRSIZE;
+
+  for (size_t i = 0; i < al_length(array); i++) {
+    int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
+    if (found) {
+      return i;
+    }
+  }
+  return AL_ERRSIZE;
 }
