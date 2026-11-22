@@ -1002,6 +1002,7 @@ static void test_resize_edge_cases() {
   assert(al_free(arr));
   PASS();
 }
+
 static void test_clear() {
   TEST("test_clear");
 
@@ -1026,6 +1027,44 @@ static void test_clear() {
   assert(al_free(arr));
   PASS();
 }
+
+static int reverse_cmp(T a, T b) { return (a != b) ? 0 : 1; }
+
+static void test_contains() {
+  TEST("test_contains");
+
+  T *arr = al_init();
+  assert(al_length(arr) == 0);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_push(&arr, 100));
+  assert(al_push(&arr, 101));
+  assert(al_push(&arr, 102));
+  assert(al_push(&arr, 103));
+
+  assert(al_length(arr) == 4);
+  assert(al_capacity(arr) == AL_INIT_CAPACITY);
+
+  assert(al_contains(arr, 100, NULL) == 0);
+  assert(al_contains(arr, 101, NULL) == 1);
+  assert(al_contains(arr, 102, NULL) == 2);
+  assert(al_contains(arr, 103, NULL) == 3);
+
+  assert(al_contains(arr, 0, NULL) == AL_ERRSIZE);
+  assert(al_contains(arr, 1, NULL) == AL_ERRSIZE);
+  assert(al_contains(arr, 2, NULL) == AL_ERRSIZE);
+
+  assert(al_contains(arr, 0, reverse_cmp) == 0);
+  assert(al_contains(arr, 1, reverse_cmp) == 0);
+  assert(al_contains(arr, 2, reverse_cmp) == 0);
+
+  // skips `100` and returns on the first different item
+  assert(al_contains(arr, 100, reverse_cmp) == 1);
+
+  assert(al_free(arr));
+  PASS();
+}
+
 int main() {
   puts("=== Running ArrayList Tests ===\n");
 
@@ -1069,6 +1108,7 @@ int main() {
   test_resize_basic();
   test_resize_edge_cases();
   test_clear();
+  test_contains();
 
   puts("\n=== All Tests Completed ===");
 

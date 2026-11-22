@@ -214,12 +214,12 @@ int al_rmall(T array[], const T item, int (*cmp)(T a, T b)) {
   int removed = 0;
   size_t i = 0;
   while (i < al_length(array)) {
-    int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
+    int found = (cmp == NULL) ? array[i] == item : !cmp(array[i], item);
     if (found) {
       size_t n_found = 1;
       for (size_t j = i; j < al_length(array) - 1; j++) {
         int found_adjacent =
-            (cmp == NULL) ? array[j + 1] == item : cmp(array[j + 1], item);
+            (cmp == NULL) ? array[j + 1] == item : !cmp(array[j + 1], item);
         if (found_adjacent)
           n_found++;
         else
@@ -278,11 +278,10 @@ inline int al_clear(T array[]) {
 }
 
 size_t al_contains(T array[], T item, int (*cmp)(T a, T b)) {
-  // TODO: test
   alH_nullguard(array, "NULL pointer", AL_ERRSIZE);
 
   for (size_t i = 0; i < al_length(array); i++) {
-    int found = (cmp == NULL) ? array[i] == item : cmp(array[i], item);
+    int found = (cmp == NULL) ? array[i] == item : !cmp(array[i], item);
     if (found) {
       return i;
     }
